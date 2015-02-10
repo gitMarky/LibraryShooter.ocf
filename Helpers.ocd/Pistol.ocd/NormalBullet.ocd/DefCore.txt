@@ -1,0 +1,16 @@
+[DefCore]
+id=NormalBullet
+Version=5,2,0,1
+Category=C4D_Object
+Width=3
+Height=3
+Offset=-1,-1
+Vertices=3
+VertexX=0,-3,3
+VertexY=0,1,1
+VertexFriction=50
+Value=10
+Mass=5
+Rotate=1
+NoStabilize=1
+Components=Metal=1;Blackpowder=1;

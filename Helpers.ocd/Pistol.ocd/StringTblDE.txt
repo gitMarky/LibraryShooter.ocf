@@ -1,0 +1,3 @@
+Name=Pistole
+Description=Mittlere Schussrate, gute Genauigkeit.|Ammo: 10/50
+UsageHelp=Ziele und schieße mit [Benutzen]. Die Muskete benötigt Bleikugeln als Munition.
