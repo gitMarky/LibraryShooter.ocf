@@ -1,0 +1,2 @@
+Name=Ammo manager
+Description=Is responsible for the distribution of ammunition
