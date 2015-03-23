@@ -60,8 +60,9 @@ public func AddItems(id item, int amount)
 		FatalError("This function needs an item");
 	}
 	
-	var current = GetItemCount(item);
-	return SetItemCount(item, current + amount);
+	var current = GetItems(item);
+	var property = Id2Property(item);
+	return SetItemCount(property, current + amount);
 }
 
 /**
@@ -81,8 +82,9 @@ func RemoveItems(id item, int amount)
 		FatalError("This function needs an item");
 	}
 	
-	var current = GetItemCount(item);
-	return SetItemCount(item, current - amount);
+	var current = GetItems(item);
+	var property = Id2Property(item);
+	return SetItemCount(property, current - amount);
 }
 
 /**
@@ -97,7 +99,7 @@ func RemoveAllItems(id item)
 	}
 	else
 	{
-		RemoveItems(item, GetItemCount(item));
+		RemoveItems(item, GetItems(item));
 	}
 }
 
@@ -106,20 +108,24 @@ func RemoveAllItems(id item)
  @par item Items of this type will be counted.
  @return The amount of items of the given type.
  */
-public func GetItemCount(id item)
+public func GetItems(id item)
 {
-	if (content == nil) content = {};
-	
 	var property = Id2Property(item);
-	return GetProperty(property, content);
+	return GetItemCount(property, content);
 }
 
-private func SetItemCount(id item, int amount)
+private func GetItemCount(string item)
 {
 	if (content == nil) content = {};
 	
-	var property = Id2Property(item);
-	SetProperty(property, amount, content);
+	return GetProperty(item, content);
+}
+
+private func SetItemCount(string item, int amount)
+{
+	if (content == nil) content = {};
+	
+	SetProperty(item, amount, content);
 	return amount;
 }
 
@@ -138,6 +144,10 @@ func TransferItems(object bag, id item, int amount, bool is_strict)
 	{
 		FatalError("A destination bag is required.");
 	}
+	if (bag->~IsBag() == false)
+	{
+		FatalError("The destination object must return true in IsBag()");
+	}
 	if (item == nil)
 	{
 		FatalError("This function needs an item");
@@ -148,7 +158,7 @@ func TransferItems(object bag, id item, int amount, bool is_strict)
 	}
 
 	
-	var top = GetItemCount(item);
+	var top = GetItems(item);
 	// no sense in transfer if it is 0
 	if (top == 0) return false;
 	
@@ -176,24 +186,29 @@ func TransferItems(object bag, id item, int amount, bool is_strict)
 	return true;
 }
 
-// Transfer all items into another bag
+/**
+ Transfer all items into another bag.
+ @par bag The destination object.
+ */
 func TransferAllItems(object bag)
 {
 	if (bag == nil)
 	{
 		FatalError("A destination bag is required.");
 	}
+	if (bag->~IsBag() == false)
+	{
+		FatalError("The destination object must return true in IsBag()");
+	}
 	
 	for (var property in GetProperties(content))
 	{
-		var mine = GetProperty(property, content);
+		var mine = GetItemCount(property);
+		var theirs = bag->GetItemCount(property);
 		
-		var theirs = GetProperty(property, bag.content);
-		
-		
+		bag->SetItemCount(property, theirs + mine);
+		SetItemCount(property, 0);
 	}
-	
-	return true;
 }
 
 private func Id2Property(id item)
