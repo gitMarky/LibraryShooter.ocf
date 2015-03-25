@@ -24,9 +24,9 @@ local is_selected; // bool: is the weapon currently selected?
 //
 // non-functional and temporary stuff
 
-public func GetCarryMode(clonk) { if(is_selected) return CARRY_Hand; }
-public func GetCarrySpecial(clonk) { if(is_selected) return "pos_hand2"; }
-public func GetCarryBone()	{	return	"main";	}
+public func GetCarryMode(clonk) {    if (is_selected) return CARRY_Hand; }
+public func GetCarrySpecial(clonk) { if (is_selected) return "pos_hand2"; }
+public func GetCarryBone() { return "main"; }
 public func GetCarryTransform()
 {
 	return Trans_Rotate(-90, 0, 1, 0);

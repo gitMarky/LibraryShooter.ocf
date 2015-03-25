@@ -11,9 +11,13 @@
  @version 0.1.0
  */
 
+static const IDBAG_Capacity_Infinite = nil;
+ 
+
 local Name = "DefinitionBag";
 
 local content;
+local capacity;
 
 /**
  Is a bag.
@@ -69,9 +73,9 @@ public func AddItems(id item, int amount)
  Deletes a certain amount of items from the bag.
  @par item This type of object will be deleted.
  @par amount This many units will be deleted.
- @return The amount of items of that type that are in the bag.
+ @return int The amount of items of that type that are in the bag.
  */
-func RemoveItems(id item, int amount)
+public func RemoveItems(id item, int amount)
 {
 	if (amount < 0)
 	{
@@ -85,6 +89,23 @@ func RemoveItems(id item, int amount)
 	var current = GetItems(item);
 	var property = Id2Property(item);
 	return SetItemCount(property, current - amount);
+}
+
+/**
+ Sets the amount of items in the bag.
+ @par item This type of object will be changed.
+ @par amount This many units will be in the bag after the change.
+ @return int The amount of items of that type that are in the bag.
+ */
+public func SetItems(id item, int amount)
+{
+	if (item == nil)
+	{
+		FatalError("This function needs an item");
+	}
+	
+	var property = Id2Property(item);
+	return SetItemCount(property, amount);
 }
 
 /**
@@ -106,7 +127,7 @@ func RemoveAllItems(id item)
 /**
  The amount of stored items.
  @par item Items of this type will be counted.
- @return The amount of items of the given type.
+ @return int The amount of items of the given type.
  */
 public func GetItems(id item)
 {
@@ -125,7 +146,54 @@ private func SetItemCount(string item, int amount)
 {
 	if (content == nil) content = {};
 	
+	var max_items = GetItemCapacity(item);
+	amount = BoundBy(amount, 0, max_items);
+	
 	SetProperty(item, amount, content);
+	return amount;
+}
+
+/**
+ The maximum amount of stored items.
+ @par item Capacity for items of this type will considered.
+ @return int the number of items of this type that can be contained in the bag.
+ */
+public func GetCapacity(id item)
+{
+	return GetItemCapacity(Id2Property(item));
+}
+
+/**
+ Defihes the maximum amount of stored items.
+ @par item Capacity for items of this type will considered.
+ @par amount This values is the new maximum of stored items. The default value is {@c IDBAG_Capacity_Infinite}.
+ */
+public func SetCapacity(id item, int amount)
+{
+	return SetItemCapacity(Id2Property(item), amount);
+}
+
+private func GetItemCapacity(string item, int amount)
+{
+	if (capacity == nil) capacity = {};
+	
+	var max = GetProperty(item, capacity);
+	
+	if (max == IDBAG_Capacity_Infinite)
+	{
+		return 2147483647;
+	}
+	else
+	{
+		return max;
+	}
+}
+
+private func SetItemCapacity(string item, int amount)
+{
+	if (capacity == nil) capacity = {};
+	
+	SetProperty(item, amount, capacity);
 	return amount;
 }
 
@@ -189,8 +257,10 @@ func TransferItems(object bag, id item, int amount, bool is_strict)
 /**
  Transfer all items into another bag.
  @par bag The destination object.
+ @par is_strict if this is set to true, then the items that could not be transferred
+      stay in this bag.
  */
-func TransferAllItems(object bag)
+func TransferAllItems(object bag, bool is_strict)
 {
 	if (bag == nil)
 	{
@@ -206,8 +276,12 @@ func TransferAllItems(object bag)
 		var mine = GetItemCount(property);
 		var theirs = bag->GetItemCount(property);
 		
-		bag->SetItemCount(property, theirs + mine);
-		SetItemCount(property, 0);
+		var theirs_then = bag->SetItemCount(property, theirs + mine);
+		var mine_then = mine + theirs - theirs_then;
+		
+		if (!is_strict) mine_then = 0;
+		
+		SetItemCount(property, mine_then);
 	}
 }
 
