@@ -9,7 +9,8 @@ local Description = "$Description$";
 local Collectible = 1;
 
 
-local is_selected; // bool: is the weapon currently selected?
+local is_selected = true; // bool: is the weapon currently selected?
+local holding = true; // TODO: experimental
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -25,8 +26,8 @@ local is_selected; // bool: is the weapon currently selected?
 //
 // non-functional and temporary stuff
 
-public func GetCarryMode(clonk) {    if (is_selected) return CARRY_Hand; }
-public func GetCarrySpecial(clonk) { if (is_selected) return "pos_hand2"; }
+public func GetCarryMode(object user) {    if (is_selected) return CARRY_Hand; }
+public func GetCarrySpecial(object user) { if (is_selected) return "pos_hand2"; }
 public func GetCarryBone() { return "main"; }
 public func GetCarryTransform()
 {
@@ -48,10 +49,26 @@ local animation_set = {
 public func GetAnimationSet() { return animation_set; }
 
 
+/**
+ This is executed each time the user presses the fire button.@br@br
 
-func ControlUseStart(object clonk, int x, int y)
+ The function does the following:@br
+ - tell the user to start aiming@br
+ - call {@link Library_Weapon#ControlUseHolding}@br
+ - call {@link Library_Weapon#Fire}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+protected func ControlUseStart(object user, int x, int y)
 {
-//	if(!Ready(clonk, x, y)) return true; // checks loading etc
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+
+//	if(!Ready(user, x, y)) return true; // checks loading etc
 
 //	if(!ReadyToFire())
 //	{
@@ -64,52 +81,99 @@ func ControlUseStart(object clonk, int x, int y)
 
 //	fAiming = 1;
 //	holding = true;
-	clonk->StartAim(this);
+	user->StartAim(this);
 
-	ControlUseHolding(clonk, x, y);
+	ControlUseHolding(user, x, y);
 	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
-		Fire(clonk, clonk->GetAimPosition());
+		Fire(user, user->GetAimPosition());
 	return true;
 }
 
-func ControlUseHolding(object clonk, ix, iy)
+/**
+ This is executed while the user is holding the fire button.@br@br
+
+ The function does the following:@br
+ - update the aiming angle according to the parameters
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+protected func ControlUseHolding(object user, int x, int y)
 {
-	var angle = GetAngle(ix, iy);
-	clonk->SetAimPosition(angle);
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+
+	var angle = GetAngle(x, y);
+	user->SetAimPosition(angle);
 	
 //	if(weapon_properties.delay_shot)
 //		ResetAim(angle);
 //	if (weapon_properties.full_auto)
 //	{
-//		if(!TryFire(clonk, angle))
+//		if(!TryFire(user, angle))
 //		{
-//			ControlUseStop(clonk, ix, iy);
+//			ControlUseStop(user, x, y);
 //			return false;
 //		}
 //	}
 	return true;
 }
 
-protected func ControlUseStop(object clonk, ix, iy)
+/**
+ This is executed when the user stops holding the fire button.@br@br
+
+ The function does the following:@br
+ - tell the user to stop aiming.
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+protected protected func ControlUseStop(object user, int x, int y)
 {
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+
 //	holding = false;
-	clonk->CancelAiming();
+	user->CancelAiming();
 	return -1;
 }
 
-
-func GetAngle(x, y)
+/**
+ Converts coordinates to an aiming angle for the weapon.
+ @par x The x coordinate, local.
+ @par y The y coordinate, local.
+ @return int The angle in degrees, normalized to the range of [-180°, 180°].
+ @version 0.1.0
+ */
+private func GetAngle(int x, int y)
 {
-	var angle = Angle(0,0,x,y); // - weapon_properties.gfx_off_y);
-		angle = Normalize(angle,-180);
+	var angle = Angle(0, 0, x, y); // - weapon_properties.gfx_off_y);
+		angle = Normalize(angle, -180);
+		
 	return angle;
 }
 
-
-func Fire(clonk, angle)
+/**
+ Fires the weapon.@br
+ 
+ The function does the following:@br
+ - write a message saying 'pew pew'
+ @par user The object that is using the weapon.
+ @par angle The angle the weapon is aimed at.
+ @version 0.1.0
+ */
+private func Fire(object user, int angle)
 {
-	if(!clonk) return;
-	if(!Contained()) return;
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
 	
-	clonk->Message("Pew pew %d", angle);
+	user->Message("Pew pew %d", angle);
 }
