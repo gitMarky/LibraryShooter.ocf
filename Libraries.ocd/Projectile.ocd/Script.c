@@ -1,11 +1,20 @@
 /*-- Bullet --*/
 
+/**
+ Identifies the object as a projectile.
+ @version 0.1.0
+ */
+public func IsProjectile(){ return true;}
+
 local damage;
-local from_ID;
+local damage_type;
+local weapon_ID;
 local user;
-local deviation;
-local bulletRange;
+
+local range;
 local speed;
+
+local speed_x, speed_y;
 
 local lastX, lastY, nextX, nextY;
 local trail;
@@ -64,155 +73,156 @@ func Remove()
 	if(self) RemoveObject();
 }
 
-public func Launch(object shooter, id weapon, int angle, int dev, int speed, int range, int dmg, int damage_type)
+public func Launch(object p_user, id weapon, int angle, int deviation, int p_speed, int p_range, int p_damage, int p_damage_type, bool p_instant)
 {
-	from_ID = weapon;
-	user = shooter;
-	damage = dmg;
-	deviation = dev;
-	bulletRange = range;
+	weapon_ID = weapon;
+	user = p_user;
 	
-	instant = true;
-		
-	SetController(shooter->GetController());
+	damage = p_damage;
+	damage_type = p_damage_type;
 
-	angle *= 100;
+	range = p_range;
+	speed = p_speed;
+
+	instant = p_instant;
+
+	SetController(user->GetController());
+	
+	var precision = 100;
+
+	angle *= precision;
 	angle += RandomX(-deviation, deviation);
 	
-	// set position to final point
-	var x_p = GetX();
-	var y_p = GetY();
-	
-	var t_x = GetX() + Sin(angle, bulletRange, 100);
-	var t_y = GetY() - Cos(angle, bulletRange, 100);
-	
-	var coords = PathFree2(x_p, y_p, t_x, t_y);
-	
-	if(!coords) // path is free
-		SetPosition(t_x, t_y);
-	else SetPosition(coords[0], coords[1]);
-		
-	// we are at the end position now, check targets
-	var hit_object = false;
-	for (var obj in FindObjects(
-								Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
-								Find_NoContainer(),
-								//Find_Layer(GetObjectLayer()),
-								//Find_PathFree(target),
-								Find_Exclude(shooter),
-								Sort_Distance(x_p - GetX(), y_p - GetY())
-							))
-	{
-		if (obj->~IsProjectileTarget(this, shooter) || obj->GetOCF() & OCF_Alive)
-		{
-			var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
-			SetPosition(x_p + Sin(angle, objdist, 100), y_p - Cos(angle, objdist, 100));
-			var self = this;
-			HitObject(obj, true);
-			hit_object = true;
-			break;
-		}
-	}
-	
-	// at end position now
-	for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
-	{
-		obj->~OnProjectileInteraction(x_p, y_p, angle, shooter, damage);
-	}
-	
-	if(!shooter.silencer)
-	{
-		var t = CreateObject(Bullet_TrailEffect, 0, 0, NO_OWNER);
-		t->Point({x = x_p, y = y_p}, {x = GetX(), y = GetY()});
-		t->FadeOut();
-		t->SetObjectBlitMode(GFX_BLIT_Additive);
-	}
-	
 	var self = this;
-	if(!hit_object)
+			
+	if (!instant)
 	{
-		var hit = GBackSolid(Sin(angle, 2, 100), -Cos(angle, 2, 100));
+		speed_x = +Sin(angle, speed, precision);
+		speed_y = -Cos(angle, speed, precision);
 		
-		if(hit)
-			Hit();
+		DoHitCheckCall();
 	}
-	if(self) RemoveObject();
+	else
+	{
+		// set position to final point
+		var x_p = GetX();
+		var y_p = GetY();
+		
+		var t_x = GetX() + Sin(angle, range, 100);
+		var t_y = GetY() - Cos(angle, range, 100);
+		
+		var coords = PathFree2(x_p, y_p, t_x, t_y);
+		
+		if(!coords) // path is free
+		{
+			SetPosition(t_x, t_y);
+		}
+		else
+		{
+			SetPosition(coords[0], coords[1]);
+		}
+			
+		// we are at the end position now, check targets
+		var hit_object = false;
+		for (var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
+									Find_NoContainer(),
+									//Find_Layer(GetObjectLayer()),
+									//Find_PathFree(target),
+									Find_Exclude(user),
+									Sort_Distance(x_p - GetX(), y_p - GetY()) ))
+		{
+			if (obj->~IsProjectileTarget(this, user) || obj->GetOCF() & OCF_Alive)
+			{
+				var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
+				SetPosition(x_p + Sin(angle, objdist, 100), y_p - Cos(angle, objdist, 100));
+				var self = this;
+				HitObject(obj, true);
+				hit_object = true;
+				break;
+			}
+		}
+		
+		// at end position now
+		for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
+		{
+			obj->~OnProjectileInteraction(x_p, y_p, angle, user, damage);
+		}
+		
+		
+		/*if(!user.silencer)
+		{
+			var t = CreateObject(Bullet_TrailEffect, 0, 0, NO_OWNER);
+			t->Point({x = x_p, y = y_p}, {x = GetX(), y = GetY()});
+			t->FadeOut();
+			t->SetObjectBlitMode(GFX_BLIT_Additive);
+		}*/
+		
+		if(!hit_object)
+		{
+			var hit = GBackSolid(Sin(angle, 2, 100), -Cos(angle, 2, 100));
+			
+			if(hit)
+			{
+				Hit();
+			}
+		}
+		if(self) RemoveObject();
+	}
+	
+	if (self)
+	{
+		OnLaunched();
+	}
 }
 
-public func Fire(object shooter, int angle, int dev, int dist, int dmg, id weapon, range)
+public func OnLaunched()
 {
-	from_ID = weapon;
-	user = shooter;
-	damage = dmg;
-	deviation = dev;
-	bulletRange = range;
-	
-	instant = true;
-		
-	SetController(shooter->GetController());
-
-	angle *= 100;
-	angle += RandomX(-deviation, deviation);
-	
-	// set position to final point
-	var x_p = GetX();
-	var y_p = GetY();
-	
-	var t_x = GetX() + Sin(angle, bulletRange, 100);
-	var t_y = GetY() - Cos(angle, bulletRange, 100);
-	
-	var coords = PathFree2(x_p, y_p, t_x, t_y);
-	
-	if(!coords) // path is free
-		SetPosition(t_x, t_y);
-	else SetPosition(coords[0], coords[1]);
-		
-	// we are at the end position now, check targets
-	var hit_object = false;
-	for (var obj in FindObjects(
-								Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
-								Find_NoContainer(),
-								//Find_Layer(GetObjectLayer()),
-								//Find_PathFree(target),
-								Find_Exclude(shooter),
-								Sort_Distance(x_p - GetX(), y_p - GetY())
-							))
-	{
-		if (obj->~IsProjectileTarget(this, shooter) || obj->GetOCF() & OCF_Alive)
-		{
-			var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
-			SetPosition(x_p + Sin(angle, objdist, 100), y_p - Cos(angle, objdist, 100));
-			var self = this;
-			HitObject(obj, true);
-			hit_object = true;
-			break;
-		}
-	}
-	
-	// at end position now
-	for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
-	{
-		obj->~OnProjectileInteraction(x_p, y_p, angle, shooter, damage);
-	}
-	
-	if(!shooter.silencer)
-	{
-		var t = CreateObject(Bullet_TrailEffect, 0, 0, NO_OWNER);
-		t->Point({x = x_p, y = y_p}, {x = GetX(), y = GetY()});
-		t->FadeOut();
-		t->SetObjectBlitMode(GFX_BLIT_Additive);
-	}
-	
-	var self = this;
-	if(!hit_object)
-	{
-		var hit = GBackSolid(Sin(angle, 2, 100), -Cos(angle, 2, 100));
-		
-		if(hit)
-			Hit();
-	}
-	if(self) RemoveObject();
 }
+
+/*
+public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int iDmg, int iDmgType, int iGlowSize, int iAPrec, int iReflections)
+{
+	if(MOD_FastBullets())
+		//return LaunchInstant(iAngle, iSpeed, iDist, iSize, iTrail, iDmg, iDmgType, iGlowSize, iAPrec, iReflections);
+		iSpeed*=2;
+
+	// Standardwerte setzen
+	if(!iSize)		iSize = 8;
+	//if(!iGlowSize)
+	//	iGlowSize = iSize;
+	if(!iTrail)	 iTrail = 300;
+	if(!iDmg)		 iDamage = 3;
+	else iDamage = iDmg;
+	if(!iDmgType) DMG_Type = DMG_Projectile;
+	else DMG_Type = iDmgType;
+
+	// Trail erzeugen
+	CreateTrail(iSize, iTrail);
+
+	bGlow = false;
+	// Tolles Leuchten erzeugen
+	if(iGlowSize)
+	{
+		bGlow = true;
+		SetGraphics(0,this(),LIGH,1,GFXOV_MODE_Base, 0, 1);
+		SetObjDrawTransform(100+35*iGlowSize,0,0, 0,100+35*iGlowSize,0, this(),1);
+		SetClrModulation(GlowColor(1),this(),1);
+	}
+
+	AddEffect("HitCheck", this(), 1,1, 0,GetID(),shooter);
+	//AddEffect("HitCheck", this, 1,1, this,0,shooter);
+
+	// Werte für Reflektionen speichern
+	iRefl = iReflections;
+
+		iTrailSize = iSize;
+		iTrailLength = iTrail;
+		iXDir = GetXDir(0, 100);
+		iYDir = GetYDir(0, 100);
+
+
+}
+*/
 
 func CreateTrail()
 {
@@ -230,11 +240,23 @@ func FxPositionCheckTimer(target, effect, time)
 	nextY = lastY + GetYDir()/10;
 }
 
-func Traveling()
+protected func Travelling()
 {
+	DoHitCheckCall();
 }
 
-func TrailColor(int acttime){/*return 0x88fffffff;*/ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
+protected func ControlSpeed()
+{
+	if (GetAction() == "Travel")
+	{
+		SetXDir(speed_x);
+		SetYDir(speed_y);
+	}
+	
+	SetR(Angle(0, 0, GetXDir(), GetYDir()));
+}
+
+func TrailColor(int acttime){ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
 
 public func HitObject(object obj, bool no_remove)
 {
@@ -244,7 +266,7 @@ public func HitObject(object obj, bool no_remove)
 		this.crit = true;
 	}
 	
-	DoDmg(damage, nil, obj, nil, nil, this, from_ID);
+	DoDmg(damage, nil, obj, nil, nil, this, weapon_ID);
 	CreateImpactEffect(Max(5, damage*2/3));
 	
 	if(!no_remove) RemoveObject();
@@ -293,7 +315,20 @@ local ActMap = {
 		Length = 1,
 		Delay = 1,
 		FacetBase = 1,
-		FacetCall="Traveling",
+		FacetCall="Travelling",
+		StartCall="ControlSpeed",
+	},
+	
+	TravelBallistic = {
+		Prototype = Action,
+		Name = "TravelBallistic",
+		Procedure = DFA_NONE,
+		Length = 1,
+		Delay = 1,
+		FacetBase = 1,
+		NextAction = "TravelBallistic",
+		FacetCall = "Travelling",
+		StartCall="ControlSpeed",
 	},
 };
 local Name = "$Name$";
@@ -301,12 +336,55 @@ local Description = "$Description$";
 
 
 
-/////////////////////////////////////////////////////////////////////+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-/* Schuss */
+/*
 
 local iTime, lx, ly, pTrail, iDamage, iPrec, iRefl, iTrailLength, iTrailSize, iXDir, iYDir, DMG_Type;
 local shooter; // Dingens/Clonk das den Schuss abgefeuert hat.
@@ -341,92 +419,6 @@ public func GetWeaponID()
 	return shooter_weapon;
 }
 
-public func Initialize()
-{
-	SetObjectBlitMode(1);
-}
-
-
-public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int iDmg, int iDmgType/*, int iDmgPrec*/, int iGlowSize, int iAPrec, int iReflections)
-{
-	if(MOD_FastBullets())
-		//return LaunchInstant(iAngle, iSpeed, iDist, iSize, iTrail, iDmg, iDmgType, iGlowSize, iAPrec, iReflections);
-		iSpeed*=2;
-
-	// Standardwerte setzen
-	if(!iSize)		iSize = 8;
-	//if(!iGlowSize)
-	//	iGlowSize = iSize;
-	if(!iTrail)	 iTrail = 300;
-	if(!iDmg)		 iDamage = 3;
-	else iDamage = iDmg;
-	if(!iDmgType) DMG_Type = DMG_Projectile;
-	else DMG_Type = iDmgType;
-
-	// und zuweisen
-	iSize = Min(iSize+2,GetDefWidth());
-	iPrec = 0;//iDmgPrec;
-
-	// Positionieren
-	//SetPosition(GetX(),GetY()+GetDefWidth()/2);
-	lx = GetX(); ly = GetY()+GetDefWidth()/2;
-
-	DoCon(100*iSize/GetDefWidth()-100);
-
-	if(DoCorrectPosition()) SetPosition(lx,ly);
-
-	//lx = GetX();
-	//ly = GetY();
-
-	iTime = 10*iDist/iSpeed;
-
-	if(!iTime)
-		return(RemoveObject());
-
-	var self = this();
-	SetAction("Travel");
-	if(!self) return;	 // Kleiner Sicherheitscheck, ob die Kugel nicht sofort verschwindet
-
-	SetXDir(+Sin(iAngle,iSpeed, iAPrec));
-	SetYDir(-Cos(iAngle,iSpeed, iAPrec));
-	SetR(+iAngle);
-
-	// Trail erzeugen
-	CreateTrail(iSize, iTrail);
-
-	bGlow = false;
-	// Tolles Leuchten erzeugen
-	if(iGlowSize)
-	{
-		bGlow = true;
-		SetGraphics(0,this(),LIGH,1,GFXOV_MODE_Base, 0, 1);
-		SetObjDrawTransform(100+35*iGlowSize,0,0, 0,100+35*iGlowSize,0, this(),1);
-		SetClrModulation(GlowColor(1),this(),1);
-	}
-
-	AddEffect("HitCheck", this(), 1,1, 0,GetID(),shooter);
-	//AddEffect("HitCheck", this, 1,1, this,0,shooter);
-
-	// Werte für Reflektionen speichern
-	iRefl = iReflections;
-	//if(iRefl)
-	//{
-		iTrailSize = iSize;
-		iTrailLength = iTrail;
-		iXDir = GetXDir(0, 100);
-		iYDir = GetYDir(0, 100);
-	//}
-
-	// Werte für Reflektionen speichern
-	/*iRefl = iReflections;
-	if(iRefl)
-	{
-		iTrailSize = iSize;
-		iTrailLength = iTrail;
-		iXDir = GetXDir(0, 100);
-		iYDir = GetYDir(0, 100);
-	}*/
-}
 
 public func LaunchSpeed(int iXD, int iYD)
 {
@@ -442,7 +434,7 @@ public func LaunchSpeed(int iXD, int iYD)
 }
 
 
-public func LaunchInstant(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int iDmg, int iDmgType/*, int iDmgPrec*/, int iGlowSize, int iAPrec, int iReflections)
+public func LaunchInstant(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int iDmg, int iDmgType, int iGlowSize, int iAPrec, int iReflections)
 {
 	// Standardwerte setzen
 	if(!iSize)		iSize = 8;
@@ -453,31 +445,6 @@ public func LaunchInstant(int iAngle, int iSpeed, int iDist, int iSize, int iTra
 	else iDamage = iDmg;
 	if(!iDmgType) DMG_Type = DMG_Projectile;
 	else DMG_Type = iDmgType;
-
-	// und zuweisen
-	iSize = Min(iSize+2,GetDefWidth());
-	iPrec = 0;//iDmgPrec;
-
-	// Positionieren
-	SetPosition(GetX(),GetY()+GetDefWidth()/2);
-
-	DoCon(100*iSize/GetDefWidth()-100);
-
-	lx = GetX();
-	ly = GetY();
-
-	iTime = 10*iDist/iSpeed;
-
-	if(!iTime)
-		return(RemoveObject());
-
-	var self = this();
-	SetAction("Travel");
-	if(!self) return;	 // Kleiner Sicherheitscheck, ob die Kugel nicht sofort verschwindet
-
-	SetXDir(+Sin(iAngle,iSpeed, iAPrec));
-	SetYDir(-Cos(iAngle,iSpeed, iAPrec));
-	SetR(+iAngle);
 
 	HitCheck(GetX(),GetY(),GetX()+Sin(iAngle,iDist, iAPrec),GetY()-Cos(iAngle,iDist,iAPrec),shooter);
 
@@ -494,7 +461,7 @@ private func CreateTrail(int iSize, int iTrail) {
 	}
 }
 
-/* Timer */
+// Timer 
 
 private func Traveling()
 {
@@ -514,7 +481,7 @@ private func Traveling()
 	if(GetY()<0) return(Remove());
 }
 
-/* Treffer */
+// Treffer
 
 private func Hit()
 {
@@ -580,7 +547,7 @@ private func Hit()
 								Find_OCF(OCF_Alive)
 							),
 							Find_Func("CheckEnemy",this())
-							/*Find_Not(Find_Func("HitExclude"))*/);
+							);
  
 	for(var pTarget in objs) {
 		BulletStrike(pTarget);
@@ -620,7 +587,7 @@ public func Remove() {
 	RemoveObject();
 }
 
-/* Effekt für Trefferüberprüfung */
+// Effekt für Trefferüberprüfung
 
 // EffectVars:
 // 0 - alte X-Position
@@ -644,71 +611,7 @@ public func FxHitCheckStart(object target, int effect, int temp, object byObj, b
 	EffectVar(4, target, effect) = false;
 	EffectVar(5, target, effect) = neverShooter;
 }
-/*
-public func FxHitCheckTimer(object target, int effect, int time)
-{
-	var obj;
-	// Oh man. :O
-	var oldx = EffectVar(0, target, effect);
-	var oldy = EffectVar(1, target, effect);
-	var newx = GetX(target);
-	var newy = GetY(target);
-	var dist = Distance(oldx, oldy, newx, newy);
-	EffectVar(0, target, effect) = GetX(target);
-	EffectVar(1, target, effect) = GetY(target);
 
-	// Schuss schon Scharf?
-	var exclude = EffectVar(2, target, effect);
-	// Ja, wir treffen nur uns selbst nicht (ja, Workaround .)
-	if(EffectVar(4, target, effect)) exclude = target;
-
-	//DrawParticleLine("NoGravSpark",newx-oldx, newy-oldy,0,0,1,25,RGB(255,0,0),RGB(0,0,255));
-	// Wir suchen nach Objekten entlang der Linie die wir uns seit dem letzten Check
-	// bewegt haben. Und sortieren sie nach Distanz (nähere zuerst)
-	for(obj in FindObjects(Find_OnLine(oldx,oldy,newx,newy),
-												 Find_NoContainer(),
-												 Sort_Distance(oldx, oldy)))
-	{
-		// Excludes
-		if(obj == target) continue;
-		if(obj == exclude) continue;
-		
-		// CheckEnemy
-		if(!CheckEnemy(obj,target)) continue;
-
-		// IsBulletTarget oder Alive
-		if(obj->~IsBulletTarget(GetID(target),target,EffectVar(2, target, effect)) || GetOCF(obj) & OCF_Alive) {
-			DebugLog("%s IsBulletTarget: %i, %s, %s","HitCheck",GetName(obj),GetID(target),GetName(target),GetName(EffectVar(2, target, effect)));
-			return(target-> ~HitObject(obj));
-		}
-	}
-
-	EffectVar(0, target, effect) = GetX(target);
-	EffectVar(1, target, effect) = GetY(target);
-
-	//verdammt, kommentier doch mal... Also:
-	// Der Schuss wird erst "scharf gemacht", d.h. kann den Schützen selbst treffen, wenn
-	// der Schuss einmal die Shape des Schützen verlassen hat.
-
-	// OKOK, Ich hab sogar das Restzeug kommentiert. :P
-	if(!EffectVar(5,target,effect)) {
-		if(!EffectVar(4, target, effect)) {
-			// ready gibt an, ob wir schon "scharf" sind. True = Scharf
-			var ready = true;
-			// Wir suchen alle Objekte mit der ID unseres Schützens an unserer momentanen Stelle
-			for(var foo in FindObjects(Find_AtPoint(GetX(target),GetY(target)),Find_ID(EffectVar(3, target, effect))))
-				// und schauen, ob es der Schütze ist.
-				if(foo == EffectVar(2, target, effect))
-					// wir haben den Schützen gefunden -> Er ist noch an unserer Position
-					ready = false;
-			// wir haben den Schützen nicht gefunden
-			if(ready)
-				// -> Wir treffen ihn ab jetzt.
-				EffectVar(4, target, effect) = true;
-		}
-	}
-}
-*/
 
 
 public func FxHitCheckTimer(object target, int effect, int time)
@@ -727,29 +630,7 @@ public func FxHitCheckTimer(object target, int effect, int time)
 	if(EffectVar(4, target, effect)) exclude = target;
 
 	if(target->~HitCheck(oldx,oldy,newx,newy,exclude)) return -1;
-/*
-	//DrawParticleLine("NoGravSpark",newx-oldx, newy-oldy,0,0,1,25,RGB(255,0,0),RGB(0,0,255));
-	//Wir suchen nach Objekten entlang der Linie die wir uns seit dem letzten Check
-	//bewegt haben. Und sortieren sie nach Distanz (nähere zuerst)
-	for(obj in FindObjects(Find_OnLine(oldx,oldy,newx,newy),
-				Find_NoContainer(),
-				Sort_Distance(oldx, oldy)))
-	{
-		//Excludes
-		if(obj == target) continue;
-		if(obj == exclude) continue;
 
-		//CheckEnemy
-		if(!CheckEnemy(obj,target)) continue;
-
-		// IsBulletTarget oder Alive
-		if(obj->~IsBulletTarget(GetID(target),target,EffectVar(2, target, effect),oldx,oldy) || GetOCF(obj) & OCF_Alive)
-		{
-			DebugLog("%s IsBulletTarget: %i, %s, %s","HitCheck",GetName(obj),GetID(target),GetName(target),GetName(EffectVar(2, target, effect)));
-			return(target-> ~HitObject(obj));
-		}
-	}
-*/
 	if(!target) return -1;
 	if(!EffectVar(0, target, effect )) return -1;
 	EffectVar(0, target, effect) = GetX(target);
@@ -934,3 +815,5 @@ TravelBallistic = {
 },
 
 };
+
+*/
