@@ -54,9 +54,6 @@ local fire_modes =
 
 		spread = 1,
 		spread_factor = 100,
-		
-		gfx_distance = 6,
-		gfx_offset_y = -6,
 
 //	static const FM_Accuracy = 		14;		//
 //	static const FM_AimAngle = 		15;		//
@@ -77,6 +74,12 @@ local ammo_containers =
 	
 	box = {
 	},
+};
+
+local weapon_properties = 
+{
+		gfx_distance = 6,
+		gfx_offset_y = -6,
 };
 
 
@@ -147,7 +150,7 @@ protected func ControlUseStart(object user, int x, int y)
 
 	ControlUseHolding(user, x, y);
 	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
-		Fire(user, user->GetAimPosition());
+		Fire(user, x, y); //user->GetAimPosition());
 	return true;
 }
 
@@ -214,7 +217,15 @@ protected func ControlUseStop(object user, int x, int y)
  */
 private func GetAngle(int x, int y)
 {
-	var angle = Angle(0, 0, x, y); // - weapon_properties.gfx_off_y);
+	var angle = Angle(0, weapon_properties.gfx_offset_y, x, y);
+		angle = Normalize(angle, -180);
+		
+	return angle;
+}
+
+private func GetFireAngle(int x, int y, proplist firemode)
+{
+	var angle = Angle(0, firemode.projectile_offset_y, x, y);
 		angle = Normalize(angle, -180);
 		
 	return angle;
@@ -229,7 +240,7 @@ private func GetAngle(int x, int y)
  @par angle The angle the weapon is aimed at.
  @version 0.1.0
  */
-private func Fire(object user, int angle, string firemode)
+private func Fire(object user, int x, int y, string firemode)
 {
 	if (user == nil)
 	{
@@ -248,9 +259,11 @@ private func Fire(object user, int angle, string firemode)
 		FatalError(Format("Fire mode '%s' not supported", firemode));
 	}
 
+	var angle = GetFireAngle(x, y, info);
+
 	FireSound(user, info);
 	FireEffect(user, angle, info);
-	
+
 	FireProjectile(user, angle, info);
 //	AddDeviation();
 	
