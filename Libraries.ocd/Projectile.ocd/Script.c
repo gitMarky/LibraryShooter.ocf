@@ -94,7 +94,7 @@ public func Launch(object shooter, id weapon, int angle, int dev, int speed, int
 		
 	// we are at the end position now, check targets
 	var hit_object = false;
-	for (obj in FindObjects(
+	for (var obj in FindObjects(
 								Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
 								Find_NoContainer(),
 								//Find_Layer(GetObjectLayer()),
@@ -169,7 +169,7 @@ public func Fire(object shooter, int angle, int dev, int dist, int dmg, id weapo
 		
 	// we are at the end position now, check targets
 	var hit_object = false;
-	for (obj in FindObjects(
+	for (var obj in FindObjects(
 								Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
 								Find_NoContainer(),
 								//Find_Layer(GetObjectLayer()),
