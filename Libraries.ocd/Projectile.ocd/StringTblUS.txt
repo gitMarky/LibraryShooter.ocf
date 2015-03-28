@@ -1,0 +1,2 @@
+Name=Bullet
+Description=You usually fire ten thousands per minute.

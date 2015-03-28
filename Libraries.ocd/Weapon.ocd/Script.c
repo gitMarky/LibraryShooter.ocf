@@ -10,11 +10,74 @@ local Collectible = 1;
 
 
 local is_selected = true; // bool: is the weapon currently selected?
-local holding = true; // TODO: experimental
+
+static const WEAPON_FM_Single	= 1;
+static const WEAPON_FM_Burst 	= 2;
+static const WEAPON_FM_Auto 	= 3;
+
+
+static const WEAPON_PR_Bullet = 1;
+static const WEAPON_PR_Ballistic = 2;
+static const WEAPON_PR_Hitscan = 3;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // global functions
+
+
+local fire_modes =
+{
+	default = 
+	{
+		name = 				"default", // string - menu caption
+		icon = 				nil, // id - menu icon
+		condition = 		nil, // string - callback for a condition
+		
+		ammo_id = 			nil,
+		ammo_usage =		1,	// this many units of ammo
+		ammo_rate =			1, // per this many shots fired
+	
+		delay_prior = 		0, // time before the first shot is fired
+		delay_reload =		6, // time to reload, in frames
+		delay_recover = 	7, // time between consecutive shots
+	
+		mode = 			 WEAPON_FM_Single,
+	
+		damage = 			10, 
+		damage_type = 		nil,	
+	
+		projectile_id = 	NormalBullet,
+		projectile_speed = 	100,
+		projectile_range = 600,
+		projectile_distance = 10,
+		projectile_offset_y = -6,
+
+		spread = 1,
+		spread_factor = 100,
+		
+		gfx_distance = 6,
+		gfx_offset_y = -6,
+
+//	static const FM_Accuracy = 		14;		//
+//	static const FM_AimAngle = 		15;		//
+//	static const FM_ProjSize = 		20;		// wie breit ist das Projektil / die Spur
+//	static const FM_ProjTrail = 	21;		// wie lang ist die Spur?
+//	static const FM_ProjSound =		22;		// welchen Sound macht der Modus
+//	static const FM_ProjEffects = 	23;		// hat der Feuermodus einen eigenen Effekte-Call?
+//	static const FM_ProjCustom = 	24;		// hat der Feuermodus einen eigenen Launch-Call?
+//	static const FM_Old = 			25;		// macht der Feuermods einen Fire%d-Call?
+//	static const FM_SightBonus = 	28;		// so viel kriegt der Spieler zu seiner ViewRange
+	},
+};
+
+local ammo_containers = 
+{
+	clip = {
+	},
+	
+	box = {
+	},
+};
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,6 +88,7 @@ local holding = true; // TODO: experimental
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // non-functional and temporary stuff
+
 
 public func GetCarryMode(object user) {    if (is_selected) return CARRY_Hand; }
 public func GetCarrySpecial(object user) { if (is_selected) return "pos_hand2"; }
@@ -79,8 +143,6 @@ protected func ControlUseStart(object user, int x, int y)
 
 //	AimStartSound();
 
-//	fAiming = 1;
-//	holding = true;
 	user->StartAim(this);
 
 	ControlUseHolding(user, x, y);
@@ -132,14 +194,13 @@ protected func ControlUseHolding(object user, int x, int y)
  @par y The y coordinate the user is aimint at.
  @version 0.1.0
  */
-protected protected func ControlUseStop(object user, int x, int y)
+protected func ControlUseStop(object user, int x, int y)
 {
 	if(user == nil)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
 
-//	holding = false;
 	user->CancelAiming();
 	return -1;
 }
@@ -168,12 +229,103 @@ private func GetAngle(int x, int y)
  @par angle The angle the weapon is aimed at.
  @version 0.1.0
  */
-private func Fire(object user, int angle)
+private func Fire(object user, int angle, string firemode)
 {
-	if(user == nil)
+	if (user == nil)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
 	
+	if (firemode == nil)
+	{
+		firemode = "default";
+	}
+	
+	var info = GetProperty(firemode, fire_modes);
+	
+	if (info == nil)
+	{
+		FatalError(Format("Fire mode '%s' not supported", firemode));
+	}
+
+	FireSound(user, info);
+	FireEffect(user, angle, info);
+	
+	FireProjectile(user, angle, info);
+//	AddDeviation();
+	
 	user->Message("Pew pew %d", angle);
+}
+
+private func RejectUse(object user)
+{
+	return !IsReadyToUse() || !user->HasHandAction();
+}
+
+/**
+ Interface for signaling that the weapon is ready to use (attack). 
+ @return true, if the object is ready to use.
+ */
+protected func IsReadyToUse()
+{
+	return true;
+}
+
+private func FireProjectile(object user, int angle, proplist firemode)
+{
+	if (user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+	if (firemode == nil)
+	{
+		FatalError("The function expects a fire mode that is not nil");
+	}
+	
+	var x = +Sin(angle, firemode.projectile_distance);
+	var y = -Cos(angle, firemode.projectile_distance) + firemode.projectile_offset_y;
+
+	var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
+	
+	OnFireProjectile(user, projectile, firemode);
+	
+	projectile->~Launch(user, GetID(), angle, GetSpread(angle), firemode.projectile_speed, firemode.projectile_range, firemode.damage, firemode.damage_type);
+}
+
+private func GetSpread(int angle) // TODO
+{
+	return angle;
+}
+
+/**
+ Callback that happens each time an individual projectile is fired.
+ @note By default this function is empty. You should create some kind of sound here.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ */
+public func FireSound(object user, proplist firemode)
+{
+	
+}
+
+/**
+ Callback that happens each time an individual projectile is fired.
+ @note By default this function is empty. You should create graphical effects here.
+ @par user The object that is using the weapon.
+ @par angle The angle the weapon is aimed at.
+ @par firemode A proplist containing the fire mode information.
+ */
+public func FireEffect(object user, int angle, proplist firemode)
+{
+
+}
+
+/**
+ Callback that happens after a projectile is created and before it is launched.
+ @par user The object that is using the weapon.
+ @par projectile The object that will be launched.
+ @par firemode A proplist containing the fire mode information.
+ */
+public func OnFireProjectile(object user, object projectile, proplist firemode)
+{
 }

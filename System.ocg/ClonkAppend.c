@@ -365,6 +365,8 @@ func FxIntAimTimer(target, effect, time)
 		if(target->GetAction() != "Walk" && target->GetAction() != "Jump") return -1;
 	}
 	
+	if(!aim_set) return;
+	
 	var angle, delta_angle, length;
 	var speed = aim_set["AimSpeed"];
 	if(speed == nil) speed = 50;

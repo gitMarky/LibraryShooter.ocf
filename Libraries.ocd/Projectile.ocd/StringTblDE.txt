@@ -1,0 +1,2 @@
+Name=Kugel
+Description=Macht aua wo wehtut.
