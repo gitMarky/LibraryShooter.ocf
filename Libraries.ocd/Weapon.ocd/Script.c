@@ -146,7 +146,7 @@ protected func ControlUseStart(object user, int x, int y)
 
 //	AimStartSound();
 
-	user->StartAim(this);
+	//user->StartAim(this);
 
 	ControlUseHolding(user, x, y);
 	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
@@ -204,7 +204,7 @@ protected func ControlUseStop(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
-	user->CancelAiming();
+	//user->CancelAiming();
 	return -1;
 }
 
@@ -341,4 +341,23 @@ public func FireEffect(object user, int angle, proplist firemode)
  */
 public func OnFireProjectile(object user, object projectile, proplist firemode)
 {
+}
+
+private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks)
+{
+	if (user == nil)
+	{
+		FatalError("This function expects a user that is not nil");
+	}
+	
+	user->CreateParticle("MuzzleFlash", x, y, 0, 0, 10, {Prototype = Particles_MuzzleFlash(), Size = 3 * size, Rotation = angle}, 1);
+
+	if (sparks)
+	{
+		var xdir = +Sin(angle, size * 2);
+		var ydir = -Cos(angle, size * 2);
+	
+		CreateParticle("StarFlash", x, y, PV_Random(xdir - size, xdir + size), PV_Random(ydir - size, ydir + size), PV_Random(20, 60), Particles_Glimmer(), size);
+	}
+	return;	
 }
