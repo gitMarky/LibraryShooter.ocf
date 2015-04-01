@@ -41,7 +41,7 @@ protected func Hit()
 		{
 			var x = GetX(), y = GetY();
 			var a = Angle(lastX, lastY, nextX, nextY);
-			var max = Max(Abs(GetXDir()/10),AbsY(GetYDir()/10));
+			var max = Max(Abs(GetXDir()/10), AbsY(GetYDir()/10));
 			for(var cnt = 0; cnt < max; cnt += 2)
 			{
 				nextX = Sin(a, cnt);
@@ -49,11 +49,16 @@ protected func Hit()
 				if(GBackSolid(lastX + nextX - x, lastY + nextY - y))
 				{
 					SetPosition(lastX + nextX, lastY + nextY);
-					if(trail)
-						trail->Traveling();
 					break;
 				}
 			}
+		}
+
+		
+		if (trail)
+		{
+			trail->UpdateRot(GetR());
+			trail->Traveling();
 		}
 
 		DoHitCheckCall();
@@ -243,12 +248,12 @@ public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int
 }
 */
 
-func CreateTrail()
+func CreateTrail(int x, int y, int width, int length)
 {
 	// neat trail
-	trail = CreateObject(BulletTrail,0,0);
+	trail = CreateObject(BulletTrail, x, y);
 	trail->SetObjectBlitMode(GFX_BLIT_Additive);
-	trail->Set(2, 125, this);
+	trail->Set(width, length, this);
 }
 
 func FxPositionCheckTimer(target, effect, time)
@@ -274,6 +279,11 @@ protected func ControlSpeed()
 	}
 	
 	SetR(Angle(0, 0, GetXDir(), GetYDir()));
+	
+	if (trail)
+	{
+		trail->UpdateRot(GetR());
+	}
 }
 
 func TrailColor(int acttime){ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
