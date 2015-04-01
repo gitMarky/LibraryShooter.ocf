@@ -53,12 +53,12 @@ protected func Hit()
 				}
 			}
 		}
-			
+
 		DoHitCheckCall();
 	}
 	
 	if(self)
-	{
+	{	
 		Sound("BulletHitGround?");
 		CreateImpactEffect(Max(5, damage*2/3));
 	  	
@@ -97,8 +97,12 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 			
 	if (!instant)
 	{
+		OnLaunch();
+	
 		speed_x = +Sin(angle, speed, precision);
 		speed_y = -Cos(angle, speed, precision);
+		
+		SetXDir(speed_x); SetYDir(speed_y);
 		
 		DoHitCheckCall();
 	}
@@ -108,8 +112,8 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 		var x_p = GetX();
 		var y_p = GetY();
 		
-		var t_x = GetX() + Sin(angle, range, 100);
-		var t_y = GetY() - Cos(angle, range, 100);
+		var t_x = GetX() + Sin(angle, range, precision);
+		var t_y = GetY() - Cos(angle, range, precision);
 		
 		var coords = PathFree2(x_p, y_p, t_x, t_y);
 		
@@ -134,7 +138,7 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 			if (obj->~IsProjectileTarget(this, user) || obj->GetOCF() & OCF_Alive)
 			{
 				var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
-				SetPosition(x_p + Sin(angle, objdist, 100), y_p - Cos(angle, objdist, 100));
+				SetPosition(x_p + Sin(angle, objdist, precision), y_p - Cos(angle, objdist, precision));
 				var self = this;
 				HitObject(obj, true);
 				hit_object = true;
@@ -174,6 +178,12 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 		OnLaunched();
 	}
 }
+
+
+public func OnLaunch()
+{
+}
+
 
 public func OnLaunched()
 {
@@ -254,6 +264,8 @@ protected func ControlSpeed()
 	}
 	
 	SetR(Angle(0, 0, GetXDir(), GetYDir()));
+	
+	Travelling();
 }
 
 func TrailColor(int acttime){ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
@@ -310,12 +322,12 @@ local ActMap = {
 	Travel = {
 		Prototype = Action,
 		Name = "Travel",
-		Procedure = DFA_FLOAT,
+		Procedure = DFA_NONE,
 		NextAction = "Travel",
 		Length = 1,
 		Delay = 1,
 		FacetBase = 1,
-		FacetCall="Travelling",
+		//FacetCall="Travelling",
 		StartCall="ControlSpeed",
 	},
 	
@@ -327,7 +339,7 @@ local ActMap = {
 		Delay = 1,
 		FacetBase = 1,
 		NextAction = "TravelBallistic",
-		FacetCall = "Travelling",
+		//FacetCall = "Travelling",
 		StartCall="ControlSpeed",
 	},
 };

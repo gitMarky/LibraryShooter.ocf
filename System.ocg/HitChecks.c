@@ -11,7 +11,16 @@
 
 global func DoHitCheckCall()
 {
+	if (!this)
+	{
+		FatalError("DoHitCheckCall() must be called from object context!");
+	}
+
 	var e = GetEffect("HitCheck2", this);
+	if (!e)
+	{
+		e = AddEffect("HitCheck2", this, 1);
+	}
 	if(!e) return;
 	EffectCall(this, e, "DoCheck");
 }
@@ -72,16 +81,16 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 	if (live)
 		shooter = target;
 	
-	if (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2)
-	{
+	//if (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2)
+	//{
 		// We search for objects along the line on which we moved since the last check
 		// and sort by distance (closer first).
 		for (obj in FindObjects(Find_OnLine(oldx, oldy, newx, newy),
 								Find_NoContainer(),
-								Find_Layer(target->GetObjectLayer()),
-								Find_PathFree(target),
+								//Find_Layer(target->GetObjectLayer()),
+								//Find_PathFree(target),
 								Sort_Distance(oldx, oldy)))
-		{
+		{	
 			// Excludes
 			if(obj == target) continue;
 			if(obj == shooter) continue;
@@ -103,58 +112,10 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 					return;
 			}
 		}
-	}
+	//}
 	
 	return;
 }
-	
-/*global func FxHitCheck2DoCheck(object target, proplist effect)
-{
-	var obj;
-	// rather search in front of the projectile, since a hit might delete the effect,
-	// and clonks can effectively hide in front of walls.
-	// NO WTF IS THIS SHIT
-	var oldx = effect.x;
-	var oldy = effect.y;
-	var newx = target->GetX();
-	var newy = target->GetY();
-	var dist = Distance(oldx, oldy, newx, newy);
-	
-	var shooter = effect.shooter;
-	var live = effect.live;
-	
-	if (live)
-		shooter = target;
-	
-	if (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2)
-	{
-		// We search for objects along the line on which we moved since the last check
-		// and sort by distance (closer first).
-		for (obj in FindObjects(Find_OnLine(oldx, oldy, newx, newy),
-								Find_NoContainer(),
-								Find_Layer(target->GetObjectLayer()),
-								Find_PathFree(target),
-								Sort_Distance(oldx, oldy)))
-		{
-			// Excludes
-			if(obj == target) continue;
-			if(obj == shooter) continue;
-
-			// Unlike in hazard, there is no NOFF rule (yet)
-			// CheckEnemy
-			//if(!CheckEnemy(obj,target)) continue;
-
-			// IsProjectileTarget or Alive will be hit
-			if (obj->~IsProjectileTarget(target, shooter) || obj->GetOCF() & OCF_Alive)
-			{
-				target->~HitObject(obj);
-				if (!target)
-					return;
-			}
-		}
-	}
-	return;
-}*/
 
 global func FxHitCheck2Effect(string newname)
 {

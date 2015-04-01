@@ -302,7 +302,7 @@ private func FireProjectile(object user, int angle, proplist firemode)
 	
 	OnFireProjectile(user, projectile, firemode);
 	
-	projectile->~Launch(user, GetID(), angle, GetSpread(angle), firemode.projectile_speed, firemode.projectile_range, firemode.damage, firemode.damage_type);
+	projectile->~Launch(user, GetID(), angle, GetSpread(angle), firemode.projectile_speed, firemode.projectile_range, firemode.damage, firemode.damage_type, false);
 }
 
 private func GetSpread(int angle) // TODO
@@ -343,7 +343,7 @@ public func OnFireProjectile(object user, object projectile, proplist firemode)
 {
 }
 
-private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks)
+private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light)
 {
 	if (user == nil)
 	{
@@ -359,5 +359,9 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 	
 		CreateParticle("StarFlash", x, y, PV_Random(xdir - size, xdir + size), PV_Random(ydir - size, ydir + size), PV_Random(20, 60), Particles_Glimmer(), size);
 	}
-	return;	
+	
+	if (light)
+	{
+		user->CreateTemporaryLight(x, y)->LightRangeStart(3 * size)->SetLifetime(2)->Activate();
+	}
 }
