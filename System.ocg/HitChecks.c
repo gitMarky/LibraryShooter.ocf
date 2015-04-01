@@ -9,6 +9,16 @@
 		HitObject(object target) in the projectile.
 --*/
 
+global func StartHitCheckCall(object shooter, bool never_shooter, bool limit_velocity)
+{
+	if (!this)
+	{
+		FatalError("StartHitCheckCall() must be called from object context!");
+	}
+	
+	return AddEffect("HitCheck2", this, 1, nil, nil, nil, shooter, never_shooter, limit_velocity);
+}
+
 global func DoHitCheckCall()
 {
 	if (!this)
@@ -17,35 +27,34 @@ global func DoHitCheckCall()
 	}
 
 	var e = GetEffect("HitCheck2", this);
-	if (!e)
-	{
-		e = AddEffect("HitCheck2", this, 1);
-	}
 	if(!e) return;
 	EffectCall(this, e, "DoCheck");
 }
 
-global func FxHitCheck2Start(object target, proplist effect, int temp, object by_obj, bool never_shooter)
+global func FxHitCheck2Start(object target, proplist effect, int temp, object by_obj, bool never_shooter, bool limit_velocity)
 {
-	if (temp)
-		return;
+	if (temp) return;
+	
 	effect.startx = target->GetX();
 	effect.starty = target->GetY();
 	effect.oldx = effect.startx;
 	effect.oldy = effect.starty;
+	
 	if (!by_obj)
 		by_obj = target;
 	if (by_obj->Contained())
 		by_obj = by_obj->Contained();
+
 	effect.shooter = by_obj;
 	effect.live = false;
 	effect.never_shooter = never_shooter;
+	effect.limit_velocity = limit_velocity;
 	
 	// C4D_Object has a hitcheck too -> change to vehicle to supress that.
 	if (target->GetCategory() & C4D_Object)
 		target->SetCategory((target->GetCategory() - C4D_Object) | C4D_Vehicle);
 	
-	effect.range = target.bulletRange;
+	//effect.range = target.bulletRange;
 	
 	EffectCall(target, effect, "DoCheck");
 	
@@ -78,16 +87,16 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 	var shooter = effect.shooter;
 	var live = effect.live;
 	
-	if (live)
+	if (live && !effect.never_shooter)
 		shooter = target;
 	
-	//if (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2)
-	//{
+	if (!effect.limit_velocity || (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2))
+	{
 		// We search for objects along the line on which we moved since the last check
 		// and sort by distance (closer first).
 		for (obj in FindObjects(Find_OnLine(oldx, oldy, newx, newy),
 								Find_NoContainer(),
-								//Find_Layer(target->GetObjectLayer()),
+								Find_Layer(target->GetObjectLayer()),
 								//Find_PathFree(target),
 								Sort_Distance(oldx, oldy)))
 		{	
@@ -112,7 +121,7 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 					return;
 			}
 		}
-	//}
+	}
 	
 	return;
 }
@@ -124,7 +133,7 @@ global func FxHitCheck2Effect(string newname)
 	return;
 }
 
-global func FxHitCheck2Add(object target, proplist effect, string neweffectname, int newtimer, by_obj, never_shooter)
+global func FxHitCheck2Add(object target, proplist effect, string neweffectname, int newtimer, by_obj, never_shooter, limit_velocity)
 {
 	effect.x = target->GetX();
 	effect.y = target->GetY();
@@ -135,6 +144,7 @@ global func FxHitCheck2Add(object target, proplist effect, string neweffectname,
 	effect.shooter = by_obj;
 	effect.live = false;
 	effect.never_shooter = never_shooter;
+	effect.limit_velocity = limit_velocity;
 	return;
 }
 
@@ -146,8 +156,8 @@ global func FxHitCheck2Timer(object target, proplist effect, int time)
 	if (!target)
 		return -1;
 		
-	if(effect.range - 1 == time)
-		return -1;
+	//if(effect.range - 1 == time)
+	//	return -1;
 	
 	effect.x = target->GetX();
 	effect.y = target->GetY();

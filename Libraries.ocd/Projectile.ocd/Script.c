@@ -21,6 +21,8 @@ local trail;
 
 local instant;
 
+local remove_on_hit;
+
 protected func Initialize()
 {
 	speed = 4000;
@@ -59,11 +61,16 @@ protected func Hit()
 	
 	if(self)
 	{	
-		Sound("BulletHitGround?");
-		CreateImpactEffect(Max(5, damage*2/3));
-	  	
-	  	RemoveObject();
+		OnHitLandscape();
+		
+		if (remove_on_hit) RemoveObject();
 	}
+}
+
+public func OnHitLandscape()
+{
+		Sound("BulletHitGround?");
+		CreateImpactEffect(10);
 }
 
 func Remove()
@@ -86,6 +93,8 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 
 	instant = p_instant;
 
+	this.remove_on_hit = true;
+
 	SetController(user->GetController());
 	
 	var precision = 100;
@@ -95,16 +104,16 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 	
 	var self = this;
 			
+	OnLaunch();
+
 	if (!instant)
 	{
-		OnLaunch();
-	
 		speed_x = +Sin(angle, speed, precision);
 		speed_y = -Cos(angle, speed, precision);
 		
 		SetXDir(speed_x); SetYDir(speed_y);
 		
-		DoHitCheckCall();
+		StartHitCheckCall(user, true, true);
 	}
 	else
 	{
@@ -253,6 +262,7 @@ func FxPositionCheckTimer(target, effect, time)
 protected func Travelling()
 {
 	DoHitCheckCall();
+	ControlSpeed();
 }
 
 protected func ControlSpeed()
@@ -264,8 +274,6 @@ protected func ControlSpeed()
 	}
 	
 	SetR(Angle(0, 0, GetXDir(), GetYDir()));
-	
-	Travelling();
 }
 
 func TrailColor(int acttime){ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
@@ -279,9 +287,18 @@ public func HitObject(object obj, bool no_remove)
 	}
 	
 	DoDmg(damage, nil, obj, nil, nil, this, weapon_ID);
-	CreateImpactEffect(Max(5, damage*2/3));
 	
-	if(!no_remove) RemoveObject();
+	OnHitObject(obj);
+	
+	if(!no_remove && remove_on_hit)
+	{
+		RemoveObject();
+	}
+}
+
+public func OnHitObject(object target)
+{
+	CreateImpactEffect(Max(5, damage*2/3));
 }
 
 // called by successful hit of object after from ProjectileHit(...)
@@ -327,8 +344,7 @@ local ActMap = {
 		Length = 1,
 		Delay = 1,
 		FacetBase = 1,
-		//FacetCall="Travelling",
-		StartCall="ControlSpeed",
+		StartCall="Travelling",
 	},
 	
 	TravelBallistic = {
@@ -339,8 +355,7 @@ local ActMap = {
 		Delay = 1,
 		FacetBase = 1,
 		NextAction = "TravelBallistic",
-		//FacetCall = "Travelling",
-		StartCall="ControlSpeed",
+		StartCall = "Travelling",
 	},
 };
 local Name = "$Name$";
