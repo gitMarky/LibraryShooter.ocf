@@ -23,6 +23,10 @@ local instant;
 
 local remove_on_hit;
 
+local lifetime;
+
+static const PROJECTILE_Default_Velocity_Precision = 10;
+
 protected func Initialize()
 {
 	speed = 4000;
@@ -91,6 +95,8 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 	speed = p_speed;
 
 	instant = p_instant;
+	
+	lifetime = PROJECTILE_Default_Velocity_Precision * range / speed;
 
 	this.remove_on_hit = true;
 
@@ -214,9 +220,6 @@ public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int
 	if(!iDmgType) DMG_Type = DMG_Projectile;
 	else DMG_Type = iDmgType;
 
-	// Trail erzeugen
-	CreateTrail(iSize, iTrail);
-
 	bGlow = false;
 	// Tolles Leuchten erzeugen
 	if(iGlowSize)
@@ -226,9 +229,6 @@ public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int
 		SetObjDrawTransform(100+35*iGlowSize,0,0, 0,100+35*iGlowSize,0, this(),1);
 		SetClrModulation(GlowColor(1),this(),1);
 	}
-
-	AddEffect("HitCheck", this(), 1,1, 0,GetID(),shooter);
-	//AddEffect("HitCheck", this, 1,1, this,0,shooter);
 
 	// Werte für Reflektionen speichern
 	iRefl = iReflections;
@@ -263,10 +263,15 @@ protected func Travelling()
 	DoHitCheckCall();
 	ControlSpeed();
 	
+	DrawColorModulation();
+	
 	if (trail)
 	{
 		trail->ProjectileUpdate();
 	}
+	
+	
+	if(GetActTime() >= lifetime) Remove();
 }
 
 protected func ControlSpeed()
@@ -280,7 +285,34 @@ protected func ControlSpeed()
 	SetR(Angle(0, 0, GetXDir(), GetYDir()));
 }
 
-func TrailColor(int acttime){ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
+private func DrawColorModulation()
+{
+	var color = ProjectileColor(GetActTime());
+	
+	if (color != nil)
+	{
+		SetClrModulation(color);
+	}
+}
+
+
+/**
+ Specifies a color modulation for the projectile, based on the time it exists.
+ @par time The time that the projectile exists, in frames.
+ @return {@c nil}, which means that the color is not adjusted.
+         You can override this function if you want a custom color modulation
+         for projectile.
+@version 0.1.0
+ */
+public func ProjectileColor(int time)
+{
+	return nil;
+}
+
+public func TrailColor(int acttime)
+{
+	return RGBa(255, 255 - Min(150, acttime*20), 75, 255);
+}
 
 public func HitObject(object obj, bool no_remove)
 {
@@ -643,52 +675,6 @@ public func FxHitCheckStart(object target, int effect, int temp, object byObj, b
 	EffectVar(5, target, effect) = neverShooter;
 }
 
-
-
-public func FxHitCheckTimer(object target, int effect, int time)
-{
-	var obj;
-	var oldx = EffectVar(0, target, effect);
-	var oldy = EffectVar(1, target, effect);
-	var newx = GetX(target);
-	var newy = GetY(target);
-	EffectVar(0, target, effect) = GetX(target);
-	EffectVar(1, target, effect) = GetY(target);
-
-	//Schuss schon Scharf?
-	var exclude = EffectVar(2, target, effect);
-	//Nicht selber treffen
-	if(EffectVar(4, target, effect)) exclude = target;
-
-	if(target->~HitCheck(oldx,oldy,newx,newy,exclude)) return -1;
-
-	if(!target) return -1;
-	if(!EffectVar(0, target, effect )) return -1;
-	EffectVar(0, target, effect) = GetX(target);
-	EffectVar(1, target, effect) = GetY(target);
-
-	//Der Schuss wird erst "scharf gemacht", d.h. kann den Schützen selbst treffen, wenn
-	//der Schuss einmal die Shape des Schützen verlassen hat.
-
-	if(!EffectVar(5,target,effect))
-	{
-		if(!EffectVar(4, target, effect))
-		{
-			//Ready gibt an, ob wir schon "scharf" sind. True = Scharf
-			var ready = true;
-			//Wir suchen alle Objekte mit der ID unseres Schützens an unserer momentanen Stelle
-			for(var foo in FindObjects(Find_AtPoint(GetX(target),GetY(target)),Find_ID(EffectVar(3, target, effect))))
-			//Und schauen, ob es der Schütze ist.
-			if(foo == EffectVar(2, target, effect))
-				//Wir haben den Schützen gefunden -> Er ist noch an unserer Position
-				ready = false;
-			//Wir haben den Schützen nicht gefunden
-			if(ready)
-				//Wir treffen ihn ab jetzt
-				EffectVar(4, target, effect) = true;
-		}
-	}
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
