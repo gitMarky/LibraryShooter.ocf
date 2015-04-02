@@ -57,8 +57,8 @@ protected func Hit()
 		
 		if (trail)
 		{
-			trail->UpdateRot(GetR());
-			trail->Traveling();
+			trail->ProjectileUpdate();
+			trail->Travelling();
 		}
 
 		DoHitCheckCall();
@@ -251,9 +251,9 @@ public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int
 func CreateTrail(int x, int y, int width, int length)
 {
 	// neat trail
-	trail = CreateObject(BulletTrail, x, y);
+	trail = CreateObject(Bullet_Trail, x, y);
 	trail->SetObjectBlitMode(GFX_BLIT_Additive);
-	trail->Set(width, length, this);
+	trail->Set(this, width, length);
 }
 
 func FxPositionCheckTimer(target, effect, time)
@@ -268,6 +268,11 @@ protected func Travelling()
 {
 	DoHitCheckCall();
 	ControlSpeed();
+	
+	if (trail)
+	{
+		trail->ProjectileUpdate();
+	}
 }
 
 protected func ControlSpeed()
@@ -279,11 +284,6 @@ protected func ControlSpeed()
 	}
 	
 	SetR(Angle(0, 0, GetXDir(), GetYDir()));
-	
-	if (trail)
-	{
-		trail->UpdateRot(GetR());
-	}
 }
 
 func TrailColor(int acttime){ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
