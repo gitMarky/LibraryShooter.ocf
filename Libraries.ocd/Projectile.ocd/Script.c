@@ -72,12 +72,6 @@ protected func Hit()
 	}
 }
 
-public func OnHitLandscape()
-{
-		Sound("BulletHitGround?");
-		CreateImpactEffect(10);
-}
-
 func Remove()
 {
 	var self = this;
@@ -290,12 +284,6 @@ func TrailColor(int acttime){ return RGBa(255,255 - Min(150, acttime*20) ,75,255
 
 public func HitObject(object obj, bool no_remove)
 {
-	if(obj.receive_crits > 0)
-	{
-		damage = (3 * damage) / 2;
-		this.crit = true;
-	}
-	
 	DoDmg(damage, nil, obj, nil, nil, this, weapon_ID);
 	
 	OnHitObject(obj);
@@ -308,7 +296,13 @@ public func HitObject(object obj, bool no_remove)
 
 public func OnHitObject(object target)
 {
-	CreateImpactEffect(Max(5, damage*2/3));
+	CreateImpactEffect(this.damage);
+}
+
+public func OnHitLandscape()
+{
+		Sound("BulletHitGround?");
+		CreateImpactEffect(this.damage);
 }
 
 // called by successful hit of object after from ProjectileHit(...)
