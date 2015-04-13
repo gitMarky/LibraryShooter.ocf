@@ -339,7 +339,13 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 	
 		OnFireProjectile(user, projectile, firemode);
 	
-		projectile->~Launch(user, GetID(), angle, GetSpread(angle), firemode.projectile_speed, firemode.projectile_range, firemode.damage, firemode.damage_type, false);
+		projectile->Shooter(user)
+				  ->Weapon(this)
+				  ->Damage(firemode.damage)
+		          ->DamageType(firemode.damage_type)
+		          ->Velocity(firemode.projectile_speed)
+				  ->Range(firemode.projectile_range)
+		          ->Launch(angle, GetSpread(angle));
 	}
 	
 	shot_counter[firemode.name]++;

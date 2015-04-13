@@ -1,4 +1,43 @@
-/*-- Bullet --*/
+/**
+ Library for projectiles.
+ 
+ @author Marky
+ @credits Hazard Team, Code Modern Combat as inspiration
+ @version 0.1.0
+ */
+
+static const PROJECTILE_Default_Velocity_Precision = 10;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// definitions
+
+
+local damage;					// int - damage on hit
+local damage_type;				// int - damage type
+local range;					// int - max. travel distance, in pixels
+local velocity;					// int - velocity
+local velocity_x, velocity_y;	// int - velocity, as components
+local weapon_ID;				// id
+local user;						// object
+local instant;					// bool - if true the projectile hits instantly
+
+local is_launched;				// bool - true if the projectile has been launched
+
+local remove_on_hit;			// bool - is the object removed when it hits an object or the landscape?
+
+local lastX, lastY, nextX, nextY;// int - positions for hit checks
+local trail;					// object - for effects
+
+local lifetime;					// int - calculated from range and velocity
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// global functions
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// finished functions
 
 /**
  Identifies the object as a projectile.
@@ -6,30 +45,153 @@
  */
 public func IsProjectile(){ return true;}
 
-local damage;
-local damage_type;
-local weapon_ID;
-local user;
 
-local range;
-local speed;
 
-local speed_x, speed_y;
+/**
+ Configures the object that controls the weapon. 
+ @par shooter An object. 
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.1.0
+ */
+public func Shooter(object shooter)
+{
+	ProhibitedWhileLaunched();
+	
+	if (shooter == nil)
+	{
+		FatalError(Format("Parameter 'shooter' expects an object, got nil"));
+	}
 
-local lastX, lastY, nextX, nextY;
-local trail;
+	user = shooter;
+	return this;
+}
 
-local instant;
 
-local remove_on_hit;
 
-local lifetime;
+/**
+ Configures how far the projectile will travel. 
+ @par value The approximate distance in pixels. The projectile calculates its lifetime in frames with {@c distance / velocity}. 
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.1.0
+ */
+public func Weapon(value)
+{
+	ProhibitedWhileLaunched();
+	
+	if (GetType(value) == C4V_Def)
+	{
+		weapon_ID = value;
+	}
+	else if (GetType(value) == C4V_C4Object)
+	{
+		weapon_ID = value->GetID();
+	}
+	else
+	{
+		FatalError(Format("Expected either an object or an ID, got %v: %v", GetType(value), value));
+	}
 
-static const PROJECTILE_Default_Velocity_Precision = 10;
+	return this;
+}
+
+
+/**
+ Configures how far the projectile will travel. 
+ @par value The approximate distance in pixels. The projectile calculates its lifetime in frames with {@c distance / velocity}. 
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.1.0
+ */
+public func Range(int value)
+{
+	ProhibitedWhileLaunched();
+	
+	if (value < 0)
+	{
+		FatalError(Format("Cannot set negative range - the function received %d", value));
+	}
+
+	range = value;
+	return this;
+}
+
+/**
+ Configures how much damage the projectile will deal when it hits. 
+ @par value The amount of damage that the projectile deals to the target. 
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.1.0
+ */
+public func Damage(int value)
+{
+	ProhibitedWhileLaunched();
+	
+	// may receive negative damage! healing projectiles :D
+	
+	damage = value;
+	return this;
+}
+
+/**
+ Configures the damage type. 
+ @par value A damage type code that exists in your project. This is a custom value. For existing damage types see {@link TODO}. 
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.1.0
+ */
+public func DamageType(int value)
+{
+	ProhibitedWhileLaunched();
+	
+	damage_type = value;
+	return this;
+}
+
+/**
+ Sets the velocity of the projectile.
+ @par value The new velocity.
+ @return object The projectile object, so that it can be modified further.
+ */
+public func Velocity(int value)
+{
+	ProhibitedWhileLaunched();
+	
+	if (value < 0)
+	{
+		FatalError(Format("Cannot set negative velocity - the function received %d", value));
+	}
+
+	velocity = value;
+	
+	return this;
+}
+
+/**
+ Configures the projectile to do a hit check immediately when launched. This means that the projectile will not fly,
+ it rather hits instantly. 
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.1.0
+ */
+public func HitScan()
+{
+	ProhibitedWhileLaunched();
+	
+	instant = true;
+	return this;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// temporary stuff
+
+
+
+
+
 
 protected func Initialize()
 {
-	speed = 4000;
+	velocity = 100;
+	damage = 0;
+	range = 500;
+	instant = false;
 }
 
 protected func Hit()
@@ -45,7 +207,7 @@ protected func Hit()
 		{
 			var x = GetX(), y = GetY();
 			var a = Angle(lastX, lastY, nextX, nextY);
-			var max = Max(Abs(GetXDir()/10), AbsY(GetYDir()/10));
+			var max = Max(Abs(GetXDir()/10), Abs(GetYDir()/10));
 			for(var cnt = 0; cnt < max; cnt += 2)
 			{
 				nextX = Sin(a, cnt);
@@ -83,21 +245,12 @@ func Remove()
 	if(self) RemoveObject();
 }
 
-public func Launch(object p_user, id weapon, int angle, int deviation, int p_speed, int p_range, int p_damage, int p_damage_type, bool p_instant)
+public func Launch(int angle, int deviation)
 {
-	weapon_ID = weapon;
-	user = p_user;
 	
-	damage = p_damage;
-	damage_type = p_damage_type;
+	lifetime = PROJECTILE_Default_Velocity_Precision * range / velocity;
 
-	range = p_range;
-	speed = p_speed;
-
-	instant = p_instant;
-	
-	lifetime = PROJECTILE_Default_Velocity_Precision * range / speed;
-
+	this.is_launched = true;
 	this.remove_on_hit = true;
 
 	SetController(user->GetController());
@@ -113,10 +266,10 @@ public func Launch(object p_user, id weapon, int angle, int deviation, int p_spe
 
 	if (!instant)
 	{
-		speed_x = +Sin(angle, speed, precision);
-		speed_y = -Cos(angle, speed, precision);
+		velocity_x = +Sin(angle, velocity, precision);
+		velocity_y = -Cos(angle, velocity, precision);
 		
-		SetXDir(speed_x); SetYDir(speed_y);
+		SetXDir(velocity_x); SetYDir(velocity_y);
 		
 		StartHitCheckCall(user, true, true);
 	}
@@ -278,8 +431,8 @@ protected func ControlSpeed()
 {
 	if (GetAction() == "Travel")
 	{
-		SetXDir(speed_x);
-		SetYDir(speed_y);
+		SetXDir(velocity_x);
+		SetYDir(velocity_y);
 	}
 	
 	SetR(Angle(0, 0, GetXDir(), GetYDir()));
@@ -834,3 +987,11 @@ TravelBallistic = {
 };
 
 */
+
+private func ProhibitedWhileLaunched()
+{
+	if (is_launched)
+	{
+		FatalError("This function may only be called before the projectile is launched.");
+	}
+}
