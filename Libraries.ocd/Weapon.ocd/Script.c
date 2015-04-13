@@ -10,6 +10,7 @@ local Collectible = 1;
 
 
 local is_selected = true; // bool: is the weapon currently selected?
+local is_using = false; // bool: is the user holding the fire button
 
 static const WEAPON_FM_Single	= 1;
 static const WEAPON_FM_Burst 	= 2;
@@ -40,6 +41,7 @@ local fire_modes =
 		delay_prior = 		0, // time before the first shot is fired
 		delay_reload =		6, // time to reload, in frames
 		delay_recover = 	7, // time between consecutive shots
+		delay_burst = 		0, // time between consecutive bursts
 	
 		mode = 			 WEAPON_FM_Single,
 	
@@ -51,9 +53,14 @@ local fire_modes =
 		projectile_range = 600,
 		projectile_distance = 10,
 		projectile_offset_y = -6,
+		projectile_number = 1,
+		projectile_spread = 0, // default inaccuracy of a single projectile
+		projectile_spread_factor = 100, // factor
 
-		spread = 1,
-		spread_factor = 100,
+		spread = 1,			   // inaccuracy from prolonged firing
+		spread_factor = 100,   // factor
+		
+		burst = 0, // number of projectiles fired in a burst
 
 //	static const FM_Accuracy = 		14;		//
 //	static const FM_AimAngle = 		15;		//
@@ -83,6 +90,9 @@ local weapon_properties =
 };
 
 
+local shot_counter; // proplist
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // finished functions
@@ -92,6 +102,11 @@ local weapon_properties =
 //
 // non-functional and temporary stuff
 
+private func Initialize()
+{
+	shot_counter = {};
+	_inherited();
+}
 
 public func GetCarryMode(object user) {    if (is_selected) return CARRY_Hand; }
 public func GetCarrySpecial(object user) { if (is_selected) return "pos_hand2"; }
@@ -114,6 +129,9 @@ local animation_set = {
 
 
 public func GetAnimationSet() { return animation_set; }
+
+// holding callbacks are made
+public func HoldingEnabled() { return true; }
 
 
 /**
@@ -150,7 +168,7 @@ protected func ControlUseStart(object user, int x, int y)
 
 	ControlUseHolding(user, x, y);
 	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
-		Fire(user, x, y); //user->GetAimPosition());
+	//	Fire(user, x, y); //user->GetAimPosition());
 	return true;
 }
 
@@ -174,6 +192,9 @@ protected func ControlUseHolding(object user, int x, int y)
 	var angle = GetAngle(x, y);
 	user->SetAimPosition(angle);
 	
+	is_using = true;
+	
+	
 //	if(weapon_properties.delay_shot)
 //		ResetAim(angle);
 //	if (weapon_properties.full_auto)
@@ -184,6 +205,11 @@ protected func ControlUseHolding(object user, int x, int y)
 //			return false;
 //		}
 //	}
+
+	if (!IsRecovering())
+	{
+		Fire(user, x, y);
+	}
 	return true;
 }
 
@@ -204,8 +230,14 @@ protected func ControlUseStop(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
+	is_using = false;
+	
+	OnUseStop(user, x, y);
+	
 	//user->CancelAiming();
-	return -1;
+	
+	return true;
+	//return -1;
 }
 
 /**
@@ -264,8 +296,10 @@ private func Fire(object user, int x, int y, string firemode)
 	FireSound(user, info);
 	FireEffect(user, angle, info);
 
-	FireProjectile(user, angle, info);
+	FireProjectiles(user, angle, info);
 //	AddDeviation();
+
+	FireRecovery(user, x, y, info);
 	
 	user->Message("Pew pew %d", angle);
 }
@@ -284,7 +318,7 @@ protected func IsReadyToUse()
 	return true;
 }
 
-private func FireProjectile(object user, int angle, proplist firemode)
+private func FireProjectiles(object user, int angle, proplist firemode)
 {
 	if (user == nil)
 	{
@@ -298,14 +332,20 @@ private func FireProjectile(object user, int angle, proplist firemode)
 	var x = +Sin(angle, firemode.projectile_distance);
 	var y = -Cos(angle, firemode.projectile_distance) + firemode.projectile_offset_y;
 
-	var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
+	// launch the single projectiles
+	for (var i = 0; i < firemode.projectile_number; i++)
+	{
+		var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
 	
-	OnFireProjectile(user, projectile, firemode);
+		OnFireProjectile(user, projectile, firemode);
 	
-	projectile->~Launch(user, GetID(), angle, GetSpread(angle), firemode.projectile_speed, firemode.projectile_range, firemode.damage, firemode.damage_type, false);
+		projectile->~Launch(user, GetID(), angle, GetSpread(angle), firemode.projectile_speed, firemode.projectile_range, firemode.damage, firemode.damage_type, false);
+	}
+	
+	shot_counter[firemode.name]++;
 }
 
-private func GetSpread(int angle) // TODO
+private func GetSpread(int angle, proplist ) // TODO
 {
 	return angle;
 }
@@ -343,6 +383,14 @@ public func OnFireProjectile(object user, object projectile, proplist firemode)
 {
 }
 
+/**
+ Callback from {@link Library_Weapon#ControlUserStop}, 
+ so that you do not have to overload the entire function.
+ */
+public func OnUseStop(object user, int x, int y)
+{
+}
+
 private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light)
 {
 	if (user == nil)
@@ -363,5 +411,62 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 	if (light)
 	{
 		user->CreateTemporaryLight(x, y)->LightRangeStart(3 * size)->SetLifetime(2)->Activate();
+	}
+}
+
+private func FireRecovery(object user, int x, int y, proplist firemode, bool burst)
+{
+	var delay;
+	if (burst)
+	{
+		delay = firemode.delay_burst;
+	}
+	else
+	{
+		delay = firemode.delay_recover;
+	}
+
+	AddEffect("IntRecovery", this, 1, delay, this, nil, user, x, y, firemode);
+}
+
+private func FxIntRecoveryStart (object target, proplist effect, int temporary, object user, int x, int y, proplist firemode)
+{
+	if (temporary) return;
+	
+	effect.user = user;
+	effect.x = x;
+	effect.y = y;
+	effect.firemode = firemode;
+}
+
+private func FxIntRecoveryTimer(object target, proplist effect, int time)
+{
+	target->Recovery(effect.user, effect.x, effect.y, effect.firemode);
+
+	return FX_Execute_Kill;
+}
+
+private func IsRecovering()
+{
+	return GetEffect("IntRecovery", this);
+}
+
+private func Recovery(object user, int x, int y, proplist firemode)
+{
+	if (firemode == nil) return;
+
+	if (firemode.burst)
+	{
+		if (shot_counter[firemode.name] >= firemode.burst)
+		{
+			shot_counter[firemode.name] = 0;
+			
+			FireRecovery(user, x, y, nil, true);
+		}
+		else if (!is_using)
+		{
+			Log("Burst!!");
+			ControlUseStart(user, x, y); // TODO
+		}
 	}
 }
