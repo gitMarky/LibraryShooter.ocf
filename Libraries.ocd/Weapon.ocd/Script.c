@@ -61,6 +61,8 @@ local fire_modes =
 		spread_factor = 100,   // factor
 		
 		burst = 0, // number of projectiles fired in a burst
+		
+		charge  = 0, // number of frames that the button must be held before the shot is fired
 
 //	static const FM_Accuracy = 		14;		//
 //	static const FM_AimAngle = 		15;		//
@@ -232,12 +234,12 @@ protected func ControlUseStop(object user, int x, int y)
 
 	is_using = false;
 	
+	StopCharge();
 	OnUseStop(user, x, y);
 	
 	//user->CancelAiming();
 	
 	return true;
-	//return -1;
 }
 
 /**
@@ -290,6 +292,8 @@ private func Fire(object user, int x, int y, string firemode)
 	{
 		FatalError(Format("Fire mode '%s' not supported", firemode));
 	}
+	
+	if (StartCharge(user, info)) return;
 
 	var angle = GetFireAngle(x, y, info);
 
@@ -474,5 +478,84 @@ private func Recovery(object user, int x, int y, proplist firemode)
 			Log("Burst!!");
 			ControlUseStart(user, x, y); // TODO
 		}
+	}
+}
+
+//////////////////////////////////////////////////
+// charging the weapon
+
+private func StartCharge(object user, proplist firemode)
+{
+	if (!is_using || firemode.charge < 1) return;
+	
+	var effect = GetEffect("IntCharge", this);
+	
+	if (effect != nil)
+	{
+		if (effect.user == user && effect.firemode == firemode)
+		{
+			if (effect.has_charged)
+			{
+				return false; // fire away
+			}
+			else if (effect.is_charged)
+			{
+				effect.has_charged = true;
+				DoCharge(user, firemode);
+				return false; // fire away
+			}
+			
+			return true; // keep charging
+		}
+		else
+		{
+			StopCharge();
+		}
+	}
+
+	AddEffect("IntCharge", this, 1, 1, this, nil, user, firemode);
+	return true; // keep charging
+}
+
+private func StopCharge()
+{
+	var effect = GetEffect("IntCharge", this);
+	
+	if (effect != nil)
+	{
+		OnStopCharge(effect.user, effect.firemode);
+		
+		RemoveEffect(nil, nil, effect);
+	}
+}
+
+private func DoCharge(object user, proplist firemode)
+{
+	OnCharge(user, firemode);
+}
+
+public func OnStopCharge()
+{
+}
+
+public func OnCharge(object user, proplist firemode)
+{
+}
+
+protected func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
+{
+	if (temp) return;
+	
+	effect.user = user;
+	effect.firemode = firemode;
+}
+
+protected func FxIntChargeTimer(object target, proplist effect, int time)
+{
+	effect.percent = BoundBy(time * 100 / effect.firemode.charge, 0, 100);
+
+	if (time > effect.firemode.charge && !effect.is_charged)
+	{
+		effect.is_charged = true;
 	}
 }
