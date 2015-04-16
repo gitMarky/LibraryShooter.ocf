@@ -43,13 +43,13 @@ local fire_modes =
 		condition = 		nil, // string - callback for a condition
 		
 		ammo_id = 			nil,
-		ammo_usage =		1,	// this many units of ammo
-		ammo_rate =			1, // per this many shots fired
+		ammo_usage =		1, // int - this many units of ammo
+		ammo_rate =			1, // int - per this many shots fired
 	
-		delay_prior = 		0, // time before the first shot is fired
-		delay_reload =		6, // time to reload, in frames
-		delay_recover = 	7, // time between consecutive shots
-		delay_burst = 		0, // time between consecutive bursts
+		delay_charge  =     0, // int, frames - time that the button must be held before the shot is fired
+		delay_recover = 	7, // int, frames - time between consecutive shots
+		delay_cooldown =    0, // int, frames - time of cooldown after the last shot is fired
+		delay_reload =		6, // int, frames - time to reload
 	
 		mode = 			 WEAPON_FM_Single,
 	
@@ -69,20 +69,6 @@ local fire_modes =
 		spread_factor = 100,   // factor
 		
 		burst = 0, // number of projectiles fired in a burst
-		
-		charge  = 0, // number of frames that the button must be held before the shot is fired
-
-		cooldown = 0, // number of frames that the weapon has to cool down after the last shot is fired
-
-//	static const FM_Accuracy = 		14;		//
-//	static const FM_AimAngle = 		15;		//
-//	static const FM_ProjSize = 		20;		// wie breit ist das Projektil / die Spur
-//	static const FM_ProjTrail = 	21;		// wie lang ist die Spur?
-//	static const FM_ProjSound =		22;		// welchen Sound macht der Modus
-//	static const FM_ProjEffects = 	23;		// hat der Feuermodus einen eigenen Effekte-Call?
-//	static const FM_ProjCustom = 	24;		// hat der Feuermodus einen eigenen Launch-Call?
-//	static const FM_Old = 			25;		// macht der Feuermods einen Fire%d-Call?
-//	static const FM_SightBonus = 	28;		// so viel kriegt der Spieler zu seiner ViewRange
 	},
 };
 
@@ -116,7 +102,7 @@ local shot_counter; // proplist
 
 private func StartCharge(object user, proplist firemode)
 {
-	if (!is_using || firemode.charge < 1 || !NeedsCharge(firemode)) return false;
+	if (!is_using || firemode.delay_charge < 1 || !NeedsCharge(firemode)) return false;
 	
 	var effect = IsCharging();
 	
@@ -242,9 +228,9 @@ private func FxIntChargeStart(object target, proplist effect, int temp, object u
 
 private func FxIntChargeTimer(object target, proplist effect, int time)
 {
-	effect.percent = BoundBy(time * 100 / effect.firemode.charge, 0, 100);
+	effect.percent = BoundBy(time * 100 / effect.firemode.delay_charge, 0, 100);
 
-	if (time > effect.firemode.charge && !effect.is_charged)
+	if (time > effect.firemode.delay_charge && !effect.is_charged)
 	{
 		effect.is_charged = true;
 	}
@@ -345,20 +331,8 @@ protected func ControlUseHolding(object user, int x, int y)
 	user->SetAimPosition(angle);
 	
 	is_using = true;
-	
-	
-//	if(weapon_properties.delay_shot)
-//		ResetAim(angle);
-//	if (weapon_properties.full_auto)
-//	{
-//		if(!TryFire(user, angle))
-//		{
-//			ControlUseStop(user, x, y);
-//			return false;
-//		}
-//	}
 
-	if (!IsRecovering())
+	if (IsReadyToFire())
 	{
 		Fire(user, x, y);
 	}
@@ -573,19 +547,9 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 	}
 }
 
-private func FireRecovery(object user, int x, int y, proplist firemode, bool burst)
+private func FireRecovery(object user, int x, int y, proplist firemode)
 {
-	var delay;
-	if (burst)
-	{
-		delay = firemode.delay_burst;
-	}
-	else
-	{
-		delay = firemode.delay_recover;
-	}
-
-	AddEffect("IntRecovery", this, 1, delay, this, nil, user, x, y, firemode);
+	AddEffect("IntRecovery", this, 1, firemode.delay_recover, this, nil, user, x, y, firemode);
 }
 
 private func FxIntRecoveryStart (object target, proplist effect, int temporary, object user, int x, int y, proplist firemode)
@@ -600,7 +564,7 @@ private func FxIntRecoveryStart (object target, proplist effect, int temporary, 
 
 private func FxIntRecoveryTimer(object target, proplist effect, int time)
 {
-	target->Recovery(effect.user, effect.x, effect.y, effect.firemode);
+	target->DoRecovery(effect.user, effect.x, effect.y, effect.firemode);
 
 	return FX_Execute_Kill;
 }
@@ -610,7 +574,7 @@ private func IsRecovering()
 	return GetEffect("IntRecovery", this);
 }
 
-private func Recovery(object user, int x, int y, proplist firemode)
+private func DoRecovery(object user, int x, int y, proplist firemode)
 {
 	if (firemode == nil) return;
 	
@@ -621,10 +585,6 @@ private func Recovery(object user, int x, int y, proplist firemode)
 		if (shot_counter[firemode.name] >= firemode.burst)
 		{
 			shot_counter[firemode.name] = 0;
-			
-			FireRecovery(user, x, y, nil, true);
-			
-			return; // prevent cooldown
 		}
 		else if (!is_using)
 		{
@@ -652,6 +612,15 @@ public func OnRecovery(object user, proplist firemode)
 	
 }
 
+/**
+ The weapon is ready to fire a shot.
+ @version 0.1.0
+ */
+private func IsReadyToFire()
+{
+	return !IsRecovering();
+}
+
 
 //----------------------------------------------------------------------------------------------------------------
 //
@@ -659,13 +628,13 @@ public func OnRecovery(object user, proplist firemode)
 
 private func StartCooldown(object user, proplist firemode)
 {
-	if (firemode.cooldown < 1 || !NeedsCooldown(firemode)) return;
+	if (firemode.delay_cooldown < 1 || !NeedsCooldown(firemode)) return;
 	
 	var effect = IsCoolingDown();
 
 	if (effect == nil)
 	{
-		AddEffect("IntCooldown", this, 1, firemode.cooldown, this, nil, user, firemode);
+		AddEffect("IntCooldown", this, 1, firemode.delay_cooldown, this, nil, user, firemode);
 		OnStartCooldown(user, firemode);
 	}
 }
