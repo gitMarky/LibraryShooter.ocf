@@ -1,5 +1,13 @@
 #include Library_AmmoManager
 
+/**
+ @note Firemodes
+  A firemode has three stages: Charge - (Fire/Recover) - Cooldown
+ @author Marky
+ @credits Hazard Team, Zapper
+ @version 0.1.0
+ */
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // definitions
@@ -64,6 +72,8 @@ local fire_modes =
 		
 		charge  = 0, // number of frames that the button must be held before the shot is fired
 
+		cooldown = 0, // number of frames that the weapon has to cool down after the last shot is fired
+
 //	static const FM_Accuracy = 		14;		//
 //	static const FM_AimAngle = 		15;		//
 //	static const FM_ProjSize = 		20;		// wie breit ist das Projektil / die Spur
@@ -99,6 +109,146 @@ local shot_counter; // proplist
 //
 // finished functions
 
+
+//----------------------------------------------------------------------------------------------------------------
+//
+// charging the weapon
+
+private func StartCharge(object user, proplist firemode)
+{
+	if (!is_using || firemode.charge < 1 || !NeedsCharge(firemode)) return false;
+	
+	var effect = IsCharging();
+	
+	if (effect != nil)
+	{
+		if (effect.user == user && effect.firemode == firemode)
+		{
+			if (effect.has_charged)
+			{
+				return false; // fire away
+			}
+			else if (effect.is_charged)
+			{
+				effect.has_charged = true;
+				DoCharge(user, firemode);
+				return false; // fire away
+			}
+			
+			return true; // keep charging
+		}
+		else
+		{
+			CancelCharge(false);
+		}
+	}
+
+	AddEffect("IntCharge", this, 1, 1, this, nil, user, firemode);
+	OnStartCharge(user, firemode);
+	return true; // keep charging
+}
+
+private func CancelCharge(bool callback)
+{
+	var effect = IsCharging();
+	
+	if (effect != nil)
+	{
+		if (callback) OnCancelCharge(effect.user, effect.firemode);
+		
+		RemoveEffect(nil, nil, effect);
+	}
+}
+
+private func DoCharge(object user, proplist firemode)
+{
+	OnFinishCharge(user, firemode);
+}
+
+private func IsCharging()
+{
+	return GetEffect("IntCharge", this);
+}
+
+/**
+ Condition when the weapon needs to be charged.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function
+         for a custom condition.
+ @version 0.1.0
+ */
+public func NeedsCharge(object user, proplist firemode)
+{
+	return true;
+}
+
+/**
+ Callback: the weapon starts charging. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnStartCharge(object user, proplist firemode)
+{
+}
+
+/**
+ Callback: the weapon has successfully charged. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnFinishCharge(object user, proplist firemode)
+{
+}
+
+/**
+ Gets the current status of the charging process.
+ @return A value of 0 to 100, if the weapon is charging.@br
+         If the weapon is not charging, this function returns -1.
+ */
+public func GetChargeProgress()
+{
+	var effect = IsCharging();
+	
+	if (effect = nil)
+	{
+		return -1;
+	}
+	else
+	{
+		return effect.percent;
+	}
+}
+
+/**
+ Callback: the weapon user cancelled charging. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnCancelCharge(object user, proplist firemode)
+{
+}
+
+private func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
+{
+	if (temp) return;
+	
+	effect.user = user;
+	effect.firemode = firemode;
+}
+
+private func FxIntChargeTimer(object target, proplist effect, int time)
+{
+	effect.percent = BoundBy(time * 100 / effect.firemode.charge, 0, 100);
+
+	if (time > effect.firemode.charge && !effect.is_charged)
+	{
+		effect.is_charged = true;
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -234,7 +384,7 @@ protected func ControlUseStop(object user, int x, int y)
 
 	is_using = false;
 	
-	StopCharge();
+	CancelCharge(true);
 	OnUseStop(user, x, y);
 	
 	//user->CancelAiming();
@@ -380,7 +530,6 @@ public func FireSound(object user, proplist firemode)
  */
 public func FireEffect(object user, int angle, proplist firemode)
 {
-
 }
 
 /**
@@ -464,6 +613,8 @@ private func IsRecovering()
 private func Recovery(object user, int x, int y, proplist firemode)
 {
 	if (firemode == nil) return;
+	
+	OnRecovery(user, firemode);
 
 	if (firemode.burst)
 	{
@@ -472,77 +623,97 @@ private func Recovery(object user, int x, int y, proplist firemode)
 			shot_counter[firemode.name] = 0;
 			
 			FireRecovery(user, x, y, nil, true);
+			
+			return; // prevent cooldown
 		}
 		else if (!is_using)
 		{
 			Log("Burst!!");
 			ControlUseStart(user, x, y); // TODO
+			
+			return; // prevent cooldown
 		}
+	}
+	
+	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
+	{
+		StartCooldown(user, firemode);
 	}
 }
 
-//////////////////////////////////////////////////
+/**
+ Callback: the weapon finished one firing cycle. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnRecovery(object user, proplist firemode)
+{
+	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------
+//
 // charging the weapon
 
-private func StartCharge(object user, proplist firemode)
+private func StartCooldown(object user, proplist firemode)
 {
-	if (!is_using || firemode.charge < 1) return;
+	if (firemode.cooldown < 1 || !NeedsCooldown(firemode)) return;
 	
-	var effect = GetEffect("IntCharge", this);
-	
-	if (effect != nil)
-	{
-		if (effect.user == user && effect.firemode == firemode)
-		{
-			if (effect.has_charged)
-			{
-				return false; // fire away
-			}
-			else if (effect.is_charged)
-			{
-				effect.has_charged = true;
-				DoCharge(user, firemode);
-				return false; // fire away
-			}
-			
-			return true; // keep charging
-		}
-		else
-		{
-			StopCharge();
-		}
-	}
+	var effect = IsCoolingDown();
 
-	AddEffect("IntCharge", this, 1, 1, this, nil, user, firemode);
-	return true; // keep charging
-}
-
-private func StopCharge()
-{
-	var effect = GetEffect("IntCharge", this);
-	
-	if (effect != nil)
+	if (effect == nil)
 	{
-		OnStopCharge(effect.user, effect.firemode);
-		
-		RemoveEffect(nil, nil, effect);
+		AddEffect("IntCooldown", this, 1, firemode.cooldown, this, nil, user, firemode);
+		OnStartCooldown(user, firemode);
 	}
 }
 
-private func DoCharge(object user, proplist firemode)
+private func DoCooldown(object user, proplist firemode)
 {
-	OnCharge(user, firemode);
+	OnFinishCooldown(user, firemode);
 }
 
-public func OnStopCharge()
+private func IsCoolingDown()
+{
+	return GetEffect("IntCooldown", this);
+}
+
+/**
+ Condition when the weapon needs a cooldown.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function
+         for a custom condition.
+ @version 0.1.0
+ */
+public func NeedsCooldown(object user, proplist firemode)
+{
+	return true;
+}
+
+/**
+ Callback: the weapon starts cooldown. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnStartCooldown(object user, proplist firemode)
 {
 }
 
-public func OnCharge(object user, proplist firemode)
+/**
+ Callback: the weapon has successfully cooled down. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnFinishCooldown(object user, proplist firemode)
 {
 }
 
-protected func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
+private func FxIntCooldownStart(object target, proplist effect, int temp, object user, proplist firemode)
 {
 	if (temp) return;
 	
@@ -550,12 +721,9 @@ protected func FxIntChargeStart(object target, proplist effect, int temp, object
 	effect.firemode = firemode;
 }
 
-protected func FxIntChargeTimer(object target, proplist effect, int time)
+private func FxIntCooldownTimer(object target, proplist effect, int time)
 {
-	effect.percent = BoundBy(time * 100 / effect.firemode.charge, 0, 100);
-
-	if (time > effect.firemode.charge && !effect.is_charged)
-	{
-		effect.is_charged = true;
-	}
+	target->DoCooldown(effect.user, effect.firemode);
+	
+	return FX_Execute_Kill;
 }

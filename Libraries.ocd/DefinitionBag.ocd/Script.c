@@ -132,7 +132,7 @@ func RemoveAllItems(id item)
 public func GetItems(id item)
 {
 	var property = Id2Property(item);
-	return GetItemCount(property, content);
+	return GetItemCount(property);
 }
 
 private func GetItemCount(string item)
