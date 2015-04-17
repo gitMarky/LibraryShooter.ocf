@@ -17,8 +17,8 @@ local Description = "$Description$";
 local Collectible = 1;
 
 
-local is_selected = true; // bool: is the weapon currently selected?
-local is_using = false; // bool: is the user holding the fire button
+local is_selected = true;  // bool: is the weapon currently selected?
+local is_using = false;    // bool: is the user holding the fire button
 
 static const WEAPON_FM_Single	= 1;
 static const WEAPON_FM_Burst 	= 2;
@@ -304,7 +304,8 @@ protected func ControlUseStart(object user, int x, int y)
 
 	//user->StartAim(this);
 
-	ControlUseHolding(user, x, y);
+	//ControlUseHolding(user, x, y);
+	
 	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
 	//	Fire(user, x, y); //user->GetAimPosition());
 	return true;
@@ -327,15 +328,8 @@ protected func ControlUseHolding(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
-	var angle = GetAngle(x, y);
-	user->SetAimPosition(angle);
+	DoFireCycle(user, x, y, true);
 	
-	is_using = true;
-
-	if (IsReadyToFire())
-	{
-		Fire(user, x, y);
-	}
 	return true;
 }
 
@@ -361,9 +355,23 @@ protected func ControlUseStop(object user, int x, int y)
 	CancelCharge(true);
 	OnUseStop(user, x, y);
 	
-	//user->CancelAiming();
-	
 	return true;
+}
+
+private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
+{
+	var angle = GetAngle(x, y);
+	user->SetAimPosition(angle);
+	
+	if (is_pressing_trigger)
+	{
+	 	is_using = true;	
+	}
+
+	if (IsReadyToFire())
+	{
+		Fire(user, x, y);
+	}
 }
 
 /**
@@ -441,7 +449,7 @@ private func RejectUse(object user)
  Interface for signaling that the weapon is ready to use (attack). 
  @return true, if the object is ready to use.
  */
-protected func IsReadyToUse()
+private func IsReadyToUse()
 {
 	return true;
 }
@@ -569,6 +577,16 @@ private func FxIntRecoveryTimer(object target, proplist effect, int time)
 	return FX_Execute_Kill;
 }
 
+private func CancelRecovery()
+{
+	var effect = IsRecovering();
+	
+	if (effect != nil)
+	{
+		RemoveEffect(nil, nil, effect);
+	}
+}
+
 private func IsRecovering()
 {
 	return GetEffect("IntRecovery", this);
@@ -582,14 +600,23 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 
 	if (firemode.burst)
 	{
+		if (firemode.mode != WEAPON_FM_Burst)
+		{
+			FatalError("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode.burst, firemode.mode);
+		}
+	
 		if (shot_counter[firemode.name] >= firemode.burst)
 		{
 			shot_counter[firemode.name] = 0;
 		}
-		else if (!is_using)
+		else 
 		{
-			Log("Burst!!");
-			ControlUseStart(user, x, y); // TODO
+			
+			if (!is_using)
+			{
+				CancelRecovery();
+				DoFireCycle(user, x, y, false);
+			}
 			
 			return; // prevent cooldown
 		}
@@ -618,7 +645,8 @@ public func OnRecovery(object user, proplist firemode)
  */
 private func IsReadyToFire()
 {
-	return !IsRecovering();
+	return !IsRecovering()
+	    && !IsCoolingDown();
 }
 
 
@@ -628,7 +656,7 @@ private func IsReadyToFire()
 
 private func StartCooldown(object user, proplist firemode)
 {
-	if (firemode.delay_cooldown < 1 || !NeedsCooldown(firemode)) return;
+	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode)) return;
 	
 	var effect = IsCoolingDown();
 
