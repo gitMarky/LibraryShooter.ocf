@@ -602,7 +602,7 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 	{
 		if (firemode.mode != WEAPON_FM_Burst)
 		{
-			FatalError("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode.burst, firemode.mode);
+			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode.burst, firemode.mode));
 		}
 	
 		if (shot_counter[firemode.name] >= firemode.burst)

@@ -27,7 +27,8 @@ local is_launched;				// bool - true if the projectile has been launched
 local remove_on_hit;			// bool - is the object removed when it hits an object or the landscape?
 
 local lastX, lastY, nextX, nextY;// int - positions for hit checks
-local trail;					// object - for effects
+local trail;					 // object - for effects
+local trail_width, trail_length; // int - trail dimensions, in pixels 
 
 local lifetime;					// int - calculated from range and velocity
 
@@ -174,6 +175,27 @@ public func HitScan()
 	ProhibitedWhileLaunched();
 	
 	instant = true;
+	return this;
+}
+
+/**
+ Configures the projectile trail dimensions.
+ @par width The trail width, in pixels.
+ @par length The trail length, in pixels.
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.1.0
+ */
+public func Trail(int width, int length)
+{
+	ProhibitedWhileLaunched();
+	
+	if (width < 0 || length < 0)
+	{
+		FatalError(Format("The trail dimensions must be positive. Got: %d/%d", width, length));
+	}
+	
+	trail_width = width;
+	trail_length = length;
 	return this;
 }
 
@@ -395,12 +417,12 @@ public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int
 }
 */
 
-func CreateTrail(int x, int y, int width, int length)
+func CreateTrail(int x, int y)
 {
 	// neat trail
 	trail = CreateObject(Bullet_Trail, x, y);
 	trail->SetObjectBlitMode(GFX_BLIT_Additive);
-	trail->Set(this, width, length);
+	trail->Set(this, trail_width, trail_length);
 }
 
 func FxPositionCheckTimer(target, effect, time)
