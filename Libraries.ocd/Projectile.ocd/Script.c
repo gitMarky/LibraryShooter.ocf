@@ -9,6 +9,9 @@
 static const PROJECTILE_Default_Velocity_Precision = 10;
 static const PROJECTILE_Range_Infinite = 0;
 
+static const PROJECTILE_Deviation_Value = 0;
+static const PROJECTILE_Deviation_Precision = 1;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // definitions
@@ -268,7 +271,7 @@ func Remove()
 	if(self) RemoveObject();
 }
 
-public func Launch(int angle, int deviation)
+public func Launch(int angle, array deviation)
 {
 	
 	lifetime = PROJECTILE_Default_Velocity_Precision * range / velocity;
@@ -279,9 +282,49 @@ public func Launch(int angle, int deviation)
 	SetController(user->GetController());
 	
 	var precision = 100;
-
-	angle *= precision;
-	angle += RandomX(-deviation, deviation);
+	var precisions = [];
+	var precision_max = 0;
+	
+	// get common precision
+	
+	if (GetType(deviation[PROJECTILE_Deviation_Value]) == C4V_Array)
+	{
+		for (var dev in deviation)
+		{
+			var pre = dev[PROJECTILE_Deviation_Precision];
+			PushBack(precisions, pre);
+			
+			if (pre > precision_max) precision_max = pre;
+		}
+		
+		var min_exponent = GetExponent(precision_max);
+		
+		precision = 1;
+		for (var pre in precisions)
+		{
+			precision *= pre;
+			
+			var exponent = GetExponent(precision);
+			if (exponent > min_exponent)
+			{
+				precision /= 10 ** (exponent - min_exponent);
+			}
+		}
+		
+		angle *= precision;
+		
+		for (var i = 0; i < GetLength(deviation); i++)
+		{
+			var rnd = deviation[i][PROJECTILE_Deviation_Value] * precision / deviation[i][PROJECTILE_Deviation_Precision];
+			angle += RandomX(-rnd, +rnd);
+		}
+	}
+	else
+	{
+		precision = deviation[PROJECTILE_Deviation_Precision];
+		angle *= precision;
+	    angle += RandomX(-deviation[PROJECTILE_Deviation_Value], deviation[PROJECTILE_Deviation_Value]);
+	}
 	
 	var self = this;
 			
@@ -1017,4 +1060,17 @@ private func ProhibitedWhileLaunched()
 	{
 		FatalError("This function may only be called before the projectile is launched.");
 	}
+}
+
+private func GetExponent(int value, int base)
+{
+	var exponent = 0;
+	
+	if (base == nil) base = 10;
+	
+	for (var test = value; test%base == 0; test = test/base)
+	{
+	}
+	
+	return exponent;
 }

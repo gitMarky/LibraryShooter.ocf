@@ -62,11 +62,9 @@ local fire_modes =
 		projectile_distance = 10,
 		projectile_offset_y = -6,
 		projectile_number = 1,
-		projectile_spread = 0, // default inaccuracy of a single projectile
-		projectile_spread_factor = 100, // factor
+		projectile_spread = [0, 100], // default inaccuracy of a single projectile
 
-		spread = 1,			   // inaccuracy from prolonged firing
-		spread_factor = 100,   // factor
+		spread = [1, 100],			   // inaccuracy from prolonged firing
 		
 		burst = 0, // number of projectiles fired in a burst
 	},
@@ -483,15 +481,15 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 		          ->DamageType(firemode.damage_type)
 		          ->Velocity(SampleVelocity(firemode.projectile_speed))
 				  ->Range(firemode.projectile_range)
-		          ->Launch(angle, GetSpread(angle));
+		          ->Launch(angle, GetSpread(firemode));
 	}
 	
 	shot_counter[firemode.name]++;
 }
 
-private func GetSpread(int angle, proplist ) // TODO
+private func GetSpread(proplist firemode)
 {
-	return angle;
+	return [firemode.spread, firemode.projectile_spread];
 }
 
 /**
