@@ -7,6 +7,7 @@
  */
 
 static const PROJECTILE_Default_Velocity_Precision = 10;
+static const PROJECTILE_Range_Infinite = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -153,7 +154,7 @@ public func DamageType(int value)
 public func Velocity(int value)
 {
 	ProhibitedWhileLaunched();
-	
+		
 	if (value < 0)
 	{
 		FatalError(Format("Cannot set negative velocity - the function received %d", value));
@@ -446,7 +447,7 @@ protected func Travelling()
 	}
 	
 	
-	if(GetActTime() >= lifetime) Remove();
+	if(lifetime > 0 && GetActTime() >= lifetime) Remove();
 }
 
 protected func ControlSpeed()

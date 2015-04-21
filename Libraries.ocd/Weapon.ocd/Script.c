@@ -474,12 +474,14 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 		var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
 	
 		OnFireProjectile(user, projectile, firemode);
+		
+		
 	
 		projectile->Shooter(user)
 				  ->Weapon(this)
 				  ->Damage(firemode.damage)
 		          ->DamageType(firemode.damage_type)
-		          ->Velocity(firemode.projectile_speed)
+		          ->Velocity(SampleVelocity(firemode.projectile_speed))
 				  ->Range(firemode.projectile_range)
 		          ->Launch(angle, GetSpread(angle));
 	}
@@ -723,4 +725,24 @@ private func FxIntCooldownTimer(object target, proplist effect, int time)
 	target->DoCooldown(effect.user, effect.firemode);
 	
 	return FX_Execute_Kill;
+}
+
+private func SampleVelocity(value)
+{
+	if (GetType(value) == C4V_Array)
+	{
+		var min = value[0];
+		var range = value[1] - min;
+		var step = Max(value[2], 1);
+		
+		return min + step * Random(range / step);
+	}
+	else if (GetType(value) == C4V_Int)
+	{
+		return value;
+	}
+	else
+	{
+		FatalError(Format("Expected int or array, got %v", value));
+	}
 }
