@@ -20,6 +20,8 @@ local Collectible = 1;
 local is_selected = true;  // bool: is the weapon currently selected?
 local is_using = false;    // bool: is the user holding the fire button
 
+static const WEAPON_Firemode_Default = "default";
+
 static const WEAPON_FM_Single	= 1;
 static const WEAPON_FM_Burst 	= 2;
 static const WEAPON_FM_Auto 	= 3;
@@ -288,6 +290,10 @@ protected func ControlUseStart(object user, int x, int y)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
+	
+	Log("Press use");
+	
+	OnPressUse(user, x, y);
 
 //	if(!Ready(user, x, y)) return true; // checks loading etc
 
@@ -310,6 +316,30 @@ protected func ControlUseStart(object user, int x, int y)
 }
 
 /**
+ The function does the following:@br
+ - tell the user to start aiming@br
+ - call {@link Library_Weapon#ControlUseHolding}@br
+ - call {@link Library_Weapon#Fire}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+protected func ControlUseAltStart(object user, int x, int y)
+{
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+	
+	Log("Press use alt");
+	
+	OnPressUseAlt(user, x, y);
+	
+	return true;
+}
+
+/**
  This is executed while the user is holding the fire button.@br@br
 
  The function does the following:@br
@@ -326,9 +356,14 @@ protected func ControlUseHolding(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
-	DoFireCycle(user, x, y, true);
+	DoFireCycle(user, x, y, true, GetFiremode());
 	
 	return true;
+}
+
+protected func ControlUseAltHolding(object user, int x, int y)
+{
+	return ControlUseHolding(user, x, y);
 }
 
 /**
@@ -351,12 +386,33 @@ protected func ControlUseStop(object user, int x, int y)
 	is_using = false;
 	
 	CancelCharge(true);
+	
+	if (!IsRecovering())
+	{
+		CheckCooldown(user, fire_modes[GetFiremode()]);
+	}
+	
 	OnUseStop(user, x, y);
 	
 	return true;
 }
 
-private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
+protected func ControlUseAltStop(object user, int x, int y)
+{
+	return ControlUseStop(user, x, y);
+}
+
+protected func ControlUseCancel(object user, int x, int y)
+{
+	return ControlUseStop(user, x, y);
+}
+
+protected func ControlUseAltCancel(object user, int x, int y)
+{
+	return ControlUseStop(user, x, y);
+}
+
+private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger, string firemode)
 {
 	var angle = GetAngle(x, y);
 	user->SetAimPosition(angle);
@@ -368,7 +424,7 @@ private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 
 	if (IsReadyToFire())
 	{
-		Fire(user, x, y);
+		Fire(user, x, y, firemode);
 	}
 }
 
@@ -434,8 +490,6 @@ private func Fire(object user, int x, int y, string firemode)
 //	AddDeviation();
 
 	FireRecovery(user, x, y, info);
-	
-	user->Message("Pew pew %d", angle);
 }
 
 private func RejectUse(object user)
@@ -615,13 +669,18 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 			if (!is_using)
 			{
 				CancelRecovery();
-				DoFireCycle(user, x, y, false);
+				DoFireCycle(user, x, y, false, firemode.name);
 			}
 			
 			return; // prevent cooldown
 		}
 	}
 	
+	CheckCooldown(user, firemode);
+}
+
+private func CheckCooldown(object user, proplist firemode)
+{
 	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
 	{
 		StartCooldown(user, firemode);
@@ -743,4 +802,35 @@ private func SampleVelocity(value)
 	{
 		FatalError(Format("Expected int or array, got %v", value));
 	}
+}
+
+/**
+ Callback: the current firemode. Overload this function for
+ @return proplist The current firemode.
+ @version 0.1.0
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+public func GetFiremode()
+{
+}
+
+/**
+ Callback: Pressed the regular use button (fire).
+ */
+public func OnPressUse(object user, int x, int y)
+{
+}
+
+/**
+ Callback: Pressed the alternate use button (fire secondary).
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+public func OnPressUseAlt(object user, int x, int y)
+{
 }
