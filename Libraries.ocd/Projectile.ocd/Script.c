@@ -287,43 +287,54 @@ public func Launch(int angle, array deviation)
 	
 	// get common precision
 	
-	if (GetType(deviation[PROJECTILE_Deviation_Value]) == C4V_Array)
+	if (GetType(deviation) == C4V_Array)
 	{
-		for (var dev in deviation)
+		if (GetType(deviation[PROJECTILE_Deviation_Value]) == C4V_Array)
 		{
-			var pre = dev[PROJECTILE_Deviation_Precision];
-			PushBack(precisions, pre);
-			
-			if (pre > precision_max) precision_max = pre;
-		}
-		
-		var min_exponent = GetExponent(precision_max);
-		
-		precision = 1;
-		for (var pre in precisions)
-		{
-			precision *= pre;
-			
-			var exponent = GetExponent(precision);
-			if (exponent > min_exponent)
+			for (var dev in deviation)
 			{
-				precision /= 10 ** (exponent - min_exponent);
+				var pre = dev[PROJECTILE_Deviation_Precision];
+				PushBack(precisions, pre);
+				
+				if (pre > precision_max) precision_max = pre;
+			}
+			
+			var min_exponent = GetExponent(precision_max);
+			
+			precision = 1;
+			for (var pre in precisions)
+			{
+				precision *= pre;
+				
+				var exponent = GetExponent(precision);
+				if (exponent > min_exponent)
+				{
+					precision /= 10 ** (exponent - min_exponent);
+				}
+			}
+			
+			angle *= precision;
+			
+			for (var i = 0; i < GetLength(deviation); i++)
+			{
+				var rnd = deviation[i][PROJECTILE_Deviation_Value] * precision / deviation[i][PROJECTILE_Deviation_Precision];
+				angle += RandomX(-rnd, +rnd);
 			}
 		}
-		
-		angle *= precision;
-		
-		for (var i = 0; i < GetLength(deviation); i++)
+		else
 		{
-			var rnd = deviation[i][PROJECTILE_Deviation_Value] * precision / deviation[i][PROJECTILE_Deviation_Precision];
-			angle += RandomX(-rnd, +rnd);
+			precision = deviation[PROJECTILE_Deviation_Precision];
+			angle *= precision;
+		    angle += RandomX(-deviation[PROJECTILE_Deviation_Value], deviation[PROJECTILE_Deviation_Value]);
 		}
+	}
+	else if (GetType(deviation) == C4V_Nil)
+	{
+		angle *= precision;
 	}
 	else
 	{
-		precision = deviation[PROJECTILE_Deviation_Precision];
-		angle *= precision;
-	    angle += RandomX(-deviation[PROJECTILE_Deviation_Value], deviation[PROJECTILE_Deviation_Value]);
+		FatalError(Format("Unexpected parameter %v for deviation. Expected array", deviation));
 	}
 	
 	var self = this;

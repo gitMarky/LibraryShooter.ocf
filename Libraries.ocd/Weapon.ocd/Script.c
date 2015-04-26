@@ -291,8 +291,6 @@ protected func ControlUseStart(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 	
-	Log("Press use");
-	
 	OnPressUse(user, x, y);
 
 //	if(!Ready(user, x, y)) return true; // checks loading etc
@@ -332,8 +330,6 @@ protected func ControlUseAltStart(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 	
-	Log("Press use alt");
-	
 	OnPressUseAlt(user, x, y);
 	
 	return true;
@@ -356,7 +352,7 @@ protected func ControlUseHolding(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
-	DoFireCycle(user, x, y, true, GetFiremode());
+	DoFireCycle(user, x, y, true);
 	
 	return true;
 }
@@ -389,7 +385,7 @@ protected func ControlUseStop(object user, int x, int y)
 	
 	if (!IsRecovering())
 	{
-		CheckCooldown(user, fire_modes[GetFiremode()]);
+		CheckCooldown(user, GetFiremode());
 	}
 	
 	OnUseStop(user, x, y);
@@ -412,7 +408,7 @@ protected func ControlUseAltCancel(object user, int x, int y)
 	return ControlUseStop(user, x, y);
 }
 
-private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger, string firemode)
+private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 {
 	var angle = GetAngle(x, y);
 	user->SetAimPosition(angle);
@@ -424,7 +420,7 @@ private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger, st
 
 	if (IsReadyToFire())
 	{
-		Fire(user, x, y, firemode);
+		Fire(user, x, y);
 	}
 }
 
@@ -460,36 +456,31 @@ private func GetFireAngle(int x, int y, proplist firemode)
  @par angle The angle the weapon is aimed at.
  @version 0.1.0
  */
-private func Fire(object user, int x, int y, string firemode)
+private func Fire(object user, int x, int y)
 {
 	if (user == nil)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
 	
+	var firemode = GetFiremode(); //GetProperty(firemode, fire_modes);
+	
 	if (firemode == nil)
-	{
-		firemode = "default";
-	}
-	
-	var info = GetProperty(firemode, fire_modes);
-	
-	if (info == nil)
 	{
 		FatalError(Format("Fire mode '%s' not supported", firemode));
 	}
 	
-	if (StartCharge(user, info)) return;
+	if (StartCharge(user, firemode)) return;
 
-	var angle = GetFireAngle(x, y, info);
+	var angle = GetFireAngle(x, y, firemode);
 
-	FireSound(user, info);
-	FireEffect(user, angle, info);
+	FireSound(user, firemode);
+	FireEffect(user, angle, firemode);
 
-	FireProjectiles(user, angle, info);
+	FireProjectiles(user, angle, firemode);
 //	AddDeviation();
 
-	FireRecovery(user, x, y, info);
+	FireRecovery(user, x, y, firemode);
 }
 
 private func RejectUse(object user)
@@ -669,7 +660,7 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 			if (!is_using)
 			{
 				CancelRecovery();
-				DoFireCycle(user, x, y, false, firemode.name);
+				DoFireCycle(user, x, y, false);
 			}
 			
 			return; // prevent cooldown
@@ -693,7 +684,7 @@ private func CheckCooldown(object user, proplist firemode)
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
  */
-public func OnRecovery(object user, proplist firemode)
+public func OnRecovery(object user)
 {
 	
 }
@@ -833,4 +824,10 @@ public func OnPressUse(object user, int x, int y)
  */
 public func OnPressUseAlt(object user, int x, int y)
 {
+}
+
+public func CanChangeFiremode()
+{
+	return !IsRecovering()
+	    && !IsCharging();
 }

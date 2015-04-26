@@ -15,7 +15,7 @@ local selected_firemode;
  */
 public func GetFiremode()
 {
-	return selected_firemode;
+	return GetProperty(selected_firemode, this.fire_modes);
 }
 
 /**
@@ -23,7 +23,7 @@ public func GetFiremode()
  */
 public func OnPressUse(object user, int x, int y)
 {
-	if (this->~IsReadyToFire())
+	if (this->~CanChangeFiremode())
 	{
 		selected_firemode = WEAPON_Firemode_Primary;
 	}
@@ -38,7 +38,7 @@ public func OnPressUse(object user, int x, int y)
  */
 public func OnPressUseAlt(object user, int x, int y)
 {
-	if (this->~IsReadyToFire())
+	if (this->~CanChangeFiremode())
 	{
 		selected_firemode = WEAPON_Firemode_Secondary;
 	}

@@ -1,25 +1,15 @@
 
 #appendto Clonk
-
+/*
 public func CreateMuzzleFlash(int x, int y, int angle, int size)
 {
 	CreateParticleAtBone("MuzzleFlash", "pos_hand1", [0, 0, 0], [100, 0, 0], 10, {Prototype = Particles_MuzzleFlash(), Size = 3 * size, Rotation = angle}, 1);
-	//for (var i = 0; i < size; ++i)
-	//CreateParticleAtBone("StarFlash", "pos_hand1", [0, 0, 0], [RandomX(-10, 10), RandomX(-10, 10), RandomX(-10, 10)], PV_Random(20, 60), Particles_Glimmer(), size);
 	var xdir = Sin(angle, size * 2);
 	var ydir = -Cos(angle, size * 2);
 	CreateParticle("StarFlash", x, y, PV_Random(xdir - size, xdir + size), PV_Random(ydir - size, ydir + size), PV_Random(20, 60), Particles_Glimmer(), size);
-	//for(var i=0; i<5; ++i)
-	//	CreateParticleAtBone("GunSmoke", "pos_hand1", [0, 0, 0], [RandomX(10, 20), RandomX(-5, 5), 0], RandomX(15,30), RGBa(255,255,255,100));
 	return;	
-	/*// main muzzle flash
-	CreateParticle("MuzzleFlash", x, y, 0, 0, 10, {Prototype = Particles_MuzzleFlash(), Size = size, Rotation = angle});
-	// and some additional little sparks
-	var xdir = Sin(angle, size * 2);
-	var ydir = -Cos(angle, size * 2);
-	CreateParticle("StarFlash", x, y, PV_Random(xdir - size, xdir + size), PV_Random(ydir - size, ydir + size), PV_Random(20, 60), */
 }
-
+*/
 func Recruitment()
 {
 	this.ThrowSpeed *= 2;
@@ -88,7 +78,7 @@ func FxOverallDamageStuffDamage(pTarget, iEffectNumber, iDmgEngy, iCause, iBy)
 				
 				if(!obj->~NoRemove())
 				{
-					AddEffect("ScheduledRemove", obj, 1, 1, 0, Clonk, pTarget);
+					AddEffect("ScheduledRemove", obj, 1, 1, nil, Clonk, pTarget);
 					pTarget.kill_bounty += Max(1, (obj->GetValue() / 5)) * 2;
 				}
 			}
