@@ -512,7 +512,7 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 	var y = -Cos(angle, firemode.projectile_distance) + firemode.projectile_offset_y;
 
 	// launch the single projectiles
-	for (var i = 0; i < firemode.projectile_number; i++)
+	for (var i = 0; i < Max(1, firemode.projectile_number); i++)
 	{
 		var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
 	

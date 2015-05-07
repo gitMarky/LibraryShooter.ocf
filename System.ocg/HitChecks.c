@@ -114,7 +114,7 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 	
 				target->SetPosition(oldx + Cos(target->GetR()-90, objdist), oldy + Sin(target->GetR()-90, objdist));
 				if(target.trail)
-					target.trail->Traveling();
+					target.trail->~Travelling();
 				
 				target->~HitObject(obj);
 				if (!target)

@@ -17,6 +17,9 @@
 local do_fade, fade_speed, projectile, w, l, r, x, y;
 
 local precision = 1000;
+local fade_speed_precision = 100;
+local fade_speed_factor = 100;
+local fade_speed_add = 0;
 
 /**
  Sets the trail to follow the projectile.
@@ -70,7 +73,7 @@ public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_
 	x = GetX();
 	y = GetY();
 	
-	fade_speed = Sqrt(x_dir * x_dir/ precision + y_dir * y_dir / precision);
+	fade_speed = Sqrt(x_dir * x_dir/ precision + y_dir * y_dir / precision) * fade_speed_factor / fade_speed_precision;
 	
 	// do the magic!
 
@@ -170,7 +173,7 @@ private func DrawTransform()
 	// stretch >-<
 	if (do_fade)
 	{
-		l = Max(0, l - fade_speed);
+		l = Max(0, Min(l, l + fade_speed_add - fade_speed));
 	}
 	
 	// stretch <->
@@ -212,7 +215,7 @@ local ActMap =
 		X = 0,
 		Y = 0,
 		Wdt = 5,
-		Hgt = 25,
+		Hgt = 28,
 		OffX = 0,
 		OffY = 2,
 		StartCall = "Travelling"
