@@ -14,7 +14,7 @@
 	@version 0.1.0
 */
 
-local do_fade, fade_speed, projectile, w, l, r, x, y;
+local do_fade, fade_speed, move_speed, projectile, w, l, r, x, y;
 
 local precision = 1000;
 local fade_speed_precision = 100;
@@ -73,14 +73,13 @@ public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_
 	x = GetX();
 	y = GetY();
 	
-	fade_speed = Sqrt(x_dir * x_dir/ precision + y_dir * y_dir / precision) * fade_speed_factor / fade_speed_precision;
+	move_speed = Sqrt(x_dir * x_dir/ precision + y_dir * y_dir / precision);
+	fade_speed = move_speed * fade_speed_factor / fade_speed_precision;
 	
 	// do the magic!
 
 	SetPosition(x_end, y_end);
 	SetAction("Travel");
-	
-	//Travelling(); // not necessary? this is the start call of the action after all
 }
 
 /**
@@ -140,6 +139,7 @@ private func Remove()
 	
 	do_fade = true;
 	projectile = nil;
+	move_speed = 0;
 }
 
 private func GetRelativeLength()
@@ -166,18 +166,17 @@ private func DrawTransform()
 {
 	var relative_length = GetRelativeLength();
 	
-	// skip because nothing has to be transformed
-	//if (!do_fade && l < relative_length)
-	//	return;
+	// stretch <->
+	var h = Max(0, Min(l, relative_length) + move_speed - fade_speed);
 	
-	// stretch >-<
 	if (do_fade)
 	{
-		l = Max(0, Min(l, l + fade_speed_add - fade_speed));
+		l = Min(l, h);
 	}
-	
-	// stretch <->
-	var h = Min(l, relative_length);
+	else
+	{
+		l = Max(l, h);
+	}
 	
 	var fsin = -Sin(r, precision), fcos = Cos(r, precision);
 	
