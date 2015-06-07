@@ -189,7 +189,7 @@ public func HitScan()
  @return object Returns the projectile object, so that further function calls can be issued.
  @version 0.1.0
  */
-public func Trail(int width, int length)
+public func Trail(int width, int length, string gfx, int speed)
 {
 	ProhibitedWhileLaunched();
 	

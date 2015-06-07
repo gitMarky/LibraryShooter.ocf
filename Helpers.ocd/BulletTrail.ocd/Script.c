@@ -74,7 +74,7 @@ public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_
 	y = GetY();
 	
 	move_speed = Sqrt(x_dir * x_dir/ precision + y_dir * y_dir / precision);
-	fade_speed = move_speed * fade_speed_factor / fade_speed_precision;
+	SetFadeSpeed(fade_speed_factor);
 	
 	// do the magic!
 
@@ -167,7 +167,7 @@ private func DrawTransform()
 	var relative_length = GetRelativeLength();
 	
 	// stretch <->
-	var h = Max(0, Min(l, relative_length) + move_speed - fade_speed);
+	var h = Max(0, Min(l + move_speed - fade_speed, relative_length));
 	
 	if (do_fade)
 	{
@@ -229,4 +229,10 @@ private func FxIntProjectileTimer(object target, proplist effect, int time)
 	}
 	
 	ProjectileUpdate();
+}
+
+public func SetFadeSpeed(int factor)
+{
+	fade_speed_factor = factor;
+	fade_speed = move_speed * fade_speed_factor / fade_speed_precision;
 }

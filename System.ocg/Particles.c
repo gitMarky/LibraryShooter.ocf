@@ -1,6 +1,9 @@
-global func CreateImpactEffect(int size, int xoff, int yoff, string name)
+global func CreateImpactEffect(int size, int xoff, int yoff, string name, particles)
 {
-	var particles = Particles_Glimmer();
+	if (particles == nil)
+	{
+		particles = Particles_Glimmer();
+	}
 	
 	if (name == nil)
 	{
