@@ -684,7 +684,7 @@ private func CheckCooldown(object user, proplist firemode)
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
  */
-public func OnRecovery(object user)
+public func OnRecovery(object user, proplist firemode)
 {
 	
 }
