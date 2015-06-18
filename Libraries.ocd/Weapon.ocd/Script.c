@@ -102,7 +102,7 @@ local shot_counter; // proplist
 
 private func StartCharge(object user, proplist firemode)
 {
-	if (!is_using || firemode.delay_charge < 1 || !NeedsCharge(firemode)) return false;
+	if (!is_using || firemode.delay_charge < 1 || !NeedsCharge(user, firemode)) return false;
 	
 	var effect = IsCharging();
 	
@@ -198,7 +198,7 @@ public func GetChargeProgress()
 {
 	var effect = IsCharging();
 	
-	if (effect = nil)
+	if (effect == nil)
 	{
 		return -1;
 	}
@@ -463,7 +463,7 @@ private func Fire(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 	
-	var firemode = GetFiremode(); //GetProperty(firemode, fire_modes);
+	var firemode = GetFiremode();
 	
 	if (firemode == nil)
 	{
@@ -577,14 +577,31 @@ public func OnUseStop(object user, int x, int y)
 {
 }
 
-private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light)
+private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light, int color, string particle)
 {
 	if (user == nil)
 	{
 		FatalError("This function expects a user that is not nil");
 	}
 	
-	user->CreateParticle("MuzzleFlash", x, y, 0, 0, 10, {Prototype = Particles_MuzzleFlash(), Size = 3 * size, Rotation = angle}, 1);
+	if (particle == nil)
+	{
+		particle = "MuzzleFlash";
+	}
+	
+	var r, g, b;
+	if (color == nil)
+	{
+		r = g = b = 255;
+	}
+	else
+	{
+		r = GetRGBaValue(color, RGBA_RED);
+		g = GetRGBaValue(color, RGBA_GREEN);
+		b = GetRGBaValue(color, RGBA_BLUE);
+	}
+
+	user->CreateParticle(particle, x, y, 0, 0, 10, {Prototype = Particles_MuzzleFlash(), Size = 3 * size, Rotation = angle, R = r, G = g, B = b}, 1);
 
 	if (sparks)
 	{
@@ -596,7 +613,7 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 	
 	if (light)
 	{
-		user->CreateTemporaryLight(x, y)->LightRangeStart(3 * size)->SetLifetime(2)->Activate();
+		user->CreateTemporaryLight(x, y)->LightRangeStart(3 * size)->SetLifetime(2)->Color(color)->Activate();
 	}
 }
 
