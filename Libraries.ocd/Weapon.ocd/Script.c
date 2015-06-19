@@ -100,8 +100,15 @@ local shot_counter; // proplist
 //
 // charging the weapon
 
-private func StartCharge(object user, proplist firemode)
+private func StartCharge(object user, int x, int y)
 {
+	var firemode = GetFiremode();
+
+	if (firemode == nil)
+	{
+		FatalError(Format("Fire mode '%s' not supported", firemode));
+	}
+
 	if (!is_using || firemode.delay_charge < 1 || !NeedsCharge(user, firemode)) return false;
 	
 	var effect = IsCharging();
@@ -117,38 +124,45 @@ private func StartCharge(object user, proplist firemode)
 			else if (effect.is_charged)
 			{
 				effect.has_charged = true;
-				DoCharge(user, firemode);
+				DoCharge(user, x, y, firemode);
 				return false; // fire away
 			}
-			
-			return true; // keep charging
+			else
+			{
+				if (effect.progress > 0)
+				{
+					OnProgressCharge(user, x, y, firemode, effect.progress);
+					effect.percent_old = effect.percent;
+				}
+				return true; // keep charging
+			}
 		}
 		else
 		{
-			CancelCharge(false);
+			CancelCharge(user, x, y, firemode, false);
 		}
 	}
 
 	AddEffect("IntCharge", this, 1, 1, this, nil, user, firemode);
-	OnStartCharge(user, firemode);
+	OnStartCharge(user, x, y, firemode);
 	return true; // keep charging
 }
 
-private func CancelCharge(bool callback)
+private func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
 {
 	var effect = IsCharging();
 	
 	if (effect != nil)
 	{
-		if (callback) OnCancelCharge(effect.user, effect.firemode);
+		if (callback) OnCancelCharge(effect.user, x, y, effect.firemode);
 		
 		RemoveEffect(nil, nil, effect);
 	}
 }
 
-private func DoCharge(object user, proplist firemode)
+private func DoCharge(object user, int x, int y, proplist firemode)
 {
-	OnFinishCharge(user, firemode);
+	OnFinishCharge(user, x, y, firemode);
 }
 
 private func IsCharging()
@@ -175,7 +189,7 @@ public func NeedsCharge(object user, proplist firemode)
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
  */
-public func OnStartCharge(object user, proplist firemode)
+public func OnStartCharge(object user, int x, int y, proplist firemode)
 {
 }
 
@@ -185,7 +199,18 @@ public func OnStartCharge(object user, proplist firemode)
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
  */
-public func OnFinishCharge(object user, proplist firemode)
+public func OnFinishCharge(object user, int x, int y, proplist firemode)
+{
+}
+
+/**
+ Callback: the weapon has successfully charged. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @par percent The progress of charging, in percent.
+ @version 0.1.0
+ */
+public func OnProgressCharge(object user, int x, int y, proplist firemode, int percent)
 {
 }
 
@@ -214,7 +239,7 @@ public func GetChargeProgress()
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
  */
-public func OnCancelCharge(object user, proplist firemode)
+public func OnCancelCharge(object user, int x, int y, proplist firemode)
 {
 }
 
@@ -224,11 +249,13 @@ private func FxIntChargeStart(object target, proplist effect, int temp, object u
 	
 	effect.user = user;
 	effect.firemode = firemode;
+	effect.percent_old = 0;
 }
 
 private func FxIntChargeTimer(object target, proplist effect, int time)
 {
 	effect.percent = BoundBy(time * 100 / effect.firemode.delay_charge, 0, 100);
+	effect.progress = effect.percent - effect.percent_old;
 
 	if (time > effect.firemode.delay_charge && !effect.is_charged)
 	{
@@ -381,7 +408,7 @@ protected func ControlUseStop(object user, int x, int y)
 
 	is_using = false;
 	
-	CancelCharge(true);
+	CancelCharge(user, x, y, GetFiremode(), true);
 	
 	if (!IsRecovering())
 	{
@@ -420,7 +447,8 @@ private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 
 	if (IsReadyToFire())
 	{
-		Fire(user, x, y);
+		if (!StartCharge(user, x, y))
+			Fire(user, x, y);
 	}
 }
 
@@ -469,8 +497,6 @@ private func Fire(object user, int x, int y)
 	{
 		FatalError(Format("Fire mode '%s' not supported", firemode));
 	}
-	
-	if (StartCharge(user, firemode)) return;
 
 	var angle = GetFireAngle(x, y, firemode);
 
