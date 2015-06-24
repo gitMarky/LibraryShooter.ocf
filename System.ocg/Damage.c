@@ -1,20 +1,21 @@
 /* Schadenssystem */
 
 
-global func DoDmg(int iDmg, int iType, object pTarget, int iPrecision, empty, object pFrom, id idWeapon) {
-  if(!pTarget)
-    if(!(pTarget = this))
-      return(0);
+global func DoDmg(int iDmg, int iType, object pTarget, int iPrecision, empty, object pFrom, id idWeapon)
+{
+	if(!pTarget)
+    	if(!(pTarget = this))
+      	return(0);
 	if(!pFrom)
 		pFrom = this;
-  if(!iPrecision)
-    iPrecision = 1000;
+  	if(!iPrecision)
+    	iPrecision = 1000;
 
-  var dmg;
+  	var dmg;
 
-  var red = pTarget->~OnDmg(iDmg, iType); //reduction
-  // reduction
-  dmg = (iDmg*(100-red)*iPrecision) / 100;
+  	var red = pTarget->~OnDmg(iDmg, iType); //reduction
+  	// reduction
+	dmg = (iDmg*(100-red)*iPrecision) / 100;
 
 	if(dmg <= 0) return;
 	pTarget->~SetLastDamagingWeapon(idWeapon);
@@ -38,15 +39,18 @@ global func DoDmg(int iDmg, int iType, object pTarget, int iPrecision, empty, ob
   if(!n) n = "???";
   Log("%s deals %d dmg to %s", n, dmg, pTarget->GetName());
   }*/
-  pTarget->~OnHit(dmg/1000, iType, pFrom, idWeapon);
-	if(pTarget->GetCategory() & C4D_Living)
+	pTarget->~OnHit(dmg/1000, iType, pFrom, idWeapon);
+  
+  	if (!pTarget) return 1;
+  
+	if (pTarget->GetCategory() & C4D_Living)
 	{
 		pTarget->DoEnergy(-dmg, true, nil, pFrom->GetController());
-		
-		
-		
-		return 1;
 	}
-  pTarget->DoDamage(dmg/1000, nil, pFrom->GetController());
-  return 1;
+	else
+	{
+		pTarget->DoDamage(dmg/1000, nil, pFrom->GetController());
+	}
+	
+	return 1;
 }

@@ -15,7 +15,7 @@ global func StartHitCheckCall(object shooter, bool never_shooter, bool limit_vel
 	{
 		FatalError("StartHitCheckCall() must be called from object context!");
 	}
-	
+
 	return AddEffect("HitCheck2", this, 1, nil, nil, nil, shooter, never_shooter, limit_velocity);
 }
 
@@ -26,9 +26,19 @@ global func DoHitCheckCall()
 		FatalError("DoHitCheckCall() must be called from object context!");
 	}
 
-	var e = GetEffect("HitCheck2", this);
+	var e = GetHitCheck();
 	if(!e) return;
 	EffectCall(this, e, "DoCheck");
+}
+
+global func GetHitCheck()
+{
+	if (!this)
+	{
+		FatalError("GetHitCheck() must be called from object context!");
+	}
+
+	return GetEffect("HitCheck2", this);
 }
 
 global func FxHitCheck2Start(object target, proplist effect, int temp, object by_obj, bool never_shooter, bool limit_velocity)
@@ -110,12 +120,15 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 			// IsProjectileTarget or Alive will be hit
 			if (obj->~IsProjectileTarget(target, shooter) || obj->GetOCF() & OCF_Alive)
 			{
-				var objdist = ObjectDistance(target, obj);
-	
-				target->SetPosition(oldx + Cos(target->GetR()-90, objdist), oldy + Sin(target->GetR()-90, objdist));
+				var objdist = Distance(oldx, oldy, obj->GetX(), obj->GetY());
+				var diffx = objdist * (newx - oldx) / Max(dist, 1);
+				var diffy = objdist * (newy - oldy) / Max(dist, 1);
+
+				target->SetPosition(oldx + diffx, oldy + diffy);
+
 				if(target.trail)
 					target.trail->~Travelling();
-				
+
 				target->~HitObject(obj);
 				if (!target)
 					return;

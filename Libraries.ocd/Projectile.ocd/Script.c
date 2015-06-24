@@ -125,7 +125,7 @@ public func Range(int value)
  @return object Returns the projectile object, so that further function calls can be issued.
  @version 0.1.0
  */
-public func Damage(int value)
+public func DamageAmount(int value)
 {
 	ProhibitedWhileLaunched();
 	
@@ -352,10 +352,14 @@ public func Launch(int angle, array deviation)
 	}
 	else
 	{
+		StartHitCheckCall(user, true, false);
+		
+		range *= precision;
+
 		// set position to final point
 		var x_p = GetX();
 		var y_p = GetY();
-		
+
 		var t_x = GetX() + Sin(angle, range, precision);
 		var t_y = GetY() - Cos(angle, range, precision);
 		
@@ -369,51 +373,64 @@ public func Launch(int angle, array deviation)
 		{
 			SetPosition(coords[0], coords[1]);
 		}
-			
+
 		// we are at the end position now, check targets
-		var hit_object = false;
-		for (var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
-									Find_NoContainer(),
-									//Find_Layer(GetObjectLayer()),
-									//Find_PathFree(target),
-									Find_Exclude(user),
-									Sort_Distance(x_p - GetX(), y_p - GetY()) ))
+		this.remove_on_hit = false;
+		DoHitCheckCall();
+		OnHitScan(x_p, y_p, GetX(), GetY());
+		
+		if (this.remove_on_hit)
 		{
-			if (obj->~IsProjectileTarget(this, user) || obj->GetOCF() & OCF_Alive)
-			{
-				var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
-				SetPosition(x_p + Sin(angle, objdist, precision), y_p - Cos(angle, objdist, precision));
-				var self = this;
-				HitObject(obj, true);
-				hit_object = true;
-				break;
-			}
+			RemoveObject();
 		}
-		
-		// at end position now
-		for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
+		else if (coords && self)
 		{
-			obj->~OnProjectileInteraction(x_p, y_p, angle, user, damage);
+			Hit();
 		}
-		
-		
-		/*if(!user.silencer)
-		{
-			var t = CreateObject(Bullet_TrailEffect, 0, 0, NO_OWNER);
-			t->Point({x = x_p, y = y_p}, {x = GetX(), y = GetY()});
-			t->FadeOut();
-			t->SetObjectBlitMode(GFX_BLIT_Additive);
-		}*/
-		
-		if(!hit_object)
-		{
-			var hit = GBackSolid(Sin(angle, 2, 100), -Cos(angle, 2, 100));
-			
-			if(hit)
-			{
-				Hit();
-			}
-		}
+//		var hit_object = false;
+//		for (var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
+//									Find_NoContainer(),
+//									//Find_Layer(GetObjectLayer()),
+//									//Find_PathFree(target),
+//									Find_Exclude(user),
+//									Sort_Distance(x_p - GetX(), y_p - GetY()) ))
+//		{
+//			if (obj->~IsProjectileTarget(this, user) || obj->GetOCF() & OCF_Alive)
+//			{
+//				var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
+//				SetPosition(x_p + Sin(angle, objdist, precision), y_p - Cos(angle, objdist, precision));
+//				var self = this;
+//				HitObject(obj, true);
+//				hit_object = true;
+//				break;
+//			}
+//		}
+//		
+//		// at end position now
+//		for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
+//		{
+//			obj->~OnProjectileInteraction(x_p, y_p, angle, user, damage);
+//		}
+//		
+//		
+//		/*if(!user.silencer)
+//		{
+//			var t = CreateObject(Bullet_TrailEffect, 0, 0, NO_OWNER);
+//			t->Point({x = x_p, y = y_p}, {x = GetX(), y = GetY()});
+//			t->FadeOut();
+//			t->SetObjectBlitMode(GFX_BLIT_Additive);
+//		}*/
+//		
+//		if(!hit_object)
+//		{
+//			var hit = GBackSolid(Sin(angle, 2, 100), -Cos(angle, 2, 100));
+//			
+//			if(hit)
+//			{
+//				Hit();
+//			}
+//		}
+
 		if(self) RemoveObject();
 	}
 	
@@ -430,6 +447,10 @@ public func OnLaunch()
 
 
 public func OnLaunched()
+{
+}
+
+public func OnHitScan(int x_start, int y_start, int x_end, int y_end)
 {
 }
 
@@ -490,7 +511,6 @@ func FxPositionCheckTimer(target, effect, time)
 
 protected func Travelling()
 {
-	DoHitCheckCall();
 	ControlSpeed();
 	
 	DrawColorModulation();
@@ -500,8 +520,9 @@ protected func Travelling()
 		trail->ProjectileUpdate();
 	}
 	
-	
-	if(lifetime > 0 && GetActTime() >= lifetime) Remove();
+	var self = this;
+	DoHitCheckCall();
+	if (self && lifetime > 0 && GetActTime() >= lifetime) Remove();
 }
 
 protected func ControlSpeed()
@@ -553,6 +574,11 @@ public func HitObject(object obj, bool no_remove)
 	if(!no_remove && remove_on_hit)
 	{
 		RemoveObject();
+	}
+	
+	if (instant && !remove_on_hit)
+	{
+		remove_on_hit = true;
 	}
 }
 

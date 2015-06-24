@@ -124,8 +124,14 @@ private func StartCharge(object user, int x, int y)
 			else if (effect.is_charged)
 			{
 				effect.has_charged = true;
-				DoCharge(user, x, y, firemode);
-				return false; // fire away
+				if (DoCharge(user, x, y, firemode))
+				{
+					return false; // fire away
+				}
+				else
+				{
+					return true; // keep charging, because someone overrided DoCharge()
+				}
 			}
 			else
 			{
@@ -163,6 +169,7 @@ private func CancelCharge(object user, int x, int y, proplist firemode, bool cal
 private func DoCharge(object user, int x, int y, proplist firemode)
 {
 	OnFinishCharge(user, x, y, firemode);
+	return true;
 }
 
 private func IsCharging()
@@ -538,24 +545,27 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 	var y = -Cos(angle, firemode.projectile_distance) + firemode.projectile_offset_y;
 
 	// launch the single projectiles
-	for (var i = 0; i < Max(1, firemode.projectile_number); i++)
+	for (var i = 0; i < Max(1, GetProjectiles(firemode)); i++)
 	{
 		var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
 	
-		OnFireProjectile(user, projectile, firemode);
-		
-		
-	
 		projectile->Shooter(user)
 				  ->Weapon(this)
-				  ->Damage(firemode.damage)
+				  ->DamageAmount(firemode.damage)
 		          ->DamageType(firemode.damage_type)
 		          ->Velocity(SampleVelocity(firemode.projectile_speed))
-				  ->Range(firemode.projectile_range)
-		          ->Launch(angle, GetSpread(firemode));
+				  ->Range(firemode.projectile_range);
+
+		OnFireProjectile(user, projectile, firemode);
+		projectile->Launch(angle, GetSpread(firemode));
 	}
 	
 	shot_counter[firemode.name]++;
+}
+
+private func GetProjectiles(proplist firemode)
+{
+	return firemode.projectile_number;
 }
 
 private func GetSpread(proplist firemode)
