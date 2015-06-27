@@ -1,6 +1,13 @@
-
+/**
+ Clonk append script from Caedes OC.
+ @author Zapper (original), Marky (cut and modified where necessary)
+ @version 0.1.0
+ */
+ 
 #appendto Clonk
+
 /*
+// shooter library has its own muzzle flash effect
 public func CreateMuzzleFlash(int x, int y, int angle, int size)
 {
 	CreateParticleAtBone("MuzzleFlash", "pos_hand1", [0, 0, 0], [100, 0, 0], 10, {Prototype = Particles_MuzzleFlash(), Size = 3 * size, Rotation = angle}, 1);
@@ -10,39 +17,38 @@ public func CreateMuzzleFlash(int x, int y, int angle, int size)
 	return;	
 }
 */
+
 func Recruitment()
 {
-	this.ThrowSpeed *= 2;
-	
+	// this modification is unnecessary
+	// this.ThrowSpeed *= 2;
+
+	// remove actions that are not intended - this should probably be part of Unreal Arena	
 	if(this.ActMap == this.Prototype.ActMap)
 		this.ActMap = {Prototype = this.Prototype.ActMap};
 	this.ActMap["Hangle"] = nil;
 	this.ActMap["Scale"] = nil;
-	
+
 	//PushActionSpeed("Scale", 150);
 	//PushActionSpeed("Hangle", 150);
 	
 	//PushActionSpeed("Walk", 200);
+
 	AddEffect("OverallDamageStuff", this, 20, 0, this);
 	AddEffect("IntAimRestarter", this, 1, 50+Random(10), this);
 	return _inherited(...);
 }
 
+/*
+// probably never called
 func SetLastDamagingWeapon(ID)
 {
 	this.last_damaging_weapon = ID;
 }
+*/
 
-func Destruction()
-{
-	/*if(GetAlive())
-	{
-		var re = GetEffect("LogDamage", this);
-		Log("DMG#4: Clonkr emove at %d|%d, %dHP, %down, %dre", GetX(), GetY(), GetEnergy(), GetOwner(), re);
-	}*/
-	return _inherited(...);
-}
-
+/*
+// so far never called
 func BloodSplatter(level)
 {
 	var particles = 
@@ -53,7 +59,10 @@ func BloodSplatter(level)
 	};
 	//FindObject(Find_ID(CallbackRule))->CreateParticle("SmokeDirty", PV_Random(-7, 7), PV_Random(-7, 7), 0, 0, 0, particles, level);
 }
+*/
 
+/*
+// so far never called
 func CatchBlow(level, by)
 {
 	//if(GetEffect("LogDamage", this)) Log("DMG: Hit by %s for %d|%i - %v", by->GetName(), level, by->GetID(), by);
@@ -62,7 +71,10 @@ func CatchBlow(level, by)
 	BloodSplatter(level);
 	return _inherited(level, by, ...);
 }
+*/
 
+/*
+// caedes stuff, not necessary
 func FxOverallDamageStuffDamage(pTarget, iEffectNumber, iDmgEngy, iCause, iBy)
 {
 	var iPlr = pTarget->GetOwner();
@@ -109,7 +121,10 @@ func FxOverallDamageStuffDamage(pTarget, iEffectNumber, iDmgEngy, iCause, iBy)
 
 	return iDmgEngy;
 }
+*/
 
+/*
+// scheduled remove from destruction, not necessary
 func FxScheduledRemoveStart(target, effect, iTemp, p)
 {
 	if(iTemp)return;
@@ -126,7 +141,10 @@ func FxScheduledRemoveStop(target, effect, iReason, iTemp)
 	//Log("DMG#3: remove %s", target->GetName());
 	target->RemoveObject();
 }
+*/
 
+/*
+// necessary, but not applicable
 func OnHit(dmg, type, from_obj, weapon)
 {
 	//if(GetEffect("LogDamage", this)) 
@@ -134,7 +152,10 @@ func OnHit(dmg, type, from_obj, weapon)
 	
 	BloodSplatter(dmg);
 }
+*/
 
+/*
+// fades out in wrong direction
 func FxFadeOutTimer(target, effect, time)
 {
 	effect.fade += effect.fade_speed;
@@ -143,15 +164,20 @@ func FxFadeOutTimer(target, effect, time)
 		target->RemoveObject();
 	return 1;
 }
+*/
 
+/*
+// this should be project specific
 func Death()
 {
 	var e = AddEffect("FadeOut", this, 1, 2, this);
 	e.fade_speed = 20;
 	return _inherited(...);
 }
+*/
 
-
+/*
+// no idea who calls this, probably caedes specific
 func UpdateHUD()
 {
 	var msg = "@";
@@ -159,7 +185,10 @@ func UpdateHUD()
 	CustomMessage(msg, this.hud_helper, nil, 0, 0, 0xffffff, nil, nil, MSG_NoLinebreak | MSG_Left);
 	return _inherited(...);
 }
+*/
 
+/*
+// also caedes-specific
 func RejectCollect(def, to_collect)
 {
 	// check if another weapon of same type is already held, if so: remove and reload
@@ -190,7 +219,10 @@ func RejectCollect(def, to_collect)
 	}
 	return _inherited(def, to_collect, ...);
 }
+*/
 
+/*
+// very caedes specific
 func DoFalconPunch()
 {
 	if(Contained()) return;
@@ -218,9 +250,6 @@ func FxFalconPunchTimer(target, effect, time)
 	
 	if(time < 30)
 	{
-		/*CXreateParticleAtBone("MagicFire", "pos_hand1", [0, 0, 0], [0, 0, 0], 40, RGB(200, 200, 200), target);
-		CXreateParticleAtBone("MagicFire", "pos_hand2", [0, 0, 0], [0, 0, 0], 40, RGB(200, 200, 200), target);
-		CXreateParticle("MagicRing", 0, 0, 0, 0, 50 + Cos(time * 2, 200), RGBa(255, 255, 255, 128), target);*/
 	}
 	else
 	{
@@ -249,7 +278,7 @@ func FxFalconPunchStop(target, effect, reason, temp)
 	if(reason == FX_Call_Normal) return;
 	StopAnimation(effect.anim);
 }
-
+*/
 
 /* Main control function */
 /*
@@ -267,6 +296,7 @@ func IsAiming()
 	return true;
 }
 
+// this has to be refactored, it still uses some of caedes weapon properties
 func FxIntAimRestarterTimer(target, effect, time)
 {
 	// for a very quick check after cancelling the last aiming..
