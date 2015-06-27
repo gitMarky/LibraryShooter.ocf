@@ -25,7 +25,7 @@ public func OnPressUse(object user, int x, int y)
 {
 	if (this->~CanChangeFiremode())
 	{
-		selected_firemode = WEAPON_Firemode_Primary;
+		ChangeFiremode(WEAPON_Firemode_Primary);
 	}
 }
 
@@ -40,6 +40,22 @@ public func OnPressUseAlt(object user, int x, int y)
 {
 	if (this->~CanChangeFiremode())
 	{
-		selected_firemode = WEAPON_Firemode_Secondary;
+		ChangeFiremode(WEAPON_Firemode_Secondary);
 	}
+}
+
+
+/**
+ Use this to change the firemode of the weapon.
+ @par firemode The name of the new firemode.
+ @version 0.1.0
+ */
+public func ChangeFiremode(string firemode)
+{
+	if (firemode == nil)
+	{
+		FatalError("The function expects a fire mode that is not nil");
+	}
+
+	selected_firemode = firemode;
 }
