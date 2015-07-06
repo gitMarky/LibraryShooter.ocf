@@ -295,26 +295,26 @@ public func Launch(int angle, array deviation)
 			{
 				var pre = dev[PROJECTILE_Deviation_Precision];
 				PushBack(precisions, pre);
-				
+
 				if (pre > precision_max) precision_max = pre;
 			}
 			
 			var min_exponent = GetExponent(precision_max);
-			
+
 			precision = 1;
 			for (var pre in precisions)
 			{
 				precision *= pre;
-				
+
 				var exponent = GetExponent(precision);
 				if (exponent > min_exponent)
 				{
 					precision /= 10 ** (exponent - min_exponent);
 				}
 			}
-			
+
 			angle *= precision;
-			
+
 			for (var i = 0; i < GetLength(deviation); i++)
 			{
 				var rnd = deviation[i][PROJECTILE_Deviation_Value] * precision / deviation[i][PROJECTILE_Deviation_Precision];
@@ -336,35 +336,48 @@ public func Launch(int angle, array deviation)
 	{
 		FatalError(Format("Unexpected parameter %v for deviation. Expected array", deviation));
 	}
-	
+
 	var self = this;
-			
+
 	OnLaunch();
 
 	if (!instant)
 	{
 		velocity_x = +Sin(angle, velocity, precision);
 		velocity_y = -Cos(angle, velocity, precision);
-		
+
 		SetXDir(velocity_x); SetYDir(velocity_y);
-		
+
 		StartHitCheckCall(user, true, true);
 	}
 	else
 	{
 		StartHitCheckCall(user, true, false);
-		
+
 		range *= precision;
 
 		// set position to final point
 		var x_p = GetX();
 		var y_p = GetY();
 
-		var t_x = GetX() + Sin(angle, range, precision);
-		var t_y = GetY() - Cos(angle, range, precision);
-		
+		var d_x = + Sin(angle, range, precision);
+		var d_y = - Cos(angle, range, precision);
+		var t_x = GetX() + d_x;
+		var t_y = GetY() + d_y;
+
+		// cap to landscape bounds
+		var current_length = Distance(0, 0, d_x, d_y);
+		for (var desired_length = current_length;
+		    (desired_length > 0)
+		 && (t_x < 0 || t_x > LandscapeWidth() || t_y < 0 || t_y > LandscapeHeight());
+		     desired_length--)
+			{
+				t_x = GetX() + desired_length * d_x / current_length;
+				t_y = GetY() + desired_length * d_y / current_length;
+			}
+
 		var coords = PathFree2(x_p, y_p, t_x, t_y);
-		
+
 		if(!coords) // path is free
 		{
 			SetPosition(t_x, t_y);
