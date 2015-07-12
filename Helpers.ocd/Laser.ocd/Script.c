@@ -128,6 +128,11 @@ private func Activate()
 	DrawTransform();
 }
 
+private func Update()
+{
+	DrawTransform();
+}
+
 protected func Laser()
 {
 	DrawTransform();
@@ -138,9 +143,9 @@ protected func Laser()
 	// animation & effect
 	SetPhase(Random(4));
 
+	// fade out (only if lifetime != 0)
 	if(!lifetime) return;
 
-	// fade out (only if lifetime != 0)
 	var a = 200 * (lifetime - timer) / lifetime;
 	var rgba = SetRGBaValue(GetClrModulation(), a, RGBA_ALPHA);
 	SetClrModulation(rgba);

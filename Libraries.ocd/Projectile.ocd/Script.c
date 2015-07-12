@@ -260,7 +260,7 @@ protected func Hit()
 	{	
 		OnHitLandscape();
 		
-		if (remove_on_hit) RemoveObject();
+		if (remove_on_hit && self) RemoveObject();
 	}
 }
 
@@ -391,7 +391,7 @@ public func Launch(int angle, array deviation)
 		this.remove_on_hit = false;
 		DoHitCheckCall();
 		OnHitScan(x_p, y_p, GetX(), GetY());
-		
+
 		if (this.remove_on_hit)
 		{
 			RemoveObject();
