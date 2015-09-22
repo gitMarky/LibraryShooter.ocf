@@ -390,9 +390,9 @@ public func Launch(int angle, array deviation)
 		// we are at the end position now, check targets
 		this.remove_on_hit = false;
 		DoHitCheckCall();
-		OnHitScan(x_p, y_p, GetX(), GetY());
+		if (self) OnHitScan(x_p, y_p, GetX(), GetY());
 
-		if (this.remove_on_hit)
+		if (self != nil && self.remove_on_hit)
 		{
 			RemoveObject();
 		}
@@ -584,14 +584,14 @@ public func HitObject(object obj, bool no_remove)
 	
 	OnHitObject(obj);
 	
-	if(!no_remove && remove_on_hit)
-	{
-		RemoveObject();
-	}
-	
 	if (instant && !remove_on_hit)
 	{
 		remove_on_hit = true;
+	}
+	
+	if(!no_remove && remove_on_hit)
+	{
+		RemoveObject();
 	}
 }
 
