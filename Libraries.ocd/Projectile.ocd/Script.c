@@ -584,14 +584,14 @@ public func HitObject(object obj, bool remove, proplist effect)
 	
 	OnHitObject(obj);
 	
-	if (instant && !remove_on_hit)
-	{
-		remove_on_hit = true;
-	}
-	
 	if(remove && remove_on_hit)
 	{
 		RemoveObject();
+	}
+
+	if (instant && !remove_on_hit)
+	{
+		remove_on_hit = true;
 	}
 	
 	if (effect)
