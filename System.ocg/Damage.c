@@ -37,7 +37,7 @@ global func DoDmg(int iDmg, int iType, object pTarget, int iPrecision, empty, ob
   /*{
   var n = pFrom->GetName();
   if(!n) n = "???";
-  Log("%s deals %d dmg to %s", n, dmg, pTarget->GetName());
+  DebugLog("%s deals %d dmg to %s", n, dmg, pTarget->GetName());
   }*/
 	pTarget->~OnHit(dmg/1000, iType, pFrom, idWeapon);
   
