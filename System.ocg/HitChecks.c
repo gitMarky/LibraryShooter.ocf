@@ -130,7 +130,7 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 				if(target.trail)
 					target.trail->~Travelling();
 
-				target->~HitObject(obj, false, effect);
+				target->~HitObject(obj, true, effect);
 
 				if (effect.registered_hit || !target)
 				{

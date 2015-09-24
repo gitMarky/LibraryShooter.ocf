@@ -108,7 +108,7 @@ public func Fire(object shooter, int angle, int dev, int dist, int dmg, id weapo
 			var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
 			SetPosition(x_p + Sin(angle, objdist, 100), y_p - Cos(angle, objdist, 100));
 			var self = this;
-			HitObject(obj, true);
+			HitObject(obj, false);
 			hit_object = true;
 			break;
 		}
@@ -161,7 +161,7 @@ func Traveling()
 
 func TrailColor(int acttime){/*return 0x88fffffff;*/ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
 
-public func HitObject(object obj, bool no_remove, proplist effect)
+public func HitObject(object obj, bool remove, proplist effect)
 {
 	if(obj.receive_crits > 0)
 	{
@@ -172,7 +172,7 @@ public func HitObject(object obj, bool no_remove, proplist effect)
 	DoDmg(damage, nil, obj, nil, nil, this, from_ID);
 	CreateImpactEffect(Max(5, damage*2/3));
 	
-	if (!no_remove) RemoveObject();
+	if (remove) RemoveObject();
 	if (effect) effect.registered_hit = true;
 }
 
