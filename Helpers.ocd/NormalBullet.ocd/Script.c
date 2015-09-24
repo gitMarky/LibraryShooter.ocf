@@ -96,14 +96,12 @@ public func Fire(object shooter, int angle, int dev, int dist, int dmg, id weapo
 		
 	// we are at the end position now, check targets
 	var hit_object = false;
-	for (obj in FindObjects(
-								Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
+	for (var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
 								Find_NoContainer(),
 								//Find_Layer(GetObjectLayer()),
 								//Find_PathFree(target),
 								Find_Exclude(shooter),
-								Sort_Distance(x_p - GetX(), y_p - GetY())
-							))
+								Sort_Distance(x_p - GetX(), y_p - GetY())))
 	{
 		if (obj->~IsProjectileTarget(this, shooter) || obj->GetOCF() & OCF_Alive)
 		{
@@ -163,7 +161,7 @@ func Traveling()
 
 func TrailColor(int acttime){/*return 0x88fffffff;*/ return RGBa(255,255 - Min(150, acttime*20) ,75,255);}
 
-public func HitObject(object obj, bool no_remove)
+public func HitObject(object obj, bool no_remove, proplist effect)
 {
 	if(obj.receive_crits > 0)
 	{
@@ -174,7 +172,8 @@ public func HitObject(object obj, bool no_remove)
 	DoDmg(damage, nil, obj, nil, nil, this, from_ID);
 	CreateImpactEffect(Max(5, damage*2/3));
 	
-	if(!no_remove) RemoveObject();
+	if (!no_remove) RemoveObject();
+	if (effect) effect.registered_hit = true;
 }
 
 // called by successful hit of object after from ProjectileHit(...)

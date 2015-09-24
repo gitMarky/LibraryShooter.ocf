@@ -578,7 +578,7 @@ public func TrailColor(int acttime)
 	return RGBa(255, 255 - Min(150, acttime*20), 75, 255);
 }
 
-public func HitObject(object obj, bool no_remove)
+public func HitObject(object obj, bool no_remove, proplist effect)
 {
 	DoDmg(damage, nil, obj, nil, nil, this, weapon_ID);
 	
@@ -593,9 +593,14 @@ public func HitObject(object obj, bool no_remove)
 	{
 		RemoveObject();
 	}
+	
+	if (effect)
+	{
+		effect.registered_hit = true;
+	}
 }
 
-public func OnHitObject(object target)
+public func OnHitObject(object target, proplist effect)
 {
 	CreateImpactEffect(this.damage);
 }

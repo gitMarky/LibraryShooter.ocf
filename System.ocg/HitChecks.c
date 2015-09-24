@@ -59,6 +59,7 @@ global func FxHitCheck2Start(object target, proplist effect, int temp, object by
 	effect.live = false;
 	effect.never_shooter = never_shooter;
 	effect.limit_velocity = limit_velocity;
+	effect.registered_hit = false;
 	
 	// C4D_Object has a hitcheck too -> change to vehicle to supress that.
 	if (target->GetCategory() & C4D_Object)
@@ -129,9 +130,13 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 				if(target.trail)
 					target.trail->~Travelling();
 
-				target->~HitObject(obj);
-				if (!target)
+				target->~HitObject(obj, false, effect);
+
+				if (effect.registered_hit || !target)
+				{
+					effect.registered_hit = false;
 					return;
+				}
 			}
 		}
 	}
