@@ -59,7 +59,7 @@ global func FxHitCheck2Start(object target, proplist effect, int temp, object by
 	effect.live = false;
 	effect.never_shooter = never_shooter;
 	effect.limit_velocity = limit_velocity;
-	effect.registered_hit = false;
+	effect.registered_hit = -1;
 	
 	// C4D_Object has a hitcheck too -> change to vehicle to supress that.
 	if (target->GetCategory() & C4D_Object)
@@ -81,8 +81,13 @@ global func FxHitCheck2Stop(object target, proplist effect, int reason, bool tem
 	return;
 }
 
-global func FxHitCheck2DoCheck(object target, proplist effect)
+global func FxHitCheck2DoCheck(object target, proplist effect, int timer)
 {
+	if (effect.registered_hit >= FrameCounter())
+	{
+		return;
+	}
+
 	var obj;
 	// rather search in front of the projectile, since a hit might delete the effect,
 	// and clonks can effectively hide in front of walls.
@@ -132,9 +137,8 @@ global func FxHitCheck2DoCheck(object target, proplist effect)
 
 				target->~HitObject(obj, true, effect);
 
-				if (effect.registered_hit || !target)
+				if (effect.registered_hit >= FrameCounter() || !target)
 				{
-					effect.registered_hit = false;
 					return;
 				}
 			}
@@ -163,6 +167,7 @@ global func FxHitCheck2Add(object target, proplist effect, string neweffectname,
 	effect.live = false;
 	effect.never_shooter = never_shooter;
 	effect.limit_velocity = limit_velocity;
+	effect.registered_hit = -1;
 	return;
 }
 

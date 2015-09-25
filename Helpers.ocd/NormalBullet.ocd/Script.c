@@ -173,7 +173,7 @@ public func HitObject(object obj, bool remove, proplist effect)
 	CreateImpactEffect(Max(5, damage*2/3));
 	
 	if (remove) RemoveObject();
-	if (effect) effect.registered_hit = true;
+	if (effect) effect.registered_hit = FrameCounter();
 }
 
 // called by successful hit of object after from ProjectileHit(...)
