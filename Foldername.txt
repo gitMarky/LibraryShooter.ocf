@@ -1,0 +1,3 @@
+If you downloaded this from gitHub, then rename this folder to:
+
+LibraryShooter.ocd
