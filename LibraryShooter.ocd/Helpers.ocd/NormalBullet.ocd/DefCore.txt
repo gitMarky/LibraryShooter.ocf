@@ -13,4 +13,3 @@ Value=10
 Mass=5
 Rotate=1
 NoStabilize=1
-Components=Metal=1;Blackpowder=1;
