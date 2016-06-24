@@ -5,5 +5,4 @@ Category=C4D_Vehicle
 Width=2
 Height=2
 Offset=-1,-1
-BorderBound=7
 IncompleteActivity=1
