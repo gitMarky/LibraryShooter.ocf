@@ -861,6 +861,13 @@ public func GetFiremode()
 {
 }
 
+
+public func GetFiremodes()
+{
+	return fire_modes;
+}
+
+
 /**
  Callback: Pressed the regular use button (fire).
  */
