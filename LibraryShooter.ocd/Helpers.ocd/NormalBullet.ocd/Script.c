@@ -147,7 +147,7 @@ func CreateTrail()
 	trail->Set(2, 125, this);
 }
 
-func FxPositionCheckTimer(target, effect, time)
+func FxPositionCheckTimer(object target, proplist effect, int time)
 {
 	lastX = GetX();
 	lastY = GetY();

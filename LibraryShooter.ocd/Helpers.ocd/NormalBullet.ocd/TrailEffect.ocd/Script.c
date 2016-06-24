@@ -39,7 +39,7 @@ func FadeOut()
 	AddEffect("QuickFade", this, 1, 1, this);
 }
 
-func FxQuickFadeTimer(target, effect, time)
+func FxQuickFadeTimer(target, proplist effect, time)
 {
 	
 	var x = (last_from.x + last_to.x) / 2;

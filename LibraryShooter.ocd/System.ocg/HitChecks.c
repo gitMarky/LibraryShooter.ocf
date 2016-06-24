@@ -41,38 +41,38 @@ global func GetHitCheck()
 	return GetEffect("HitCheck2", this);
 }
 
-global func FxHitCheck2Start(object target, proplist effect, int temp, object by_obj, bool never_shooter, bool limit_velocity)
+global func FxHitCheck2Start(object target, proplist fx, int temp, object by_obj, bool never_shooter, bool limit_velocity)
 {
 	if (temp) return;
 	
-	effect.startx = target->GetX();
-	effect.starty = target->GetY();
-	effect.oldx = effect.startx;
-	effect.oldy = effect.starty;
+	fx.startx = target->GetX();
+	fx.starty = target->GetY();
+	fx.oldx = fx.startx;
+	fx.oldy = fx.starty;
 	
 	if (!by_obj)
 		by_obj = target;
 	if (by_obj->Contained())
 		by_obj = by_obj->Contained();
 
-	effect.shooter = by_obj;
-	effect.live = false;
-	effect.never_shooter = never_shooter;
-	effect.limit_velocity = limit_velocity;
-	effect.registered_hit = -1;
+	fx.shooter = by_obj;
+	fx.live = false;
+	fx.never_shooter = never_shooter;
+	fx.limit_velocity = limit_velocity;
+	fx.registered_hit = -1;
 	
 	// C4D_Object has a hitcheck too -> change to vehicle to supress that.
 	if (target->GetCategory() & C4D_Object)
 		target->SetCategory((target->GetCategory() - C4D_Object) | C4D_Vehicle);
 	
-	//effect.range = target.bulletRange;
+	//fx.range = target.bulletRange;
 	
-	EffectCall(target, effect, "DoCheck");
+	EffectCall(target, fx, "DoCheck");
 	
 	return;
 }
 
-global func FxHitCheck2Stop(object target, proplist effect, int reason, bool temp)
+global func FxHitCheck2Stop(object target, proplist fx, int reason, bool temp)
 {
 	if (temp)
 		return;
@@ -81,9 +81,9 @@ global func FxHitCheck2Stop(object target, proplist effect, int reason, bool tem
 	return;
 }
 
-global func FxHitCheck2DoCheck(object target, proplist effect, int timer)
+global func FxHitCheck2DoCheck(object target, proplist fx, int timer)
 {
-	if (effect.registered_hit >= FrameCounter())
+	if (fx.registered_hit >= FrameCounter())
 	{
 		return;
 	}
@@ -92,21 +92,21 @@ global func FxHitCheck2DoCheck(object target, proplist effect, int timer)
 	// rather search in front of the projectile, since a hit might delete the effect,
 	// and clonks can effectively hide in front of walls.
 	// NO WTF IS THIS SHIT
-	var oldx = effect.oldx;
-	var oldy = effect.oldy;
+	var oldx = fx.oldx;
+	var oldy = fx.oldy;
 	var newx = target->GetX();
 	var newy = target->GetY();
-	effect.oldx = newx;
-	effect.oldy = newy;
+	fx.oldx = newx;
+	fx.oldy = newy;
 	var dist = Distance(oldx, oldy, newx, newy);
 	
-	var shooter = effect.shooter;
-	var live = effect.live;
+	var shooter = fx.shooter;
+	var live = fx.live;
 	
-	if (live && !effect.never_shooter)
+	if (live && !fx.never_shooter)
 		shooter = target;
 	
-	if (!effect.limit_velocity || (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2))
+	if (!fx.limit_velocity || (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2))
 	{
 		// We search for objects along the line on which we moved since the last check
 		// and sort by distance (closer first).
@@ -135,9 +135,9 @@ global func FxHitCheck2DoCheck(object target, proplist effect, int timer)
 				if(target.trail)
 					target.trail->~Travelling();
 
-				target->~HitObject(obj, true, effect);
+				if (target) target->~HitObject(obj, true, fx);
 
-				if (effect.registered_hit >= FrameCounter() || !target)
+				if (fx.registered_hit >= FrameCounter() || !target)
 				{
 					return;
 				}
@@ -155,25 +155,25 @@ global func FxHitCheck2Effect(string newname)
 	return;
 }
 
-global func FxHitCheck2Add(object target, proplist effect, string neweffectname, int newtimer, by_obj, never_shooter, limit_velocity)
+global func FxHitCheck2Add(object target, proplist fx, string neweffectname, int newtimer, by_obj, never_shooter, limit_velocity)
 {
-	effect.x = target->GetX();
-	effect.y = target->GetY();
+	fx.x = target->GetX();
+	fx.y = target->GetY();
 	if (!by_obj)
 		by_obj = target;
 	if (by_obj->Contained())
 		by_obj = by_obj->Contained();
-	effect.shooter = by_obj;
-	effect.live = false;
-	effect.never_shooter = never_shooter;
-	effect.limit_velocity = limit_velocity;
-	effect.registered_hit = -1;
+	fx.shooter = by_obj;
+	fx.live = false;
+	fx.never_shooter = never_shooter;
+	fx.limit_velocity = limit_velocity;
+	fx.registered_hit = -1;
 	return;
 }
 
-global func FxHitCheck2Timer(object target, proplist effect, int time)
+global func FxHitCheck2Timer(object target, proplist fx, int time)
 {
-	EffectCall(target, effect, "DoCheck");
+	EffectCall(target, fx, "DoCheck");
 	// It could be that it hit something and removed itself. thus check if target is still there.
 	// The effect will be deleted right after this.
 	if (!target)
@@ -182,11 +182,11 @@ global func FxHitCheck2Timer(object target, proplist effect, int time)
 	//if(effect.range - 1 == time)
 	//	return -1;
 	
-	effect.x = target->GetX();
-	effect.y = target->GetY();
-	var live = effect.live;
-	var never_shooter = effect.never_shooter;
-	var shooter = effect.shooter;
+	fx.x = target->GetX();
+	fx.y = target->GetY();
+	var live = fx.live;
+	var never_shooter = fx.never_shooter;
+	var shooter = fx.shooter;
 
 	// The projectile will be only switched to "live", meaning that it can hit the
 	// shooter himself when the shot exited the shape of the shooter one time.
@@ -205,7 +205,7 @@ global func FxHitCheck2Timer(object target, proplist effect, int time)
 			}
 			// Otherwise, the shot will be live.
 			if (ready)
-				effect.live = true;
+				fx.live = true;
 		}
 	}
 	return;
