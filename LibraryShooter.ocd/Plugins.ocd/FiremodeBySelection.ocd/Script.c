@@ -1,4 +1,6 @@
-
+/**
+ Basic plugin class for weapons with a changeable fire mode.
+ */
 
 local selected_firemode;
 
@@ -13,7 +15,7 @@ local selected_firemode;
  */
 public func GetFiremode()
 {
-	return GetProperty(selected_firemode, this.fire_modes);
+	return this.fire_modes[selected_firemode];
 }
 
 
