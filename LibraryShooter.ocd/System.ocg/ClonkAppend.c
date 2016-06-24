@@ -6,17 +6,6 @@
  
 #appendto Clonk
 
-/*
-// shooter library has its own muzzle flash effect
-public func CreateMuzzleFlash(int x, int y, int angle, int size)
-{
-	CreateParticleAtBone("MuzzleFlash", "pos_hand1", [0, 0, 0], [100, 0, 0], 10, {Prototype = Particles_MuzzleFlash(), Size = 3 * size, Rotation = angle}, 1);
-	var xdir = Sin(angle, size * 2);
-	var ydir = -Cos(angle, size * 2);
-	CreateParticle("StarFlash", x, y, PV_Random(xdir - size, xdir + size), PV_Random(ydir - size, ydir + size), PV_Random(20, 60), Particles_Glimmer(), size);
-	return;	
-}
-*/
 
 func Recruitment()
 {
