@@ -592,8 +592,7 @@ public func HitObject(object obj, bool remove, proplist effect)
 	{
 		RemoveObject();
 	}
-
-	if (instant && !remove_on_hit)
+	else if (instant && !remove_on_hit)
 	{
 		remove_on_hit = true;
 	}
