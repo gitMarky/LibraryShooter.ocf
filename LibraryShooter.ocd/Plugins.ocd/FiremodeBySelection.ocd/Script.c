@@ -15,7 +15,7 @@ local selected_firemode;
  */
 public func GetFiremode()
 {
-	return this.fire_modes[selected_firemode];
+	return selected_firemode;
 }
 
 
@@ -24,12 +24,23 @@ public func GetFiremode()
  @par firemode The name of the new firemode.
  @version 0.2.0
  */
-public func ChangeFiremode(string firemode)
+public func ChangeFiremode(firemode)
 {
 	if (firemode == nil)
 	{
 		FatalError("The function expects a fire mode that is not nil");
 	}
-
-	selected_firemode = firemode;
+	
+	if (GetType(firemode) == C4V_String)
+	{
+		selected_firemode = this.fire_modes[firemode];
+	} 
+	else if (GetType(firemode) == C4V_PropList)
+	{
+		selected_firemode = firemode;
+	}
+	else
+	{
+		FatalError(Format("The function expects a string or proplist argument, you passed %v: %v", GetType(firemode), firemode));
+	}
 }
