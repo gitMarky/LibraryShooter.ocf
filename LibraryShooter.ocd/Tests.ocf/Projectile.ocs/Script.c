@@ -183,31 +183,33 @@ global func Test1_OnStart()
 
 global func Test1_Completed()
 {
-	var no_deviation = [0, 100];
+	var no_deviation = nil; //[0, 100];
 
 	var passed = true;
+	
+	var precision = 1;
 
 	for (var range in [100, 500, 1000])
 	{
 		for (var angle = 0; angle < 360; angle +=5)
 		{
 			var projectile = CreateProjectile();
-			
+
 			projectile->Launch(angle, no_deviation);
-			
-			var actual_angle = Angle(0, 0, projectile->GetXDir(), projectile->GetYDir());
+
+			var actual_angle = Angle(0, 0, projectile->GetXDir(), projectile->GetYDir(), precision);
 			var range = 1000;
 			
-			var x_actual = +Sin(actual_angle, range);
-			var y_actual = -Cos(actual_angle, range);
+			var x_actual = +Sin(actual_angle, range, precision);
+			var y_actual = -Cos(actual_angle, range, precision);
 			
-			var x_expected = +Sin(angle, range);
-			var y_expected = -Cos(angle, range);
+			var x_expected = +Sin(angle * precision, range, precision);
+			var y_expected = -Cos(angle * precision, range, precision);
 			
 			var dist = Distance(x_actual, y_actual, x_expected, y_expected);
 			
-			Log("Launched projectile at angle %d, final angle is %d; deviation from target would be %d", angle, actual_angle, dist);
-	
+			Log("Launched projectile at angle %d, final angle is %d; deviation from target would be %d", angle * precision, actual_angle, dist);
+
 			passed &= doTest("Deviation from target is <= 3 pixels.", dist <= 3, true);
 		}
 	}
