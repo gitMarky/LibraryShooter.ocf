@@ -346,6 +346,8 @@ public func Launch(int angle, array deviation)
 		velocity_x = +Sin(angle, velocity, precision);
 		velocity_y = -Cos(angle, velocity, precision);
 
+		//Log("Launching projectile at angle %d (%d with precision %d), v_x = %d, v_y = %d", angle / precision, angle, precision, velocity_x, velocity_y);
+
 		SetXDir(velocity_x); SetYDir(velocity_y);
 
 		StartHitCheckCall(user, true, true);
@@ -1124,10 +1126,11 @@ private func GetExponent(int value, int base)
 {
 	var exponent = 0;
 	
-	if (base == nil) base = 10;
+	base = base ?? 10;
 	
 	for (var test = value; test%base == 0; test = test/base)
 	{
+		exponent += 1;
 	}
 	
 	return exponent;

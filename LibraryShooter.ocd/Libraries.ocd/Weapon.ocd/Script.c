@@ -574,7 +574,14 @@ private func GetProjectiles(proplist firemode)
 
 private func GetSpread(proplist firemode)
 {
-	return [firemode.spread, firemode.projectile_spread];
+	if (firemode.spread || firemode.projectile_spread)
+	{
+		return [firemode.spread, firemode.projectile_spread];
+	}
+	else
+	{
+		return nil;
+	}
 }
 
 /**
