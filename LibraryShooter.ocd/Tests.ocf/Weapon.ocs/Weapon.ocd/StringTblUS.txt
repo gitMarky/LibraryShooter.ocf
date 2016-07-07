@@ -1,0 +1,13 @@
+Name=Assault pistol
+Description=The assault pistol is a part of the standard equipment of a Hazardclonk. Awesome firepower is granted through the small built-in grenade launcher.
+
+Standard=Single shots
+GrenadeLauncher=Grenade launcher
+Laser=Laser
+Slime=Bio slime
+
+KLASUpgradeDesc=Replaces the fire mechanism with a laser.
+KSLMUpgradeDesc=Replaces the grenade mechanism with a bio slime launcher.
+
+UpgradedToLaser=Replaced the fire mechanism with a laser.
+UpgradedToSlime=Replaced the grenade mechanism with a bio slime launcher.
