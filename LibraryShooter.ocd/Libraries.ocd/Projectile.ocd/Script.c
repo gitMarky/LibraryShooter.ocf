@@ -260,7 +260,7 @@ protected func Hit()
 	{	
 		OnHitLandscape();
 		
-		if (remove_on_hit && self) RemoveObject();
+		if (self && remove_on_hit) RemoveObject();
 	}
 }
 
@@ -274,7 +274,7 @@ func Remove()
 public func Launch(int angle, array deviation)
 {
 	
-	lifetime = PROJECTILE_Default_Velocity_Precision * range / velocity;
+	lifetime = PROJECTILE_Default_Velocity_Precision * range / Max(velocity, 1);
 
 	this.is_launched = true;
 	this.remove_on_hit = true;
@@ -588,7 +588,16 @@ public func HitObject(object obj, bool remove, proplist effect)
 {
 	DoDmg(damage, nil, obj, nil, nil, this, weapon_ID);
 	
+	var self = this;
+	
 	OnHitObject(obj);
+	
+	if (effect)
+	{
+		effect.registered_hit = FrameCounter();
+	}
+
+	if (!self) return;
 	
 	if(remove && remove_on_hit)
 	{
@@ -597,11 +606,6 @@ public func HitObject(object obj, bool remove, proplist effect)
 	else if (instant && !remove_on_hit)
 	{
 		remove_on_hit = true;
-	}
-	
-	if (effect)
-	{
-		effect.registered_hit = FrameCounter();
 	}
 }
 
