@@ -631,10 +631,7 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 		FatalError("This function expects a user that is not nil");
 	}
 	
-	if (particle == nil)
-	{
-		particle = "MuzzleFlash";
-	}
+	particle = particle ?? "MuzzleFlash";
 	
 	var r, g, b;
 	if (color == nil)
@@ -648,7 +645,7 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 		b = GetRGBaValue(color, RGBA_BLUE);
 	}
 
-	user->CreateParticle(particle, x, y, 0, 0, 10, {Prototype = Particles_MuzzleFlash(), Size = 3 * size, Rotation = angle, R = r, G = g, B = b}, 1);
+	user->CreateParticle(particle, x, y, 0, 0, 10, {Prototype = Particles_MuzzleFlash(), Size = size, Rotation = angle, R = r, G = g, B = b}, 1);
 
 	if (sparks)
 	{
@@ -657,7 +654,7 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 	
 		CreateParticle("StarFlash", x, y, PV_Random(xdir - size, xdir + size), PV_Random(ydir - size, ydir + size), PV_Random(20, 60), Particles_Glimmer(), size);
 	}
-	
+
 	if (light)
 	{
 		user->CreateTemporaryLight(x, y)->LightRangeStart(3 * size)->SetLifetime(2)->Color(color)->Activate();
