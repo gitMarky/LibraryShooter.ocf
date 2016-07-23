@@ -268,7 +268,8 @@ func Remove()
 {
 	var self = this;
 	DoHitCheckCall();
-	if(self) RemoveObject();
+	if (self) this->OnHitNothing();
+	if (self) RemoveObject();
 }
 
 public func Launch(int angle, array deviation)
@@ -609,10 +610,16 @@ public func HitObject(object obj, bool remove, proplist effect)
 	}
 }
 
+
+public func OnHitNothing()
+{
+}
+
 public func OnHitObject(object target, proplist effect)
 {
 	CreateImpactEffect(this.damage);
 }
+
 
 public func OnHitLandscape()
 {
