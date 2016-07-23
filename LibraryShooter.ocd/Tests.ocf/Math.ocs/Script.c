@@ -141,6 +141,26 @@ global func doTest(string message, actual, expected)
 {
 	var passed = actual == expected;
 	
+	if (GetType(actual) == C4V_Array)
+	{
+		if (GetLength(actual) == GetLength(expected))
+		{
+			passed = true;
+			for (var i = 0; i < GetLength(actual); ++i)
+			{
+				if (actual[i] != expected[i])
+				{
+					passed = false;
+					break;
+				}
+			}
+		}
+		else
+		{
+			passed = false;
+		}
+	}
+	
 	var log_message = Format(message, actual, expected);
 	
 	if (passed)
@@ -170,6 +190,7 @@ global func Test1_OnStart()
 global func Test1_Completed()
 {
 	var bases = [2, 3, 5, 7, 10];
+	var passed = true;
 
 	for (var base in bases)
 	{
@@ -177,11 +198,60 @@ global func Test1_Completed()
 		{
 			var value = base ** exponent;
 			Log("Testing %d ^ %d = %d", base, exponent, value);
-			doTest("Exponent is %d, should be %d", GetExponent(value, base), exponent);
+			passed &= doTest("Exponent is %d, should be %d", GetExponent(value, base), exponent);
 		}
 	}
+	
+	if (!passed) FailTest();
 
 	return true;
 }
 
 global func Test1_OnFinished(){}
+
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+
+global func Test2_OnStart()
+{
+	Log("Test for math function, projectile deviations: Projectile_Deviation");
+	return true;
+}
+
+global func Test2_Completed()
+{	
+	var passed = doTest("Projectile_Deviation has the correct angle. Got %d, expected %d.", Projectile_Deviation(4, 100).angle, 4);
+	passed &= doTest("Projectile_Deviation has the correct precision. Got %d, expected %d.", Projectile_Deviation(4, 100).precision, 100);
+	passed &= doTest("Projectile_Deviation keeps arrays as angle. Got %v, expected %v.", Projectile_Deviation([1, 2, 3], 10).angle, [1, 2, 3]);
+
+	return passed || FailTest();
+}
+
+global func Test2_OnFinished(){}
+
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+
+global func Test3_OnStart()
+{
+	Log("Test for math function, projectile deviations: NormalizeDeviations");
+	return true;
+}
+
+global func Test3_Completed()
+{
+	var deviation1 = Projectile_Deviation(1, 1);
+	var deviation2 = Projectile_Deviation(2, 10);
+	var deviation3 = Projectile_Deviation(3, 100);
+	var deviation4 = Projectile_Deviation(4, 1000);
+	
+	var deviation_normalized = NormalizeDeviations([deviation1, deviation2, deviation3, deviation4]);
+	
+	var passed = doTest("Normalizing deviations uses the maximum precision. Got %d, expected %d.", deviation_normalized.precision, 1000);
+	passed &= doTest("Normalizing deviations scales the angles correctly. Got %v, expected %v.", deviation_normalized.angle, [1000, 200, 30, 4]);
+
+	if (!passed) FailTest();
+	return true;
+}
+
+global func Test3_OnFinished(){}

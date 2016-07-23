@@ -342,7 +342,6 @@ public func Launch(int angle, array deviation)
 	
 	var precision = 100;
 	var precisions = [];
-	var precision_max = 0;
 	
 	// get common precision
 	
@@ -350,27 +349,6 @@ public func Launch(int angle, array deviation)
 	{
 		if (GetType(deviation[PROJECTILE_Deviation_Value]) == C4V_Array)
 		{
-			for (var dev in deviation)
-			{
-				var pre = dev[PROJECTILE_Deviation_Precision];
-				PushBack(precisions, pre);
-
-				if (pre > precision_max) precision_max = pre;
-			}
-			
-			var min_exponent = GetExponent(precision_max);
-
-			precision = 1;
-			for (var pre in precisions)
-			{
-				precision *= pre;
-
-				var exponent = GetExponent(precision);
-				if (exponent > min_exponent)
-				{
-					precision /= 10 ** (exponent - min_exponent);
-				}
-			}
 
 			angle *= precision;
 
