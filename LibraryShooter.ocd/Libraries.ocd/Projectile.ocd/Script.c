@@ -51,7 +51,6 @@ local lifetime;					// int - calculated from range and velocity
 public func IsProjectile(){ return true;}
 
 
-
 /**
  Configures the object that controls the weapon. 
  @par shooter An object. 
@@ -72,10 +71,20 @@ public func Shooter(object shooter)
 }
 
 
+/**
+ Gets the shooter that this projectile was configured with.
+ @return object Returns the shooter, usually the object that fired the projectile.
+ @version 0.2.0
+ */
+public func GetShooter()
+{
+	return user;
+}
+
 
 /**
- Configures how far the projectile will travel. 
- @par value The approximate distance in pixels. The projectile calculates its lifetime in frames with {@c distance / velocity}. 
+ Configures the weapon ID that shot the projectile.
+ @par value The weapon that launches the projectile. This can be either an id, or an object. 
  @return object Returns the projectile object, so that further function calls can be issued.
  @version 0.1.0
  */
@@ -101,6 +110,17 @@ public func Weapon(value)
 
 
 /**
+ Gets a weapon ID that can be used for kill messages, for example.
+ @return The weapon ID that this object was configured with.
+ @version 0.2.0
+ */
+public func GetWeaponID()
+{
+	return weapon_ID;
+}
+
+
+/**
  Configures how far the projectile will travel. 
  @par value The approximate distance in pixels. The projectile calculates its lifetime in frames with {@c distance / velocity}. 
  @return object Returns the projectile object, so that further function calls can be issued.
@@ -119,6 +139,18 @@ public func Range(int value)
 	return this;
 }
 
+
+/**
+ Gets the range of the projectile.
+ @return int the range of the projectile, in pixels.
+ @version 0.2.0
+ */
+public func GetRange()
+{
+	return range;
+}
+
+
 /**
  Configures how much damage the projectile will deal when it hits. 
  @par value The amount of damage that the projectile deals to the target. 
@@ -135,6 +167,18 @@ public func DamageAmount(int value)
 	return this;
 }
 
+
+/**
+ Gets the amount of damage that this projectile was configured with.
+ @return int The amount of damage that this projectile should inflict.
+ @version 0.2.0
+ */
+public func GetDamageAmount()
+{
+	return damage;
+}
+
+
 /**
  Configures the damage type. 
  @par value A damage type code that exists in your project. This is a custom value. For existing damage types see {@link TODO}. 
@@ -148,6 +192,18 @@ public func DamageType(int value)
 	damage_type = value;
 	return this;
 }
+
+
+/**
+ Gets the damage type that this projectile was configured with.
+ @return int The damage type for this projectile.
+ @version 0.2.0
+ */
+public func GetDamageType()
+{
+	return damage_type;
+}
+
 
 /**
  Sets the velocity of the projectile.
@@ -168,6 +224,7 @@ public func Velocity(int value)
 	return this;
 }
 
+
 /**
  Configures the projectile to do a hit check immediately when launched. This means that the projectile will not fly,
  it rather hits instantly. 
@@ -181,6 +238,7 @@ public func HitScan()
 	instant = true;
 	return this;
 }
+
 
 /**
  Configures the projectile trail dimensions.
@@ -461,15 +519,41 @@ public func Launch(int angle, array deviation)
 }
 
 
+/**
+ Callback that happens before the projectile is launched.
+ @version 0.1.0
+ */
 public func OnLaunch()
 {
 }
 
 
+/**
+ Callback that happens after the projectile was launched.
+ The projectile may be gone before the call happens, in
+ that case the call will not be executed at all.
+ @version 0.1.0
+ */
 public func OnLaunched()
 {
 }
 
+
+/**
+ Callback that happens after a hitscan projectile determines the
+ projectile end position. This is typically used to create a
+ line of hit effects.
+
+ @par x_start The starting X coordinate of the projectile, in global
+              coordinates. 
+ @par y_start The starting Y coordinate of the projectile, in global
+              coordinates. 
+ @par x_end   The final X coordinate of the projectile, in global
+              coordinates. 
+ @par y_end   The final Y coordinate of the projectile, in global
+              coordinates. 
+ @version 0.1.0
+ */
 public func OnHitScan(int x_start, int y_start, int x_end, int y_end)
 {
 }
@@ -512,6 +596,7 @@ public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int
 
 }
 */
+
 
 func CreateTrail(int x, int y)
 {
@@ -582,7 +667,7 @@ public func ProjectileColor(int time)
 
 public func TrailColor(int acttime)
 {
-	return RGBa(255, 255 - Min(150, acttime*20), 75, 255);
+	return RGBa(255, Max(0, 255 - Min(150, acttime * 20)), 75, 255);
 }
 
 public func HitObject(object obj, bool remove, proplist effect)
