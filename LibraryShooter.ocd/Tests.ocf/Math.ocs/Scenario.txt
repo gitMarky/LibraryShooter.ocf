@@ -1,5 +1,5 @@
 [Head]
-Title=Weapon
+Title=Math
 
 [Definitions]
 Definition1=Objects.ocd
