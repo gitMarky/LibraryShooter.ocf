@@ -239,15 +239,16 @@ global func Test2_OnStart()
 
 global func Test2_Completed()
 {
-	var no_deviation = nil; //[0, 100];
+	var no_deviation = nil;
 
 	var passed = true;
 	
+	var projectile = CreateProjectile();
+
 	for (var precision in [100, 500, 1000])
 	{
 		for (var angle = 0; angle < 360; angle +=5)
 		{
-			var projectile = CreateProjectile();
 
 			var launch_angle = projectile->GetLaunchAngle(angle, precision, no_deviation);
 
@@ -256,6 +257,8 @@ global func Test2_Completed()
 			passed &= doTest("Launch angle is %d, expected %d.", launch_angle, expected_angle);
 		}
 	}
+	
+	if (projectile) projectile->RemoveObject();
 	
 	if (!passed)
 	{
@@ -266,7 +269,67 @@ global func Test2_Completed()
 		pass("The projectile angles were correct");
 	}
 
-	return true;
+	return passed || FailTest();
 }
 
 global func Test2_OnFinished(){}
+
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+
+global func Test3_OnStart()
+{
+	Log("Test for projectile: Launch angles without deviation");
+	return true;
+}
+
+global func Test3_Completed()
+{
+	var no_deviation = nil;
+
+	var passed = true;
+	
+	var projectile = CreateProjectile();
+
+	for (var precision in [100, 1000, 10000])
+	{
+		for (var angle in [0, 50])
+		{
+			Log("Testing precision %d, angle %d", precision, angle);
+			var deviation = Projectile_Deviation(5, precision);
+
+			
+			var max_launch_angle = angle * precision;
+			var min_launch_angle = angle * precision;
+
+			var expected_max = angle * precision + 5;
+			var expected_min = angle * precision - 5;
+
+			for (var i = 0; i < 1000; ++i)
+			{
+				var launch_angle = projectile->GetLaunchAngle(angle, precision, deviation);
+				
+				if (launch_angle < min_launch_angle) min_launch_angle = launch_angle;
+				if (launch_angle > max_launch_angle) max_launch_angle = launch_angle;
+			}
+
+			passed &= doTest("Min launch angle is %d, expected %d.", min_launch_angle, expected_min);
+			passed &= doTest("Max launch angle is %d, expected %d.", max_launch_angle, expected_max);
+		}
+	}
+
+	if (projectile) projectile->RemoveObject();
+
+	if (!passed)
+	{
+		fail("The projectile angles were not correct");
+	}
+	else
+	{
+		pass("The projectile angles were correct");
+	}
+
+	return passed || FailTest();
+}
+
+global func Test3_OnFinished(){}

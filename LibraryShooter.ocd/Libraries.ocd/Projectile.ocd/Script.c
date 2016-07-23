@@ -1189,7 +1189,7 @@ private func GetLaunchAngle(int angle, int precision, deviation)
 
 		for (var i = 0; i < GetLength(deviation.angle); ++i)
 		{
-			var rnd = deviation.angle[i] * precision;
+			var rnd = deviation.angle[i];
 			launch_angle += RandomX(-rnd, +rnd);
 		}
 	}
