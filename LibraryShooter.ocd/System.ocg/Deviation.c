@@ -34,9 +34,9 @@ global func Projectile_Deviation(angle, int precision)
  @par deviations The deviation definitions.
  @version 0.2.0
  */ 
-global func NormalizeDeviations(array deviations)
+global func NormalizeDeviations(array deviations, int min_precision)
 {
-	var precision_max = 0;
+	var precision_max = min_precision ?? 1;
 	var precisions = [];
 	for (var deviation in deviations)
 	{

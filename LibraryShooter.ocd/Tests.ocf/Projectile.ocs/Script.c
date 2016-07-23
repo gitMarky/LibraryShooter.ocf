@@ -177,13 +177,13 @@ global func CreateProjectile()
 
 global func Test1_OnStart()
 {
-	Log("Test for Weapon: Aiming works correctly");
+	Log("Test for projectile: The launch angle without precision or deviation is correct");
 	return true;
 }
 
 global func Test1_Completed()
 {
-	var no_deviation = nil; //[0, 100];
+	var no_deviation = nil;
 
 	var passed = true;
 	
@@ -223,7 +223,50 @@ global func Test1_Completed()
 		pass("The projectile angles were correct");
 	}
 
-	return true;
+	return passed || FailTest();
 }
 
 global func Test1_OnFinished(){}
+
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+
+global func Test2_OnStart()
+{
+	Log("Test for projectile: Launch angles without deviation");
+	return true;
+}
+
+global func Test2_Completed()
+{
+	var no_deviation = nil; //[0, 100];
+
+	var passed = true;
+	
+	for (var precision in [100, 500, 1000])
+	{
+		for (var angle = 0; angle < 360; angle +=5)
+		{
+			var projectile = CreateProjectile();
+
+			var launch_angle = projectile->GetLaunchAngle(angle, precision, no_deviation);
+
+			var expected_angle = angle * precision;
+
+			passed &= doTest("Launch angle is %d, expected %d.", launch_angle, expected_angle);
+		}
+	}
+	
+	if (!passed)
+	{
+		fail("The projectile angles were not correct");
+	}
+	else
+	{
+		pass("The projectile angles were correct");
+	}
+
+	return true;
+}
+
+global func Test2_OnFinished(){}

@@ -341,38 +341,17 @@ public func Launch(int angle, array deviation)
 	SetController(user->GetController());
 	
 	var precision = 100;
-	var precisions = [];
 	
 	// get common precision
-	
 	if (GetType(deviation) == C4V_Array)
 	{
-		if (GetType(deviation[PROJECTILE_Deviation_Value]) == C4V_Array)
-		{
-
-			angle *= precision;
-
-			for (var i = 0; i < GetLength(deviation); i++)
-			{
-				var rnd = deviation[i][PROJECTILE_Deviation_Value] * precision / deviation[i][PROJECTILE_Deviation_Precision];
-				angle += RandomX(-rnd, +rnd);
-			}
-		}
-		else
-		{
-			precision = deviation[PROJECTILE_Deviation_Precision];
-			angle *= precision;
-		    angle += RandomX(-deviation[PROJECTILE_Deviation_Value], deviation[PROJECTILE_Deviation_Value]);
-		}
+		deviation = NormalizeDeviations(deviation, precision);
 	}
-	else if (GetType(deviation) == C4V_Nil)
-	{
-		angle *= precision;
-	}
-	else
-	{
-		FatalError(Format("Unexpected parameter %v for deviation. Expected array", deviation));
-	}
+	// get correct precision	
+	if (GetType(deviation) == C4V_PropList) precision = deviation.precision;
+	
+	// get angle
+	angle = GetLaunchAngle(angle, precision, deviation);
 
 	var self = this;
 
@@ -1196,3 +1175,27 @@ private func ProhibitedWhileLaunched()
 	}
 }
 
+
+private func GetLaunchAngle(int angle, int precision, deviation)
+{
+	var launch_angle = angle * precision;
+	// handle correct deviation
+	if (GetType(deviation) == C4V_PropList)
+	{
+		if (GetType(deviation.angle) == C4V_Int)
+		{
+			deviation.angle = [deviation.angle];
+		}
+
+		for (var i = 0; i < GetLength(deviation.angle); ++i)
+		{
+			var rnd = deviation.angle[i] * precision;
+			launch_angle += RandomX(-rnd, +rnd);
+		}
+	}
+	else if (GetType(deviation) != C4V_Nil)
+	{
+		FatalError(Format("Unexpected parameter %v for deviation. Expected array, proplist, or nil.", deviation));
+	}
+	return launch_angle;
+}
