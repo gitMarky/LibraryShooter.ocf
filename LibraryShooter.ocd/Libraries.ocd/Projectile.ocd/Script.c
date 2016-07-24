@@ -134,7 +134,7 @@ public func Range(int value)
 	{
 		FatalError(Format("Cannot set negative range - the function received %d", value));
 	}
-
+	
 	range = value;
 	return this;
 }
@@ -220,7 +220,6 @@ public func Velocity(int value)
 	}
 
 	velocity = value;
-	
 	return this;
 }
 
@@ -342,8 +341,12 @@ public func Launch(int angle, proplist deviation)
 	
 	var precision = 100;
 	
-	// get correct precision	
-	if (deviation.precision > precision)
+	// get correct precision
+	if (deviation == nil)
+	{
+		// everything ok
+	}
+	else if (deviation.precision > precision)
 	{
 		precision = deviation.precision;
 	}

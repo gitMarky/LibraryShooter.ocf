@@ -557,8 +557,8 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 				  ->Weapon(this)
 				  ->DamageAmount(firemode.damage)
 		          ->DamageType(firemode.damage_type)
-		          ->Velocity(SampleVelocity(firemode.projectile_speed))
-				  ->Range(firemode.projectile_range);
+		          ->Velocity(SampleValue(firemode.projectile_speed))
+				  ->Range(SampleValue(firemode.projectile_range));
 
 		OnFireProjectile(user, projectile, firemode);
 		projectile->Launch(angle, GetSpread(firemode));
@@ -836,7 +836,17 @@ private func FxIntCooldownTimer(object target, proplist effect, int time)
 	return FX_Execute_Kill;
 }
 
-private func SampleVelocity(value)
+
+/**
+ Gets a sample of a random value.
+ 
+ @par value The value. This can be a {@code C4V_Int}, or {@code C4V_Array}. 
+ @return int The sampled value. This is either the {@code value}, if {@code C4V_Int}
+         was passed, or if an array was passed: a random value between
+         {@code value[0]} and {@code value[1]}, where the possible increments are
+         {@code value[2]}.  
+ */
+private func SampleValue(value)
 {
 	if (GetType(value) == C4V_Array)
 	{
