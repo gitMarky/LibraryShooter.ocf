@@ -218,6 +218,23 @@ local ActMap =
 		OffX = 0,
 		OffY = 2,
 		StartCall = "Travelling"
+	},
+	Laser =
+	{
+		Prototype = Action,
+		Name = "Laser",
+		Procedure = DFA_FLOAT,
+		Speed = 100000,
+		NextAction = "Laser",
+		Length = 4,
+		Delay = 1,
+		X = 0,
+		Y = 0,
+		Wdt = 5,
+		Hgt = 28,
+		OffX = 0,
+		OffY = 2,
+		PhaseCall = "Travelling"
 	}
 };
 
