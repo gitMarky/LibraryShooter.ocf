@@ -576,7 +576,7 @@ private func GetSpread(proplist firemode)
 {
 	if (firemode.spread || firemode.projectile_spread)
 	{
-		return [firemode.spread, firemode.projectile_spread];
+		return NormalizeDeviations([firemode.spread, firemode.projectile_spread]);
 	}
 	else
 	{

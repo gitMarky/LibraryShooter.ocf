@@ -330,7 +330,7 @@ func Remove()
 	if (self) RemoveObject();
 }
 
-public func Launch(int angle, array deviation)
+public func Launch(int angle, proplist deviation)
 {
 	
 	lifetime = PROJECTILE_Default_Velocity_Precision * range / Max(velocity, 1);
@@ -342,13 +342,15 @@ public func Launch(int angle, array deviation)
 	
 	var precision = 100;
 	
-	// get common precision
-	if (GetType(deviation) == C4V_Array)
-	{
-		deviation = NormalizeDeviations(deviation, precision);
-	}
 	// get correct precision	
-	if (GetType(deviation) == C4V_PropList) precision = deviation.precision;
+	if (deviation.precision > precision)
+	{
+		precision = deviation.precision;
+	}
+	else
+	{
+		deviation = ScaleDeviation(deviation, precision);
+	}
 	
 	// get angle
 	angle = GetLaunchAngle(angle, precision, deviation);
