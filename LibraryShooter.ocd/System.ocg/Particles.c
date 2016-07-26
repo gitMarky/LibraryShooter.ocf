@@ -25,9 +25,9 @@ global func CreateImpactEffect(int size, int xoff, int yoff, string name, partic
            which has to be considered when calculating the velocity.
  @version 0.1.0
  */
-global func CreateCartridgeEffect(string particle, int size, int x, int y, int xdir, int ydir)
+global func CreateCartridgeEffect(string particle, int size, int x, int y, int xdir, int ydir, int amount)
 {
-	CreateParticle(particle, x, y, xdir, ydir, PV_Random(60, 120), Particles_Cartridge(size), 1);
+	CreateParticle(particle, x, y, xdir, ydir, PV_Random(60, 120), Particles_Cartridge(size), amount ?? 1);
 }
 
 global func Particles_Cartridge(int size)
