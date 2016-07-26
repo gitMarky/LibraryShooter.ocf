@@ -627,9 +627,11 @@ protected func Travelling()
 		trail->ProjectileUpdate();
 	}
 	
+	this->OnTravelling();
+	
 	var self = this;
 	DoHitCheckCall();
-	if (self && lifetime > 0 && GetActTime() >= lifetime) Remove();
+	if (self && GetLifetime() > 0 && GetActTime() >= GetLifetime()) Remove();
 }
 
 protected func ControlSpeed()
@@ -651,6 +653,16 @@ private func DrawColorModulation()
 	{
 		SetClrModulation(color);
 	}
+}
+
+
+/**
+ Callback while the projectile travels.
+ Overload this, if you want to have custom
+ effects for the projectile while it travels.
+ */
+public func OnTravelling()
+{
 }
 
 
