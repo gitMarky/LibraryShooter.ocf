@@ -686,17 +686,17 @@ public func TrailColor(int acttime)
 
 public func HitObject(object obj, bool remove, proplist effect)
 {
-	DoDmg(damage, nil, obj, nil, nil, this, weapon_ID);
-	
-	var self = this;
-	
-	OnHitObject(obj);
+	DoDamageObject(obj);
 	
 	if (effect)
 	{
 		effect.registered_hit = FrameCounter();
 	}
-
+	
+	var self = this;
+	
+	OnHitObject(obj);
+	
 	if (!self) return;
 	
 	if(remove && remove_on_hit)
@@ -707,6 +707,17 @@ public func HitObject(object obj, bool remove, proplist effect)
 	{
 		remove_on_hit = true;
 	}
+}
+
+
+/**
+ Callback when a target should be damaged.
+ @par target The object that should be damaged.
+ @version 0.2.0 
+ */
+public func DoDamageObject(object target)
+{
+	DoDmg(GetDamageAmount(), nil, target, nil, nil, this, GetWeaponID());
 }
 
 
