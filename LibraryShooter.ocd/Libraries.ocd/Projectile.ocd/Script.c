@@ -710,20 +710,37 @@ public func HitObject(object obj, bool remove, proplist effect)
 }
 
 
+/**
+ Callback if the projectile was removed because
+ it did not hit anything before its lifetime
+ expired.
+ @version 0.2.0
+ */
 public func OnHitNothing()
 {
 }
 
+
+/**
+ Callback if the projectile hits another object.
+ @par target This is the object that was hit.
+ @par effect
+ @version 0.1.0
+ */
 public func OnHitObject(object target, proplist effect)
 {
 	CreateImpactEffect(this.damage);
 }
 
 
+/**
+ Callback if the projectile collides with the landscape.
+ @version 0.1.0
+ */
 public func OnHitLandscape()
 {
-		Sound("BulletHitGround?");
-		CreateImpactEffect(this.damage);
+	Sound("BulletHitGround?");
+	CreateImpactEffect(this.damage);
 }
 
 // called by successful hit of object after from ProjectileHit(...)
@@ -739,24 +756,22 @@ public func OnStrike(object obj)
 
 private func SquishVertices(bool squish)
 {
-	if(squish==true)
+	if(squish)
 	{
-		SetVertex(1,VTX_X,0,2);
-		SetVertex(1,VTX_Y,0,2);
-		SetVertex(2,VTX_X,0,2);
-		SetVertex(2,VTX_Y,0,2);
-	return 1;
+		SetVertex(1, VTX_X, 0, 2);
+		SetVertex(1, VTX_Y, 0, 2);
+		SetVertex(2, VTX_X, 0, 2);
+		SetVertex(2, VTX_Y, 0, 2);
+		return true;
 	}
-
-	if(squish!=true)
+	else
 	{
-		SetVertex(1,VTX_X,-3,2);
-		SetVertex(1,VTX_Y,1,2);
-		SetVertex(2,VTX_X,3,2);
-		SetVertex(2,VTX_Y,1,2);
-	return 0;
+		SetVertex(1, VTX_X,-3, 2);
+		SetVertex(1, VTX_Y, 1, 2);
+		SetVertex(2, VTX_X, 3, 2);
+		SetVertex(2, VTX_Y, 1, 2);
+		return false;
 	}
-
 }
 
 local ActMap = {
@@ -783,6 +798,7 @@ local ActMap = {
 		StartCall = "Travelling",
 	},
 };
+
 local Name = "$Name$";
 local Description = "$Description$";
 
