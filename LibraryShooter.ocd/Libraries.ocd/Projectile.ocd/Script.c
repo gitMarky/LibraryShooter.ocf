@@ -135,6 +135,11 @@ public func Range(int value)
 		FatalError(Format("Cannot set negative range - the function received %d", value));
 	}
 	
+	if (GetLifetime() > 0)
+	{
+		FatalError(Format("Cannot set range, because a lifetime of %d was specified already", GetLifetime()));
+	}
+	
 	range = value;
 	return this;
 }
@@ -148,6 +153,42 @@ public func Range(int value)
 public func GetRange()
 {
 	return range;
+}
+
+
+/**
+ Configures how long the projectile will travel. 
+ @par value The lifetime in frames.
+ @return object Returns the projectile object, so that further function calls can be issued.
+ @version 0.2.0
+ */
+public func Lifetime(int value)
+{
+	ProhibitedWhileLaunched();
+	
+	if (value <= 0)
+	{
+		FatalError(Format("Must sef positive lifetime - the function received %d", value));
+	}
+	
+	if (GetRange() > 0)
+	{
+		FatalError(Format("Cannot set lifetime, because a range of %d was specified already", GetRange()));
+	}
+
+	lifetime = value;
+	return this;
+}
+
+
+/**
+ Gets the lifetime of the projectile.
+ @return int the lifetime of the projectile, in frames.
+ @version 0.2.0
+ */
+public func GetLifetime()
+{
+	return lifetime;
 }
 
 
@@ -331,8 +372,7 @@ func Remove()
 
 public func Launch(int angle, proplist deviation)
 {
-	
-	lifetime = PROJECTILE_Default_Velocity_Precision * range / Max(velocity, 1);
+	lifetime = lifetime ?? (PROJECTILE_Default_Velocity_Precision * GetRange() / Max(velocity, 1));
 
 	this.is_launched = true;
 	this.remove_on_hit = true;
