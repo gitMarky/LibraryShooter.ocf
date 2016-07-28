@@ -420,8 +420,6 @@ public func Launch(int angle, proplist deviation)
 
 		if (self)
 		{
-			range *= precision;
-	
 			// set position to final point
 			var x_p = GetX();
 			var y_p = GetY();
