@@ -164,9 +164,9 @@ global func askUser(string message)
 global func CreateProjectile()
 {
 	if (Test().projectile) Test().projectile->RemoveObject();
-	
+
 	Test().projectile = CreateObject(Bullet, 10, 10, NO_OWNER);
-		
+
 	Test().projectile->Velocity(1000)->Range(1000)->Shooter(Test().user);
 
 	return Test().projectile;
@@ -285,8 +285,6 @@ global func Test3_OnStart()
 
 global func Test3_Completed()
 {
-	var no_deviation = nil;
-
 	var passed = true;
 	
 	var projectile = CreateProjectile();
@@ -333,3 +331,66 @@ global func Test3_Completed()
 }
 
 global func Test3_OnFinished(){}
+
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+
+global func Test4_OnStart()
+{
+	Log("Test for projectile: Hit scan weapons are ranged");
+	return true;
+}
+
+global func Test4_Completed()
+{
+	var no_deviation = nil;
+
+	var passed = true;
+	
+	var precision = 1;
+
+	for (var range in [50, 100, 180])
+	{
+		for (var angle in [0, 30, 55, 90])
+		{
+			var projectile = CreateProjectile();
+			projectile->Range(range);
+			projectile->HitScan();
+			projectile.OnHitScan = Global.Test4_OnHitScan;
+
+			projectile->SetPosition(Test().user->GetX(), Test().user->GetY());
+
+			projectile->Launch(angle, no_deviation);
+
+			var x_expected = Test().user->GetX() + Sin(angle * precision, range, precision);
+			var y_expected = Test().user->GetY() - Cos(angle * precision, range, precision);
+
+			var dist = Distance(Test().test4_x, Test().test4_y, x_expected, y_expected);
+
+			Log("Launched projectile at angle %d, expected range %d, final range is %d; deviation from target would be %d", angle * precision, range, Test().test4_range, dist);
+
+			passed &= doTest("Deviation from target is <= 3 pixels.", dist <= 3, true);
+		}
+	}
+	
+	if (!passed)
+	{
+		fail("The hiscan projectile ranges were not correct");
+	}
+	else
+	{
+		pass("The hitscan projectile ranges were correct");
+	}
+
+	return passed || FailTest();
+}
+
+global func Test4_OnFinished(){}
+
+global func Test4_OnHitScan(int x_start, int y_start, int x_end, int y_end)
+{
+	Log("Hit scan %d %d %d %d", x_start, y_start, x_end, y_end);
+	Test().test4_x = x_end;
+	Test().test4_y = y_end;
+	Test().test4_range = Distance(x_start, y_start, x_end, y_end);
+}
