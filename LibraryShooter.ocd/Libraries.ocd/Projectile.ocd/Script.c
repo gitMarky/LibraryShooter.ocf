@@ -356,7 +356,7 @@ protected func Hit()
 	
 	if(self)
 	{	
-		OnHitLandscape();
+		this->OnHitLandscape();
 		
 		if (self && remove_on_hit) RemoveObject();
 	}
@@ -400,7 +400,7 @@ public func Launch(int angle, proplist deviation)
 
 	var self = this;
 
-	OnLaunch();
+	this->OnLaunch();
 
 	if (!instant)
 	{
@@ -457,35 +457,20 @@ public func Launch(int angle, proplist deviation)
 			DoHitCheckCall();
 		}
 
-		if (self) OnHitScan(x_p, y_p, GetX(), GetY());
+		if (self) this->OnHitScan(x_p, y_p, GetX(), GetY());
 
-		if (self != nil && self.remove_on_hit)
+		if (self)
 		{
-			RemoveObject();
+			if (self.remove_on_hit)
+			{
+				RemoveObject();
+			}
+			else if (coords)
+			{
+				Hit();
+			}
 		}
-		else if (coords && self)
-		{
-			Hit();
-		}
-//		var hit_object = false;
-//		for (var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
-//									Find_NoContainer(),
-//									//Find_Layer(GetObjectLayer()),
-//									//Find_PathFree(target),
-//									Find_Exclude(user),
-//									Sort_Distance(x_p - GetX(), y_p - GetY()) ))
-//		{
-//			if (obj->~IsProjectileTarget(this, user) || obj->GetOCF() & OCF_Alive)
-//			{
-//				var objdist = Distance(x_p, y_p, obj->GetX(), obj->GetY());
-//				SetPosition(x_p + Sin(angle, objdist, precision), y_p - Cos(angle, objdist, precision));
-//				var self = this;
-//				HitObject(obj, true);
-//				hit_object = true;
-//				break;
-//			}
-//		}
-//		
+
 //		// at end position now
 //		for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
 //		{
@@ -516,7 +501,7 @@ public func Launch(int angle, proplist deviation)
 	
 	if (self)
 	{
-		OnLaunched();
+		this->OnLaunched();
 	}
 }
 
@@ -695,7 +680,7 @@ public func HitObject(object obj, bool remove, proplist effect)
 	
 	var self = this;
 	
-	OnHitObject(obj);
+	this->OnHitObject(obj);
 	
 	if (!self) return;
 	
