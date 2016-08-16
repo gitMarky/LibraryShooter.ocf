@@ -35,6 +35,7 @@ local trail;					 // object - for effects
 local trail_width, trail_length; // int - trail dimensions, in pixels 
 
 local lifetime;					// int - calculated from range and velocity
+local rotation_by_rdir;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -356,9 +357,9 @@ protected func Hit()
 	
 	if(self)
 	{	
-		this->OnHitLandscape();
+		self->OnHitLandscape();
 		
-		if (self && remove_on_hit) RemoveObject();
+		if (self && self->ShouldRemoveOnHit()) RemoveObject();
 	}
 }
 
@@ -370,12 +371,27 @@ func Remove()
 	if (self) RemoveObject();
 }
 
+func RemoveOnHit()
+{
+	this.remove_on_hit = false;
+}
+
+func StayOnHit()
+{
+	this.remove_on_hit = false;
+}
+
+func ShouldRemoveOnHit()
+{
+	return this.remove_on_hit;
+}
+
 public func Launch(int angle, proplist deviation)
 {
 	lifetime = lifetime ?? (PROJECTILE_Default_Velocity_Precision * GetRange() / Max(velocity, 1));
 
 	this.is_launched = true;
-	this.remove_on_hit = true;
+	RemoveOnHit();
 
 	SetController(user->GetController());
 	
@@ -415,7 +431,7 @@ public func Launch(int angle, proplist deviation)
 	}
 	else
 	{
-		this.remove_on_hit = false;
+		StayOnHit();
 		StartHitCheckCall(user, true, false);
 
 		if (self)
@@ -459,7 +475,7 @@ public func Launch(int angle, proplist deviation)
 
 		if (self)
 		{
-			if (self.remove_on_hit)
+			if (self->ShouldRemoveOnHit())
 			{
 				RemoveObject();
 			}
@@ -625,7 +641,7 @@ protected func ControlSpeed()
 		SetYDir(velocity_y);
 	}
 	
-	SetR(Angle(0, 0, GetXDir(), GetYDir()));
+	if (!rotation_by_rdir) SetR(Angle(0, 0, GetXDir(), GetYDir()));
 }
 
 private func DrawColorModulation()
@@ -675,20 +691,22 @@ public func HitObject(object obj, bool remove, proplist effect)
 	{
 		effect.registered_hit = FrameCounter();
 	}
-	
+
 	var self = this;
-	
+
 	this->OnHitObject(obj);
-	
+
 	if (!self) return;
-	
-	if(remove && remove_on_hit)
+
+	// remove object if removal is requested
+	if(remove && self->ShouldRemoveOnHit())
 	{
 		RemoveObject();
 	}
-	else if (instant && !remove_on_hit)
+	// TODO: workaround for hitscan projectiles: the removal happens later
+	else if (instant && !self->ShouldRemoveOnHit())
 	{
-		remove_on_hit = true;
+		RemoveOnHit();
 	}
 }
 
