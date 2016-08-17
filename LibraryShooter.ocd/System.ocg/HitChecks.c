@@ -11,32 +11,36 @@
 
 global func StartHitCheckCall(object shooter, bool never_shooter, bool limit_velocity)
 {
-	if (!this)
-	{
-		FatalError("StartHitCheckCall() must be called from object context!");
-	}
+	AssertObjectContext("StartHitCheckCall()");
 
 	return AddEffect("HitCheck2", this, 1, nil, nil, nil, shooter, never_shooter, limit_velocity);
 }
 
 global func DoHitCheckCall()
 {
-	if (!this)
-	{
-		FatalError("DoHitCheckCall() must be called from object context!");
-	}
+	AssertObjectContext("DoHitCheckCall()");
 
 	var e = GetHitCheck();
 	if(!e) return;
 	EffectCall(this, e, "DoCheck");
 }
 
+global func UpdateHitCheckCoordinates(int x_start, int y_start, int x_end, int y_end)
+{
+	AssertObjectContext("UpdateHitCheckCoordinates()");
+
+	var e = GetHitCheck();
+	if (!e) return;
+
+	e.oldx = x_start;
+	e.oldy = y_start;
+	e.newx = x_end;
+	e.newy = y_end;
+}
+
 global func GetHitCheck()
 {
-	if (!this)
-	{
-		FatalError("GetHitCheck() must be called from object context!");
-	}
+	AssertObjectContext("GetHitCheck()");
 
 	return GetEffect("HitCheck2", this);
 }
