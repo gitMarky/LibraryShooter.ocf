@@ -418,13 +418,13 @@ public func Launch(int angle, proplist deviation)
 
 	this->OnLaunch();
 
-	if (!instant)
+	if (instant)
 	{
-		LaunchAsProjectile(angle, precision);
+		LaunchHitscan(angle, precision);
 	}
 	else
 	{
-		LaunchHitscan(angle, precision);
+		LaunchAsProjectile(angle, precision);
 	}
 	
 	if (self)
@@ -522,6 +522,8 @@ public func OnLaunch()
  Callback that happens after the projectile was launched.
  The projectile may be gone before the call happens, in
  that case the call will not be executed at all.
+ @note This call will not be executed in hitscan projectiles,
+       see {@link Library_Projectile#HitScan}.
  @version 0.1.0
  */
 public func OnLaunched()
