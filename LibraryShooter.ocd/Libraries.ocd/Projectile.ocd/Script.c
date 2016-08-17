@@ -373,7 +373,7 @@ func Remove()
 
 func RemoveOnHit()
 {
-	this.remove_on_hit = false;
+	this.remove_on_hit = true;
 }
 
 func StayOnHit()
@@ -491,9 +491,9 @@ private func LaunchHitscan(int angle, int precision)
 	}
 
 	//-- actual hit detection
-
-		// we are at the end position now, check targets
-		DoHitCheckCall();
+	
+	// we are at the end position now, check targets
+	DoHitCheckCall();
 
 	//-- cleanup
 

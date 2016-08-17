@@ -31,7 +31,7 @@ global func UpdateHitCheckCoordinates(int x_start, int y_start, int x_end, int y
 
 	var e = GetHitCheck();
 	if (!e) return;
-
+	
 	e.oldx = x_start;
 	e.oldy = y_start;
 	e.newx = x_end;
@@ -166,11 +166,13 @@ global func FxHitCheck2DoCheck(object target, proplist fx, int timer)
 
 				if (fx.registered_hit >= FrameCounter() || !target)
 				{
-					return;
+					break;
 				}
 			}
 		}
 	}
+	
+	if (target) target->~OnHitCheckCall(fx);
 	
 	return;
 }
