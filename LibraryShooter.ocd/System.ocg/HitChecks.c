@@ -49,6 +49,16 @@ global func ExcludedFromHitCheckCall()
 }
 
 
+global func SetHitCheckCallCounter(int value)
+{
+	AssertObjectContext("ResetHitCheckCallCounter()");
+	
+	var e = GetHitCheck();
+	if (!e) return;
+	e.registered_hit = value ?? -1;
+}
+
+
 global func GetHitCheck()
 {
 	AssertObjectContext("GetHitCheck()");
