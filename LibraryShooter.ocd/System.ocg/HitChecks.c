@@ -38,6 +38,17 @@ global func UpdateHitCheckCoordinates(int x_start, int y_start, int x_end, int y
 	e.newy = y_end;
 }
 
+
+global func ExcludedFromHitCheckCall()
+{
+	AssertObjectContext("ExcludedFromHitCheckCall()");
+	
+	var e = GetHitCheck();
+	if (!e) return [];
+	return e.excluded;
+}
+
+
 global func GetHitCheck()
 {
 	AssertObjectContext("GetHitCheck()");
@@ -64,6 +75,7 @@ global func FxHitCheck2Start(object target, proplist fx, int temp, object by_obj
 	fx.never_shooter = never_shooter;
 	fx.limit_velocity = limit_velocity;
 	fx.registered_hit = -1;
+	fx.excluded = [];
 	
 	// C4D_Object has a hitcheck too -> change to vehicle to supress that.
 	if (target->GetCategory() & C4D_Object)
@@ -121,8 +133,9 @@ global func FxHitCheck2DoCheck(object target, proplist fx, int timer)
 								Sort_Distance(oldx, oldy)))
 		{	
 			// Excludes
-			if(obj == target) continue;
-			if(obj == shooter) continue;
+			if (obj == target) continue;
+			if (obj == shooter) continue;
+			if (IsValueInArray(fx.excluded)) continue;
 			// Unlike in hazard, there is no NOFF rule (yet)
 			// CheckEnemy
 			//if(!CheckEnemy(obj,target)) continue;
