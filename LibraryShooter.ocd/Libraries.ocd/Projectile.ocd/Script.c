@@ -420,103 +420,92 @@ public func Launch(int angle, proplist deviation)
 
 	if (!instant)
 	{
-		velocity_x = +Sin(angle, velocity, precision);
-		velocity_y = -Cos(angle, velocity, precision);
-
-		//Log("Launching projectile at angle %d (%d with precision %d), v_x = %d, v_y = %d", angle / precision, angle, precision, velocity_x, velocity_y);
-
-		SetXDir(velocity_x); SetYDir(velocity_y);
-
-		StartHitCheckCall(user, true, true);
+		LaunchAsProjectile(angle, precision);
 	}
 	else
 	{
-		StayOnHit();
-		StartHitCheckCall(user, true, false);
-
-		if (self)
-		{
-			// set position to final point
-			var x_p = GetX();
-			var y_p = GetY();
-	
-			var d_x = + Sin(angle, range, precision);
-			var d_y = - Cos(angle, range, precision);
-			var t_x = GetX() + d_x;
-			var t_y = GetY() + d_y;
-	
-			// cap to landscape bounds
-			var current_length = Distance(0, 0, d_x, d_y);
-			for (var desired_length = current_length;
-			    (desired_length > 0)
-			 && (t_x < 0 || t_x > LandscapeWidth() || t_y < 0 || t_y > LandscapeHeight());
-			     desired_length--)
-				{
-					t_x = GetX() + desired_length * d_x / current_length;
-					t_y = GetY() + desired_length * d_y / current_length;
-				}
-	
-			var coords = PathFree2(x_p, y_p, t_x, t_y);
-	
-			if(!coords) // path is free
-			{
-				SetPosition(t_x, t_y);
-			}
-			else
-			{
-				SetPosition(coords[0], coords[1]);
-			}
-	
-			// we are at the end position now, check targets
-			DoHitCheckCall();
-		}
-
-		if (self) this->OnHitScan(x_p, y_p, GetX(), GetY());
-
-		if (self)
-		{
-			if (self->ShouldRemoveOnHit())
-			{
-				RemoveObject();
-			}
-			else if (coords)
-			{
-				Hit();
-			}
-		}
-
-//		// at end position now
-//		for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
-//		{
-//			obj->~OnProjectileInteraction(x_p, y_p, angle, user, damage);
-//		}
-//		
-//		
-//		/*if(!user.silencer)
-//		{
-//			var t = CreateObject(Bullet_TrailEffect, 0, 0, NO_OWNER);
-//			t->Point({x = x_p, y = y_p}, {x = GetX(), y = GetY()});
-//			t->FadeOut();
-//			t->SetObjectBlitMode(GFX_BLIT_Additive);
-//		}*/
-//		
-//		if(!hit_object)
-//		{
-//			var hit = GBackSolid(Sin(angle, 2, 100), -Cos(angle, 2, 100));
-//			
-//			if(hit)
-//			{
-//				Hit();
-//			}
-//		}
-
-		if(self) RemoveObject();
+		LaunchHitscan(angle, precision);
 	}
 	
 	if (self)
 	{
 		this->OnLaunched();
 	}
+}
+
+
+private func LaunchAsProjectile(int angle, int precision)
+{
+	velocity_x = +Sin(angle, velocity, precision);
+	velocity_y = -Cos(angle, velocity, precision);
+
+	//Log("Launching projectile at angle %d (%d with precision %d), v_x = %d, v_y = %d", angle / precision, angle, precision, velocity_x, velocity_y);
+
+	SetXDir(velocity_x); SetYDir(velocity_y);
+
+	StartHitCheckCall(user, true, true);
+}
+
+
+private func LaunchHitscan(int angle, int precision)
+{
+	var self = this;
+
+	StayOnHit();
+	StartHitCheckCall(user, true, false);
+
+	if (self)
+	{
+		// set position to final point
+		var x_p = GetX();
+		var y_p = GetY();
+
+		var d_x = + Sin(angle, range, precision);
+		var d_y = - Cos(angle, range, precision);
+		var t_x = GetX() + d_x;
+		var t_y = GetY() + d_y;
+
+		// cap to landscape bounds
+		var current_length = Distance(0, 0, d_x, d_y);
+		for (var desired_length = current_length;
+		    (desired_length > 0)
+		 && (t_x < 0 || t_x > LandscapeWidth() || t_y < 0 || t_y > LandscapeHeight());
+		     desired_length--)
+			{
+				t_x = GetX() + desired_length * d_x / current_length;
+				t_y = GetY() + desired_length * d_y / current_length;
+			}
+
+		var coords = PathFree2(x_p, y_p, t_x, t_y);
+
+		if(!coords) // path is free
+		{
+			SetPosition(t_x, t_y);
+		}
+		else
+		{
+			SetPosition(coords[0], coords[1]);
+		}
+
+		// we are at the end position now, check targets
+		DoHitCheckCall();
+	}
+
+	if (self) this->OnHitScan(x_p, y_p, GetX(), GetY());
+
+	if (self)
+	{
+		if (self->ShouldRemoveOnHit())
+		{
+			RemoveObject();
+		}
+		else if (coords)
+		{
+			Hit();
+		}
+	}
+
+	if(self) RemoveObject();
 }
 
 
