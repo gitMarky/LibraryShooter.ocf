@@ -449,49 +449,55 @@ private func LaunchAsProjectile(int angle, int precision)
 
 private func LaunchHitscan(int angle, int precision)
 {
+	//-- initialize position
+
 	var self = this;
+	var x_start = GetX();
+	var y_start = GetY();
 
 	StayOnHit();
 	StartHitCheckCall(user, true, false);
 
-	if (self)
+	if (!self) return;
+
+	//-- set position to final point
+
+	var d_x = + Sin(angle, range, precision);
+	var d_y = - Cos(angle, range, precision);
+	var x_end = GetX() + d_x;
+	var y_end = GetY() + d_y;
+
+	// cap to landscape bounds
+	var current_length = Distance(0, 0, d_x, d_y);
+	for (var desired_length = current_length;
+	    (desired_length > 0)
+	 && (x_end < 0 || x_end > LandscapeWidth() || y_end < 0 || y_end > LandscapeHeight());
+	     desired_length--)
+		{
+			x_end = GetX() + desired_length * d_x / current_length;
+			y_end = GetY() + desired_length * d_y / current_length;
+		}
+
+	// cap to landscape itself
+	var coords = PathFree2(x_start, y_start, x_end, y_end);
+
+	if(!coords) // path is free
 	{
-		// set position to final point
-		var x_p = GetX();
-		var y_p = GetY();
+		SetPosition(x_end, y_end);
+	}
+	else
+	{
+		SetPosition(coords[0], coords[1]);
+	}
 
-		var d_x = + Sin(angle, range, precision);
-		var d_y = - Cos(angle, range, precision);
-		var t_x = GetX() + d_x;
-		var t_y = GetY() + d_y;
-
-		// cap to landscape bounds
-		var current_length = Distance(0, 0, d_x, d_y);
-		for (var desired_length = current_length;
-		    (desired_length > 0)
-		 && (t_x < 0 || t_x > LandscapeWidth() || t_y < 0 || t_y > LandscapeHeight());
-		     desired_length--)
-			{
-				t_x = GetX() + desired_length * d_x / current_length;
-				t_y = GetY() + desired_length * d_y / current_length;
-			}
-
-		var coords = PathFree2(x_p, y_p, t_x, t_y);
-
-		if(!coords) // path is free
-		{
-			SetPosition(t_x, t_y);
-		}
-		else
-		{
-			SetPosition(coords[0], coords[1]);
-		}
+	//-- actual hit detection
 
 		// we are at the end position now, check targets
 		DoHitCheckCall();
-	}
 
-	if (self) this->OnHitScan(x_p, y_p, GetX(), GetY());
+	//-- cleanup
+
+	if (self) this->OnHitScan(x_start, y_start, GetX(), GetY());
 
 	if (self)
 	{
