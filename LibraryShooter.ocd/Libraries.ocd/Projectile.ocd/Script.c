@@ -748,17 +748,17 @@ public func OnHitObject(object target, proplist effect)
  */
 public func OnHitLandscape()
 {
-	Sound("BulletHitGround?");
-	CreateImpactEffect(this.damage);
+//	Sound("BulletHitGround?");
+//	CreateImpactEffect(this.damage);
 }
 
 // called by successful hit of object after from ProjectileHit(...)
 public func OnStrike(object obj)
 {
-	if(obj->GetAlive())
-		Sound("ProjectileHitLiving?");
-	else
-		Sound("BulletHitGround?");
+//	if(obj->GetAlive())
+//		Sound("ProjectileHitLiving?");
+//	else
+//		Sound("BulletHitGround?");
 }
 
 
