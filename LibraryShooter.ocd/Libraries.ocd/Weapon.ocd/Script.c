@@ -769,7 +769,8 @@ public func OnRecovery(object user, proplist firemode)
 private func IsReadyToFire()
 {
 	return !IsRecovering()
-	    && !IsCoolingDown();
+	    && !IsCoolingDown()
+	    && !IsWeaponLocked();
 }
 
 
@@ -1030,4 +1031,44 @@ protected func HandleAmmoUsage(proplist firemode)
 	{
 		this->OnAmmoChange();
 	}
+}
+
+//----------------------------------------------------------------------------------------------------------------
+//
+// Locking the weapon
+
+/**
+ Locks the weapon against interaction.
+
+ @par lock_time The weapon will be locked for this many frames. On a lock time of {@code 0}
+                the weapon stays locked until you call {@link Library_Weapon#UnlockWeapon}
+ @version 0.2.0
+ */
+public func LockWeapon(int lock_time)
+{
+	var effect = IsWeaponLocked();
+	if (effect == nil)
+	{
+		AddEffect("IntWeaponLocked", this, 1, lock_time, this, nil);
+	}
+	else
+	{
+		effect.Interval = lock_time;
+	}
+}
+
+/**
+ Unlocks the weapon, so that it can be interacted with
+
+ @version 0.2.0
+ */
+public func UnlockWeapon()
+{
+	var effect = IsWeaponLocked();
+	if (effect) RemoveEffect(nil, this, effect);
+}
+
+private func IsWeaponLocked()
+{
+	return GetEffect("IntWeaponLocked", this);
 }
