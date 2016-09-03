@@ -90,7 +90,7 @@ public func GetAmmo(id ammo)
 			FatalError("Could not find the object that should contain the ammunition. Make sure that GetAmmoContainer() returns an existing object.");
 		}
 
-		return owner->~GetAmmo();
+		return owner->~GetAmmo(ammo);
 	}
 	else if (ammo_source == AMMO_Source_Infinite)
 	{
