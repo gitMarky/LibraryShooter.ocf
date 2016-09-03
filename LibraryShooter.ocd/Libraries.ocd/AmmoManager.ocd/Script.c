@@ -70,7 +70,7 @@ public func GetAmmo(id ammo)
 	{
 		FatalError("You have to specify a type of ammunition.");
 	}
-
+	
 	var ammo_source = GetAmmoSource(ammo);
 
 	if (ammo_source == AMMO_Source_Local)
@@ -94,7 +94,7 @@ public func GetAmmo(id ammo)
 	}
 	else if (ammo_source == AMMO_Source_Infinite)
 	{
-		return GetItems(ammo);
+		return Max(1, GetItems(ammo));
 	}
 }
 
