@@ -93,6 +93,7 @@ local weapon_properties =
 
 
 local shot_counter; // proplist
+local ammo_rate_counter; // proplist
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -281,6 +282,7 @@ private func FxIntChargeTimer(object target, proplist effect, int time)
 private func Initialize()
 {
 	shot_counter = {};
+	ammo_rate_counter = {};
 	_inherited();
 }
 
@@ -508,16 +510,23 @@ private func Fire(object user, int x, int y)
 	{
 		FatalError(Format("Fire mode '%s' not supported", firemode));
 	}
-
-	var angle = GetFireAngle(x, y, firemode);
-
-	FireSound(user, firemode);
-	FireEffect(user, angle, firemode);
-
-	FireProjectiles(user, angle, firemode);
-//	AddDeviation();
-
-	FireRecovery(user, x, y, firemode);
+	
+	if (HasAmmo(firemode))
+	{
+		var angle = GetFireAngle(x, y, firemode);
+	
+		FireSound(user, firemode);
+		FireEffect(user, angle, firemode);
+	
+		FireProjectiles(user, angle, firemode);
+	//	AddDeviation();
+	
+		FireRecovery(user, x, y, firemode);
+	}
+	else
+	{
+		this->OnNoAmmo(user, firemode);
+	}
 }
 
 private func RejectUse(object user)
@@ -544,7 +553,7 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 	{
 		FatalError("The function expects a fire mode that is not nil");
 	}
-	
+
 	var x = +Sin(angle, firemode.projectile_distance);
 	var y = -Cos(angle, firemode.projectile_distance) + firemode.projectile_offset_y;
 
@@ -565,6 +574,9 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 	}
 	
 	shot_counter[firemode.name]++;
+	ammo_rate_counter[firemode.name]--;
+	
+	HandleAmmoUsage(firemode);
 }
 
 private func GetProjectiles(proplist firemode)
@@ -904,4 +916,118 @@ public func CanChangeFiremode()
 {
 	return !IsRecovering()
 	    && !IsCharging();
+}
+
+//----------------------------------------------------------------------------------------------------------------
+//
+// ammo management
+
+/**
+ Checks whether the weapon has ammo.
+ 
+ @par firemode The ammo type for this firemode is checked.
+ @return bool Returns {@code true} if the weapon has enough ammo for the firemode
+ @version 0.2.0
+ */
+public func HasAmmo(proplist firemode)
+{
+	return GetAmmo(firemode) >= firemode.ammo_usage // enough ammo for the firemode?
+	    || ammo_rate_counter[firemode.name] > 0;    // or ammo left from previously using the weapon?
+}
+
+/**
+ Overrides func Fx{@link Library_AmmoManager#GetAmmo}, so that you can ask theDamage(obj, effect)
+ amount of ammunition for a specific firemode.
+ 
+ @par type_or_firemode You can pass an ID as in the original implementation,
+                       or you can pass a firemode. If you pass {@code nil}
+                       the value for {@link Library_Weapon#func GetFiremode} is
+                       requested. The method will fail if the proplist is not a
+                       firemode.
+ @return int The current amount of ammunition for an ID or firemode.
+ @version 0.2.0
+ */
+public func GetAmmo(type_or_firemode)
+{
+	if (GetType(type_or_firemode) == C4V_Def)
+	{
+		return _inherited(type_or_firemode, ...);
+	}
+	else if (GetType(type_or_firemode) == C4V_PropList)
+	{
+		return _inherited(type_or_firemode.ammo_id, ...);
+	}
+	else if (GetType(type_or_firemode) == C4V_Nil)
+	{
+		var fm = GetFiremode();
+		if (fm == nil)
+		{
+			FatalError("Cannot get firemode!");
+		}
+		else
+		{
+			return GetAmmo(fm);
+		}
+	}
+	else
+	{
+		FatalError("You have to specify an id or proplist (firemode), but you specified %v", GetType(type_or_firemode));
+	}
+}
+
+
+/**
+ Callback: The weapon has no ammo during {@link Library_Weapon#DoFireCycle},
+           see {@link Library_Weapon#HasAmmo}.
+
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+ */
+public func OnNoAmmo(object user, proplist firemode)
+{
+}
+
+protected func HandleAmmoUsage(proplist firemode)
+{
+	// default values
+	var rate = firemode.ammo_rate ?? 1;
+	var ammo_type = firemode.ammo_id;
+	var ammo_requested = firemode.ammo_usage ?? 1;
+
+	// status
+	var ammo_changed = false;
+	var enough_ammo = true;
+
+	// only use actual ammo if there is no spare ammo per ammo rate
+	if (ammo_rate_counter[firemode.name] <= 0)
+	{
+		var ammo_available = GetAmmo(ammo_type);
+		
+		// cancel if not enough ammo
+		if (ammo_available < ammo_requested)
+		{
+			enough_ammo = false;
+		}
+		else
+		{
+			// undo if something went wrong
+			var ammo_received = Abs(DoAmmo(ammo_type, -ammo_requested));
+			if (ammo_received < ammo_requested)
+			{
+				DoAmmo(ammo_type, ammo_received);
+				enough_ammo = false;
+			}
+			else // everything ok: fill up the spare ammo per rate, signal that something has changed
+			{
+				ammo_changed = true;
+				ammo_rate_counter[firemode.name] += rate;
+			}
+		}
+	}
+
+	if (ammo_changed)
+	{
+		this->OnAmmoChange();
+	}
 }
