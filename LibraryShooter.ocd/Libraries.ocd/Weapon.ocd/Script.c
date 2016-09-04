@@ -1130,7 +1130,7 @@ private func StartReload(object user, int x, int y)
 			{
 				if (effect.progress > 0)
 				{
-					OnProgressReload(user, x, y, firemode, effect.progress);
+					OnProgressReload(user, x, y, firemode, effect.percent, effect.progress);
 					effect.percent_old = effect.percent;
 				}
 				return true; // keep reloading
@@ -1224,10 +1224,11 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
  Callback: the weapon has successfully reloaded. Does nothing by default.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @par percent The progress of reloading, in percent.
+ @par current_percent The progress of reloading, in percent.
+ @par change_percent The change of progress, since the last update.
  @version 0.2.0
  */
-public func OnProgressReload(object user, int x, int y, proplist firemode, int percent)
+public func OnProgressReload(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
 }
 
