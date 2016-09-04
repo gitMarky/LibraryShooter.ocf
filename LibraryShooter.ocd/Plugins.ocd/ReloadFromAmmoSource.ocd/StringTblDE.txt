@@ -1,0 +1,2 @@
+Name=Waffe
+Description=Eine Waffe, die Projektile verschieﬂt oder mit der man zuschlagen kann
