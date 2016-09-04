@@ -938,6 +938,7 @@ public func HasAmmo(proplist firemode)
 	    || ammo_rate_counter[firemode.name] > 0;    // or ammo left from previously using the weapon?
 }
 
+
 /**
  Overrides func Fx{@link Library_AmmoManager#GetAmmo}, so that you can ask theDamage(obj, effect)
  amount of ammunition for a specific firemode.
@@ -1141,8 +1142,11 @@ private func StartReload(object user, int x, int y)
 		}
 	}
 
-	AddEffect("IntReload", this, 1, 1, this, nil, user, firemode);
-	OnStartReload(user, x, y, firemode);
+	if (CanReload(user, firemode))
+	{
+		AddEffect("IntReload", this, 1, 1, this, nil, user, firemode);
+		OnStartReload(user, x, y, firemode);
+	}
 	return true; // keep reloading
 }
 
@@ -1168,6 +1172,19 @@ private func DoReload(object user, int x, int y, proplist firemode)
 private func IsReloading()
 {
 	return GetEffect("IntReload", this);
+}
+
+/**
+ Condition when the weapon can be reloaded.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function
+         for a custom condition.
+ @version 0.2.0
+ */
+public func CanReload(object user, proplist firemode)
+{
+	return true;
 }
 
 /**
