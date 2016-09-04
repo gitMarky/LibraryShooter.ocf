@@ -1,4 +1,30 @@
+/**
+ Plugin for weapons: The weapon has to reload from a specified ammo source container.
+ 
+ It can reload only if the ammo source container has ammo.
+ It updates the weapon ammo of the weapon when reloading is finished.
+ Does not support reload animations yet.
+ 
+ This plugin is best used to model weapons that have a magazine or clip of some kind in
+ the weapon. The {@link Plugin_Weapon_ReloadFromAmmoSource#GetAmmoReloadContainer} in this
+ case is the person, vehicle, or whatever that holds the ammo reserves.
+ The weapon should, but may not have, the {@link Library_AmmoManager#GetAmmoSource}:
+ {@link Library_AmmoManager#AMMO_Source_Local}.
 
+ @author Marky
+ @version 0.2.0
+ */
+
+
+/**
+ Callback: the weapon has successfully reloaded.
+ Updates the weapon ammo from the source container. Takes as much ammo
+ as is needed or as is available, whichever is lower, from the container
+ and feeds it to the weapon.
+
+ @see {@link Plugin_Weapon_ReloadFromAmmoSource#GetAmmoReloadContainer}
+ @par firemode A proplist containing the fire mode information.
+ */
 public func OnFinishReload(object user, int x, int y, proplist firemode)
 {
 	_inherited(user, x, y, firemode, ...);
@@ -35,6 +61,17 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 	if (firemode.progress_bar) firemode.progress_bar->Close();
 }
 
+
+/**
+ Condition when the weapon can be reloaded: 
+ The {@link Plugin_Weapon_ReloadFromAmmoSource#GetAmmoReloadContainer}
+ has ammo of the type that is specified in the firemode.
+
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function
+         for a custom condition.
+ */
 public func CanReload(object user, proplist firemode)
 {
 	var source = this->GetAmmoReloadContainer();
@@ -78,7 +115,11 @@ public func OnProgressReload(object user, int x, int y, proplist firemode, int c
 	}
 }
 
+/**
+ Gets the ammunition manager that provides the weapon with new ammo.
+ @return object An object that is a {@link Library_AmmoManager}.
+ */
 public func GetAmmoReloadContainer()
 {
-	// TODO;
+	FatalError("You have to implement this function yourself.");
 }
