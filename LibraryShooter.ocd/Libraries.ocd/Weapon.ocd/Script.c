@@ -142,7 +142,7 @@ private func StartCharge(object user, int x, int y)
 			{
 				if (effect.progress > 0)
 				{
-					OnProgressCharge(user, x, y, firemode, effect.progress);
+					OnProgressCharge(user, x, y, firemode, effect.percent, effect.progress);
 					effect.percent_old = effect.percent;
 				}
 				return true; // keep charging
@@ -219,10 +219,13 @@ public func OnFinishCharge(object user, int x, int y, proplist firemode)
  Callback: the weapon has successfully charged. Does nothing by default.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @par percent The progress of charging, in percent.
- @version 0.1.0
+ @par current_percent The progress of charging, in percent.
+ @par change_percent The change since the last update, in percent.
+ @version 0.2.0
+ @note The function existed in version 0.1.0 too, passing {@code change_percent} in place
+       of {@code current_percent}.
  */
-public func OnProgressCharge(object user, int x, int y, proplist firemode, int percent)
+public func OnProgressCharge(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
 }
 
