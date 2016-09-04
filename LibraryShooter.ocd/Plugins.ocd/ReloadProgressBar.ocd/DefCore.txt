@@ -1,4 +1,4 @@
 [DefCore]
-id=Plugin_Weapon_ReloadFromAmmoSource
+id=Plugin_Weapon_ReloadProgressBar
 Version=7,0
 Category=C4D_StaticBack
