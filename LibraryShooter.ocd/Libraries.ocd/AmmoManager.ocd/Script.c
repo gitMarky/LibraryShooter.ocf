@@ -118,10 +118,17 @@ public func DoAmmo(id ammo, int amount)
 		FatalError("You have to specify a type of ammunition.");
 	}
 	
-	var before = GetAmmo(ammo);
-	var after = SetAmmo(ammo, before + amount);
+	if (GetAmmoSource(ammo) == AMMO_Source_Infinite)
+	{
+		return amount;
+	}
+	else
+	{
+		var before = GetAmmo(ammo);
+		var after = SetAmmo(ammo, before + amount);
 	
-	return after - before;
+		return after - before;
+	}
 }
 
 /**
