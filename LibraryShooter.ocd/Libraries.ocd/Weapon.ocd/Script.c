@@ -75,6 +75,11 @@ local fire_mode_default =
 	burst = 0, // number of projectiles fired in a burst
 	
 	auto_reload = false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
+	
+	anim_shoot_name = nil,	// for animation set: shoot animation
+	anim_load_name = nil,	// for animation set: reload animation
+	walk_speed_front = nil,	// for animation set: relative walk speed
+	walk_speed_back = nil,	// for animation set: relative walk speed
 };
 
 
@@ -311,7 +316,38 @@ local animation_set = {
 	};
 
 
-public func GetAnimationSet() { return animation_set; }
+public func GetAnimationSet()
+{
+	var firemode = GetFiremode();
+
+	var anim_shoot_name = nil;
+	var anim_shoot_time = nil;
+	var anim_load_name = nil;
+	var anim_load_time = nil;
+	var anim_walk_speed_front = nil;
+	var anim_walk_speed_back = nil;
+
+	if (firemode)
+	{
+		anim_shoot_name = firemode.anim_shoot_name;
+		anim_shoot_time = firemode.delay_recover;
+		anim_load_name = firemode.anim_load_name;
+		anim_load_time = firemode.delay_reload;
+		anim_walk_speed_front = firemode.walk_speed_front;	
+		anim_walk_speed_back = firemode.walk_speed_back;
+	}
+
+	return {
+		AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
+		AnimationAim   = "MusketAimArms",
+		AnimationLoad  = anim_load_name,
+		LoadTime       = anim_load_time,
+		AnimationShoot = anim_shoot_name,
+		ShootTime      = anim_shoot_time,
+		WalkSpeed      = anim_walk_speed_front,
+		WalkBack       = anim_walk_speed_back,
+	};
+}
 
 // holding callbacks are made
 public func HoldingEnabled() { return true; }
