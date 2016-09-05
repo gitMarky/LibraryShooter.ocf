@@ -1113,29 +1113,15 @@ private func StartReload(object user, int x, int y)
 	{
 		if (effect.user == user && effect.firemode == firemode)
 		{
+			effect.x = x;
+			effect.y = y;
+
 			if (effect.has_reloaded)
 			{
 				return false; // fire away
 			}
-			else if (effect.is_reloaded)
-			{
-				effect.has_reloaded = true;
-				if (DoReload(user, x, y, firemode))
-				{
-					return false; // fire away
-				}
-				else
-				{
-					return true; // keep reloading, because someone overrided DoReload()
-				}
-			}
 			else
 			{
-				if (effect.progress > 0)
-				{
-					OnProgressReload(user, x, y, firemode, effect.percent, effect.progress);
-					effect.percent_old = effect.percent;
-				}
 				return true; // keep reloading
 			}
 		}
@@ -1281,5 +1267,17 @@ private func FxIntReloadTimer(object target, proplist effect, int time)
 	if (time > effect.firemode.delay_reload && !effect.is_reloaded)
 	{
 		effect.is_reloaded = true;
+		
+		if (target->DoReload(effect.user, effect.x, effect.y, effect.firemode))
+		{
+			effect.has_reloaded = true;
+			return FX_Execute_Kill;
+		}
+	}
+
+	if (effect.progress > 0)
+	{
+		target->OnProgressReload(effect.user, effect.x, effect.y, effect.firemode, effect.percent, effect.progress);
+		effect.percent_old = effect.percent;
 	}
 }
