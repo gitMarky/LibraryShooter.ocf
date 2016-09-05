@@ -23,9 +23,9 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 }
 
 
-public func OnCancelReload(object user, int x, int y, proplist firemode)
+public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
-	_inherited(user, x, y, firemode);
+	_inherited(user, x, y, firemode, requested_by_user);
 
 	if (reload_progress_bar) reload_progress_bar->Close();
 }

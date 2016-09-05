@@ -73,6 +73,8 @@ local fire_mode_default =
 	spread = [1, 100],			   // inaccuracy from prolonged firing
 	
 	burst = 0, // number of projectiles fired in a burst
+	
+	auto_reload = false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
 };
 
 
@@ -1139,15 +1141,17 @@ private func StartReload(object user, int x, int y)
 	return true; // keep reloading
 }
 
-private func CancelReload(object user, int x, int y, proplist firemode, bool callback)
+private func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
 	var effect = IsReloading();
 	
+	var auto_reload = firemode.auto_reload && requested_by_user; 
+
 	if (effect != nil)
 	{
-		if (callback) OnCancelReload(effect.user, x, y, effect.firemode);
-		
-		RemoveEffect(nil, nil, effect);
+		OnCancelReload(effect.user, x, y, effect.firemode, requested_by_user);
+
+		if (!auto_reload) RemoveEffect(nil, nil, effect);
 	}
 }
 
@@ -1244,9 +1248,12 @@ public func GetReloadProgress()
  Callback: the weapon user cancelled reloading. Does nothing by default.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
+ @par requested_by_user Is {@code true} if the user releases the use button while
+                        the weapon is reloading. Otherwise, for example if the
+                        user changes the parameter is {@code false}.
  @version 0.2.0
  */
-public func OnCancelReload(object user, int x, int y, proplist firemode)
+public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
 }
 
