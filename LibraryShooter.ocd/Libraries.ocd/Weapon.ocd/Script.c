@@ -718,7 +718,8 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 
 private func FireRecovery(object user, int x, int y, proplist firemode)
 {
-	AddEffect("IntRecovery", this, 1, firemode.delay_recover, this, nil, user, x, y, firemode);
+	var recovery = AddEffect("IntRecovery", this, 1, firemode.delay_recover, this, nil, user, x, y, firemode);
+	recovery.delay = firemode.delay_recover;
 }
 
 private func FxIntRecoveryStart (object target, proplist effect, int temporary, object user, int x, int y, proplist firemode)
@@ -729,6 +730,7 @@ private func FxIntRecoveryStart (object target, proplist effect, int temporary, 
 	effect.x = x;
 	effect.y = y;
 	effect.firemode = firemode;
+	effect.start = FrameCounter();
 }
 
 private func FxIntRecoveryTimer(object target, proplist effect, int time)
@@ -745,6 +747,20 @@ private func CancelRecovery()
 	if (effect != nil)
 	{
 		RemoveEffect(nil, nil, effect);
+	}
+}
+
+private func GetRecoveryProgress()
+{
+	var recovery = IsRecovering();
+	if (recovery)
+	{
+		var progress = BoundBy(FrameCounter() - recovery.start, 0, recovery.delay);
+		return progress * 100 / recovery.delay;
+	}
+	else
+	{
+		return 0;
 	}
 }
 
