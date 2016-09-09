@@ -1032,7 +1032,7 @@ public func GetAmmo(type_or_firemode)
 	}
 	else
 	{
-		FatalError("You have to specify an id or proplist (firemode), but you specified %v", GetType(type_or_firemode));
+		FatalError(Format("You have to specify an id or proplist (firemode), but you specified %v", GetType(type_or_firemode)));
 	}
 }
 
