@@ -5,23 +5,23 @@
  */
 func UpdateRot(int angle)
 {
-	r = angle;
+	rotation = angle;
 }
 
 
-func Set(int iWidth, int iLength, object pSht)
+//func Set(int iWidth, int iLength, object pSht)
+public func Set(object bullet, int wdt, int lgt)
 {
-	_inherited(iWidth, iLength, pSht);
-	
-	SetXDir();
-	SetYDir();
+	_inherited(bullet, wdt, lgt);
+//	SetXDir();
+//	SetYDir();
 }
 
-
+/*
 func DrawTransform()
 {
 	
-	var distance = Distance(x, y, GetX(), GetY());
+	var distance = Distance(orig_x, orig_y, GetX(), GetY());
 	var relative_length = 1000 * distance / ActMap.Travel.Hgt;
 	
 	// skip because nothing has to be transformed
@@ -29,22 +29,25 @@ func DrawTransform()
 	
 	// stretch >-<
 	if (fRemove)
-		l = Max(0, l - iSpeed);
+		length = Max(0, length - speed);
 	
 	// stretch <->
-	var h = Min(l, relative_length);
+	var h = Min(length, relative_length);
 	
-	var fsin = -Sin(r, 1000), fcos = Cos(r, 1000);
+	var fsin = -Sin(rotation, 1000), fcos = Cos(rotation, 1000);
 	
-	var xoff = -(ActMap.Travel.Wdt * w / 1000) / 2;
+	var xoff = -(ActMap.Travel.Wdt * width / 1000) / 2;
 	var yoff = 0;
 	
-	var width = +fcos * w / 1000, height = +fcos * h / 1000;
-	var xskew = +fsin * h / 1000, yskew = -fsin * w / 1000;
-	
+	var draw_width = +fcos * width / 1000;
+	var draw_height = +fcos * h / 1000;
+	var xskew = +fsin * h / 1000;
+	var yskew = -fsin * width / 1000;
+
 	var xadjust = +fcos * xoff + fsin * yoff;
 	var yadjust = -fsin * xoff + fcos * yoff;
 	
 	// set matrix values
-	SetObjDrawTransform(width, xskew, xadjust, yskew, height, yadjust);
+	SetObjDrawTransform(draw_width, xskew, xadjust, yskew, draw_height, yadjust);
 }
+*/

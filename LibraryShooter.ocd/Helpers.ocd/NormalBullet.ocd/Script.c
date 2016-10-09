@@ -40,8 +40,8 @@ protected func Hit()
 				if(GBackSolid(lastX + nextX - x, lastY + nextY - y))
 				{
 					SetPosition(lastX + nextX, lastY + nextY);
-					if(trail)
-						trail->Traveling();
+					if (trail)
+						trail->Travelling();
 					break;
 				}
 			}
@@ -144,7 +144,7 @@ func CreateTrail()
 	// neat trail
 	trail = CreateObject(BulletTrail,0,0);
 	trail->SetObjectBlitMode(GFX_BLIT_Additive);
-	trail->Set(2, 125, this);
+	trail->Set(this, 2, 125);
 }
 
 func FxPositionCheckTimer(object target, proplist effect, int time)

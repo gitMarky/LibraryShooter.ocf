@@ -596,9 +596,12 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 	{
 		FatalError("The function expects a fire mode that is not nil");
 	}
+	
+	var user_x = user->~GetWeaponX(this); if (user_x) user_x -= GetX();
+	var user_y = user->~GetWeaponY(this); if (user_y) user_y -= GetY();
 
-	var x = +Sin(angle, firemode.projectile_distance);
-	var y = -Cos(angle, firemode.projectile_distance) + firemode.projectile_offset_y;
+	var x = +Sin(angle, firemode.projectile_distance) + user_x;
+	var y = -Cos(angle, firemode.projectile_distance) + user_y + firemode.projectile_offset_y;
 
 	// launch the single projectiles
 	for (var i = 0; i < Max(1, GetProjectiles(firemode)); i++)
