@@ -188,3 +188,15 @@ public func GetAmmoContainer()
 {
 	return nil;
 }
+
+
+/**
+ Identifies the object as an ammo manager.
+ @return {@c true}
+ @author Marky
+ @version 0.2.0
+ */
+public func IsAmmoManager()
+{
+	return true;
+}
