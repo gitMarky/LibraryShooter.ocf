@@ -460,7 +460,7 @@ protected func ControlUseStop(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
-	is_using = false;
+	CancelUsing();
 	
 	CancelCharge(user, x, y, GetFiremode(), true);
 	CancelReload(user, x, y, GetFiremode(), true);
@@ -488,6 +488,11 @@ protected func ControlUseCancel(object user, int x, int y)
 protected func ControlUseAltCancel(object user, int x, int y)
 {
 	return ControlUseStop(user, x, y);
+}
+
+private func CancelUsing()
+{
+	is_using = false;
 }
 
 private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
@@ -801,12 +806,17 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 			return; // prevent cooldown
 		}
 	}
-	
+
 	CheckCooldown(user, firemode);
 }
 
 private func CheckCooldown(object user, proplist firemode)
 {
+	if (!HasAmmo(firemode))
+	{
+		CancelUsing();
+	}
+
 	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
 	{
 		StartCooldown(user, firemode);
@@ -1163,7 +1173,7 @@ private func StartReload(object user, int x, int y)
 	}
 
 	if (!is_using || !NeedsReload(user, firemode)) return false;
-	
+
 	var effect = IsReloading();
 	
 	if (effect != nil)
