@@ -432,6 +432,12 @@ protected func ControlUseHolding(object user, int x, int y)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
+	
+	if (this->~RejectUse(user))
+	{
+		ControlUseStop(user, x, y);
+		return false;
+	}
 
 	DoFireCycle(user, x, y, true);
 	
