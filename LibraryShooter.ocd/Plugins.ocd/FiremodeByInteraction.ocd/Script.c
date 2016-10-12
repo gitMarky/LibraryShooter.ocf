@@ -55,17 +55,19 @@ public func GetGUIFiremodeMenuEntries(object crew)
 		var is_available = firemode.condition == nil || Call(firemode.condition);
 		
 		if (!is_available) continue;
+		
+		var firemode_symbol = firemode.icon ?? this;
 
 		PushBack(menu_entries,
 		{
-		    symbol = firemode.icon ?? this,
+		    symbol = firemode_symbol,
 		    extra_data = firemode.name,
 			custom = 
 			{
 				Prototype = custom_entry,
 				Priority = 1,
-				text = {Prototype = custom_entry.text, Text = "TODO: fire mode description"},
-				image = {Prototype = custom_entry.image, Symbol = this}, // TODO: Icon
+				text = {Prototype = custom_entry.text, Text = firemode.name},
+				image = {Prototype = custom_entry.image, Symbol = firemode_symbol},
 			}
 		});
 	}
