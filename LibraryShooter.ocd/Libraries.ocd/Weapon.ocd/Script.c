@@ -36,10 +36,7 @@ static const WEAPON_PR_Hitscan = 3;
 // global functions
 
 
-local fire_modes =
-{
-	default = new fire_mode_default {},
-};
+local fire_modes = [fire_mode_default];
 
 
 local fire_mode_default = 
@@ -964,12 +961,23 @@ private func SampleValue(value)
  */
 public func GetFiremode()
 {
+
 }
 
 
 public func GetFiremodes()
 {
 	return fire_modes;
+}
+
+public func ClearFiremodes()
+{
+	fire_modes = [];
+}
+
+public func AddFiremode(proplist fire_mode)
+{
+	PushBack(fire_modes, fire_mode);
 }
 
 

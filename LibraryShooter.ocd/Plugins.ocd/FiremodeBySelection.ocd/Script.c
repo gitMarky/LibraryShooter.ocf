@@ -33,7 +33,16 @@ public func ChangeFiremode(firemode)
 	
 	if (GetType(firemode) == C4V_String)
 	{
-		selected_firemode = this.fire_modes[firemode];
+		for (var mode in this->GetFiremodes())
+		{
+			if (mode.name == firemode)
+			{
+				selected_firemode = mode;
+				break;
+			}
+			
+			FatalError(Format("No firemode '%s'", firemode));
+		}
 	} 
 	else if (GetType(firemode) == C4V_PropList)
 	{
