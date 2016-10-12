@@ -80,15 +80,6 @@ local fire_mode_default =
 };
 
 
-local ammo_containers = 
-{
-	clip = {
-	},
-	
-	box = {
-	},
-};
-
 local weapon_properties = 
 {
 		gfx_distance = 6,
