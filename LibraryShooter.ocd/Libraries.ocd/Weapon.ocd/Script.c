@@ -405,7 +405,7 @@ protected func ControlUseAltStart(object user, int x, int y)
 }
 
 /**
- This is executed while the user is holding the fire button.@br@br
+ This is executed while the user is holding the primary use button.@br@br
 
  The function does the following:@br
  - update the aiming angle according to the parameters
@@ -415,6 +415,22 @@ protected func ControlUseAltStart(object user, int x, int y)
  @version 0.1.0
  */
 protected func ControlUseHolding(object user, int x, int y)
+{
+	OnHoldingUse(user, x, y);
+	return ControlFireHolding(user, x, y);
+}
+
+/**
+ This is executed while the user is holding the fire button.@br@br
+
+ The function does the following:@br
+ - update the aiming angle according to the parameters
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ @version 0.2.0
+ */
+protected func ControlFireHolding(object user, int x, int y)
 {
 	if(user == nil)
 	{
@@ -434,7 +450,8 @@ protected func ControlUseHolding(object user, int x, int y)
 
 protected func ControlUseAltHolding(object user, int x, int y)
 {
-	return ControlUseHolding(user, x, y);
+	OnHoldingUseAlt(user, x, y);
+	return ControlFireHolding(user, x, y);
 }
 
 /**
@@ -958,6 +975,11 @@ public func GetFiremode()
 
 public func GetFiremodes()
 {
+	if (!fire_modes)
+	{
+		FatalError("Fire modes is somehow empty??");
+	}
+
 	return fire_modes;
 }
 
@@ -974,8 +996,19 @@ public func AddFiremode(proplist fire_mode)
 
 /**
  Callback: Pressed the regular use button (fire).
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
  */
 public func OnPressUse(object user, int x, int y)
+{
+}
+
+/**
+ Callback: Holding the regular use button (fire).
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ */
+public func OnHoldingUse(object user, int x, int y)
 {
 }
 
@@ -983,17 +1016,29 @@ public func OnPressUse(object user, int x, int y)
  Callback: Pressed the alternate use button (fire secondary).
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
+ @par y The y coordinate the user is aiming at.
  @version 0.1.0
  */
 public func OnPressUseAlt(object user, int x, int y)
 {
 }
 
+/**
+ Callback: Holding the alternate use button (fire secondary).
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ */
+public func OnHoldingUseAlt(object user, int x, int y)
+{
+}
+
 public func CanChangeFiremode()
 {
 	return !IsRecovering()
-	    && !IsCharging();
+	    && !IsCharging()
+	    && !IsReloading()
+	    && !IsWeaponLocked();
 }
 
 //----------------------------------------------------------------------------------------------------------------
