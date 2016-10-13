@@ -38,11 +38,11 @@ public func ChangeFiremode(firemode)
 			if (mode.name == firemode)
 			{
 				selected_firemode = mode;
-				break;
-			}
-			
-			FatalError(Format("No firemode '%s'", firemode));
+				return;
+			}			
 		}
+
+		FatalError(Format("No firemode '%s'", firemode));
 	} 
 	else if (GetType(firemode) == C4V_PropList)
 	{
