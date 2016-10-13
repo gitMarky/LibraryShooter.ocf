@@ -1,5 +1,7 @@
 /**
  Allows fire mode selection via the object interaction menu.
+ 
+ {@c public func HasInteractionMenu()} must be implemented in order for this to work.
  */
 
 #include Plugin_Weapon_FiremodeBySelection
@@ -10,7 +12,6 @@
 
 static const GUI_PRIORITY_FIREMODE = 10;
 
-public func HasInteractionMenu() { return true; }
 
 public func GetInteractionMenus(object crew)
 {
@@ -65,7 +66,7 @@ public func GetGUIFiremodeMenuEntries(object crew)
 			custom = 
 			{
 				Prototype = custom_entry,
-				Priority = 1,
+				Priority = GUI_PRIORITY_FIREMODE,
 				text = {Prototype = custom_entry.text, Text = firemode.name},
 				image = {Prototype = custom_entry.image, Symbol = firemode_symbol},
 			}
