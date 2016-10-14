@@ -49,7 +49,17 @@ global func NormalizeDeviations(array deviations, int min_precision)
 	var angles = [];
 	for (var deviation in deviations)
 	{
-		PushBack(angles, deviation.angle * precision_max / deviation.precision);
+		if (GetType(deviation.angle == C4V_Array)
+		{
+			for (var angle in deviation.angle)
+			{
+				PushBack(angles, angle * precision_max / deviation.precision);
+			}
+		}
+		else
+		{
+			PushBack(angles, deviation.angle * precision_max / deviation.precision);
+		}
 	}
 	
 	return Projectile_Deviation(angles, precision_max);
