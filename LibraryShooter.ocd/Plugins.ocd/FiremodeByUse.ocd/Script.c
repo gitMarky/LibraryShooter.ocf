@@ -9,8 +9,6 @@
 static const WEAPON_Firemode_Primary = "primary";
 static const WEAPON_Firemode_Secondary = "secondary";
 
-local firemode_cached = nil;
-
 /**
  Callback: Pressed the regular use button (fire).
  */
@@ -40,44 +38,3 @@ public func OnUseStop(object user, int x, int y)
 {
 	ResetChangeFiremode();
 }
-
-
-
-func ScheduleChangeFiremode(string firemode)
-{
-	if (this->~CanChangeFiremode())
-	{
-		ChangeFiremode(firemode);
-	}
-	else
-	{
-		var schedule = GetEffect("scheduled_firemode", this) ?? CreateEffect(scheduled_firemode, 1, 1);
-		schedule.mode = firemode;
-	}
-}
-
-func ResetChangeFiremode()
-{
-	var schedule = GetEffect("scheduled_firemode", this);
-	if (schedule)
-	{
-		schedule.mode = nil;
-	}
-}
-
-local scheduled_firemode = new Effect
-{
-	Timer = func(int time)
-	{
-		// Stop if there is no mode
-		if (this.mode == nil) return FX_Execute_Kill;
-
-		if (Target->~CanChangeFiremode())
-		{
-			Target->ChangeFiremode(this.mode);
-			return FX_Execute_Kill;
-		}
-		
-		return FX_OK;
-	}
-};

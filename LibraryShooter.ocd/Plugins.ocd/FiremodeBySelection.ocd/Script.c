@@ -53,3 +53,67 @@ public func ChangeFiremode(firemode)
 		FatalError(Format("The function expects a string or proplist argument, you passed %v: %v", GetType(firemode), firemode));
 	}
 }
+
+
+/**
+ Changes the firemode at the next possible time.
+ 
+ @version 0.2.0
+ */
+func ScheduleChangeFiremode(string firemode)
+{
+	if (this->~CanChangeFiremode())
+	{
+		ChangeFiremode(firemode);
+	}
+	else
+	{
+		var schedule = GetEffect("scheduled_firemode", this) ?? CreateEffect(scheduled_firemode, 1, 1);
+		schedule.mode = firemode;
+	}
+}
+
+
+
+/**
+ Gets the scheduled firemode
+ 
+ @return the firemode, which may be a string or a proplist.
+ @version 0.2.0
+ */
+func GetScheduledFiremode()
+{
+	var schedule = GetEffect("scheduled_firemode", this);
+	
+	if (schedule)
+	{
+		return schedule.mode;
+	}
+	return nil;
+}
+
+func ResetChangeFiremode()
+{
+	var schedule = GetEffect("scheduled_firemode", this);
+	if (schedule)
+	{
+		schedule.mode = nil;
+	}
+}
+
+local scheduled_firemode = new Effect
+{
+	Timer = func(int time)
+	{
+		// Stop if there is no mode
+		if (this.mode == nil) return FX_Execute_Kill;
+
+		if (Target->~CanChangeFiremode())
+		{
+			Target->ChangeFiremode(this.mode);
+			return FX_Execute_Kill;
+		}
+		
+		return FX_OK;
+	}
+};
