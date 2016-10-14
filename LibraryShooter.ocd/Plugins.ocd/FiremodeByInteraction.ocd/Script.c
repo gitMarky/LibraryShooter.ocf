@@ -25,7 +25,7 @@ public func GetInteractionMenus(object crew)
 		callback_hover = "OnGUIHoverFiremode",
 		callback_target = this,
 		BackgroundColor = GetGUIFiremodeMenuColor(),
-		Priority = GUI_PRIORITY_FIREMODE
+		Priority = GUI_PRIORITY_FIREMODE,
 	};
 
 	PushBack(menus, change_firemode_menu);
@@ -51,7 +51,11 @@ public func GetGUIFiremodeMenuEntries(object crew)
 	
 		
 	// Add info message for every defender
-	for (var firemode in this->~GetFiremodes())
+	var modes = this->~GetFiremodes();
+	
+	if (!modes) return menu_entries;
+	
+	for (var firemode in modes)
 	{
 		var is_available = firemode.condition == nil || Call(firemode.condition);
 		
