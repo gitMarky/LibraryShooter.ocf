@@ -49,7 +49,7 @@ global func NormalizeDeviations(array deviations, int min_precision)
 	var angles = [];
 	for (var deviation in deviations)
 	{
-		if (GetType(deviation.angle == C4V_Array)
+		if (GetType(deviation.angle) == C4V_Array)
 		{
 			for (var angle in deviation.angle)
 			{
