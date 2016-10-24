@@ -176,8 +176,8 @@ public func HitObject(object obj, bool remove, proplist effect)
 	if (effect) effect.registered_hit = FrameCounter();
 }
 
-// called by successful hit of object after from ProjectileHit(...)
-public func OnStrike(object obj)
+
+public func OnHitObject(object obj)
 {
 	if(obj->GetAlive())
 		Sound("ProjectileHitLiving?");
