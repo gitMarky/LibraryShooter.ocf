@@ -691,6 +691,7 @@ public func HitObject(object obj, bool remove, proplist effect)
 
 	var self = this;
 
+	obj->~OnProjectileHit(this);
 	this->OnHitObject(obj);
 
 	if (!self) return;
