@@ -682,8 +682,6 @@ public func TrailColor(int acttime)
 
 public func HitObject(object obj, bool remove, proplist effect)
 {
-	DoDamageObject(obj);
-	
 	if (effect)
 	{
 		effect.registered_hit = FrameCounter();
@@ -692,6 +690,7 @@ public func HitObject(object obj, bool remove, proplist effect)
 	var self = this;
 
 	obj->~OnProjectileHit(this);
+	this->DoDamageObject(obj);
 	this->OnHitObject(obj);
 
 	if (!self) return;
