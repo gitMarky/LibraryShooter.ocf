@@ -19,6 +19,8 @@ global func WeaponDamageShooter(object target, int damage, int damage_type, int 
 	
 	if (exact_damage < 0) return;
 	
+	target->~OnWeaponDamageShooter(this, true_damage, damage_type);
+	
 	// TODO: pTarget->~SetLastDamagingWeapon(idWeapon);
 	/*
 	// Killer setzen
