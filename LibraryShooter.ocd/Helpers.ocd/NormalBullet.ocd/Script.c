@@ -169,7 +169,7 @@ public func HitObject(object obj, bool remove, proplist effect)
 		this.crit = true;
 	}
 	
-	DoDmg(damage, nil, obj, nil, nil, this, from_ID);
+	//DoDmg(damage, nil, obj, nil, nil, this, from_ID);
 	CreateImpactEffect(Max(5, damage*2/3));
 	
 	if (remove) RemoveObject();

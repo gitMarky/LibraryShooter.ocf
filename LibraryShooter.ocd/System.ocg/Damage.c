@@ -1,56 +1,57 @@
-/* Schadenssystem */
 
-
-global func DoDmg(int iDmg, int iType, object pTarget, int iPrecision, empty, object pFrom, id idWeapon)
+/*
+	Deals damage to an object, draining either energy for living things or dealing damage otherwise.
+	CatchBlow is called on the target if it's alive.
+*/
+global func WeaponDamageShooter(object target, int damage, int damage_type, int engine_damage_type, bool exact_damage, id weapon)
 {
-	if(!pTarget)
-    	if(!(pTarget = this))
-      	return(0);
-	if(!pFrom)
-		pFrom = this;
-  	if(!iPrecision)
-    	iPrecision = 1000;
-
-  	var dmg;
-
-  	var red = pTarget->~OnDmg(iDmg, iType); //reduction
-  	// reduction
-	dmg = (iDmg*(100-red)*iPrecision) / 100;
-
-	if(dmg <= 0) return;
-	pTarget->~SetLastDamagingWeapon(idWeapon);
-  // Killer setzen
-  /*if(this && (pTarget->GetOCF() & OCF_CrewMember))
-  {
-    //DebugLog("DoDmg sets killer: %d, owner of %s", "damage", this->GetOwner(), this->GetName());
-   
-    if(iDmg) pTarget->~SetLastDamagingObject(pFrom);
-    if(iDmg) pTarget->~SetLastDamagingWeapon(idWeapon);
-  }*/
-
-  //Schaden machen
-  //if(pTarget != this())
-    
-  //if(pFrom)
-  //	pTarget->SetKiller(pFrom->GetController());
-  //pTarget->~LastDamageType(iType);
-  /*{
-  var n = pFrom->GetName();
-  if(!n) n = "???";
-  DebugLog("%s deals %d dmg to %s", n, dmg, pTarget->GetName());
-  }*/
-	pTarget->~OnHit(dmg/1000, iType, pFrom, idWeapon);
-  
-  	if (!pTarget) return 1;
-  
-	if (pTarget->GetCategory() & C4D_Living)
+	AssertObjectContext("WeaponDamageShooter");
+	
+	if (!target)
 	{
-		pTarget->DoEnergy(-dmg, true, nil, pFrom->GetController());
+		FatalError("This function needs a target, got nil.");
+	}
+
+	engine_damage_type = engine_damage_type ?? FX_Call_EngObjHit;
+	damage = target->~ModifyWeaponDamageShooter(damage, damage_type, engine_damage_type) ?? damage;
+	var true_damage = damage;
+	if (exact_damage) true_damage = damage / 1000;
+	
+	if (exact_damage < 0) return;
+	
+	// TODO: pTarget->~SetLastDamagingWeapon(idWeapon);
+	/*
+	// Killer setzen
+	if(this && (pTarget->GetOCF() & OCF_CrewMember))
+	{
+		//DebugLog("WeaponDamageShooter sets killer: %d, owner of %s", "damage", this->GetOwner(), this->GetName());
+		   
+		if(amount) pTarget->~SetLastDamagingObject(pFrom);
+		if(amount) pTarget->~SetLastDamagingWeapon(idWeapon);
+	}
+	*/
+	//Schaden machen
+	//if(pTarget != this())
+	
+	//if(pFrom)
+	//	pTarget->SetKiller(pFrom->GetController());
+	//pTarget->~LastDamageType(engine_damage_type);
+	/*{
+		var n = pFrom->GetName();
+		if(!n) n = "???";
+		DebugLog("%s deals %d dmg to %s", n, dmg, pTarget->GetName());
+	}*/
+
+
+	if (target->GetAlive())
+	{
+		target->DoEnergy(-damage, exact_damage, engine_damage_type, GetController());
+		if (!target) return;
+
+		target->~CatchBlow(-true_damage, this);
 	}
 	else
 	{
-		pTarget->DoDamage(dmg/1000, nil, pFrom->GetController());
+		target->DoDamage(true_damage, engine_damage_type, GetController());
 	}
-	
-	return 1;
 }
