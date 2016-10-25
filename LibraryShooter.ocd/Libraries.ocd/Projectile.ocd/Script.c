@@ -715,7 +715,7 @@ public func HitObject(object obj, bool remove, proplist effect)
  */
 public func DoDamageObject(object target)
 {
-	WeaponDamageShooter(target, GetDamageAmount(), GetDamageType, nil, false, GetWeaponID());
+	WeaponDamageShooter(target, GetDamageAmount(), GetDamageType(), nil, false, GetWeaponID());
 }
 
 
