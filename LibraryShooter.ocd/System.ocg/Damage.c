@@ -44,16 +44,18 @@ global func WeaponDamageShooter(object target, int damage, int damage_type, int 
 		DebugLog("%s deals %d dmg to %s", n, dmg, pTarget->GetName());
 	}*/
 
-
-	if (target->GetAlive())
+	if (target)
 	{
-		target->DoEnergy(-damage, exact_damage, engine_damage_type, GetController());
-		if (!target) return;
-
-		target->~CatchBlow(-true_damage, this);
-	}
-	else
-	{
-		target->DoDamage(true_damage, engine_damage_type, GetController());
+		if (target->GetAlive())
+		{
+			target->DoEnergy(-damage, exact_damage, engine_damage_type, GetController());
+			if (!target) return;
+	
+			target->~CatchBlow(-true_damage, this);
+		}
+		else
+		{
+			target->DoDamage(true_damage, engine_damage_type, GetController());
+		}
 	}
 }
