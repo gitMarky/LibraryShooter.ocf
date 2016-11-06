@@ -52,9 +52,7 @@ public func GetXDir(int precision)
 {
 	if (IsHitscan())
 	{
-		var velo = (precision ?? PROJECTILE_Default_Velocity_Precision) * velocity_x / PROJECTILE_Default_Velocity_Precision;
-		Log("GetXDir for hitscan = %d", velo);
-		return velo;
+		return (precision ?? PROJECTILE_Default_Velocity_Precision) * velocity_x / PROJECTILE_Default_Velocity_Precision;
 	}
 	else
 	{
@@ -73,9 +71,7 @@ public func GetYDir(int precision)
 {
 	if (IsHitscan())
 	{
-		var velo = (precision ?? PROJECTILE_Default_Velocity_Precision) * velocity_y / PROJECTILE_Default_Velocity_Precision;
-		Log("GetYDir for hitscan = %d", velo);
-		return velo;
+		return (precision ?? PROJECTILE_Default_Velocity_Precision) * velocity_y / PROJECTILE_Default_Velocity_Precision;
 	}
 	else
 	{
