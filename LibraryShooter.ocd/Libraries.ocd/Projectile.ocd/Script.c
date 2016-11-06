@@ -41,6 +41,48 @@ local rotation_by_rdir;
 //
 // global functions
 
+/**
+ Override of the default function for getting x dir, so that hitscan projectiles
+ can provide a correct value.
+ 
+ @par precision The precision value, default is 10.
+ @version 0.2.0
+ */
+public func GetXDir(int precision)
+{
+	if (IsHitscan())
+	{
+		var velo = (precision ?? PROJECTILE_Default_Velocity_Precision) * velocity_x / PROJECTILE_Default_Velocity_Precision;
+		Log("GetXDir for hitscan = %d", velo);
+		return velo;
+	}
+	else
+	{
+		return _inherited(precision, ...);
+	}
+}
+
+/**
+ Override of the default function for getting y dir, so that hitscan projectiles
+ can provide a correct value.
+
+ @par precision The precision value, default is 10.
+ @version 0.2.0
+ */
+public func GetYDir(int precision)
+{
+	if (IsHitscan())
+	{
+		var velo = (precision ?? PROJECTILE_Default_Velocity_Precision) * velocity_y / PROJECTILE_Default_Velocity_Precision;
+		Log("GetYDir for hitscan = %d", velo);
+		return velo;
+	}
+	else
+	{
+		return _inherited(precision, ...);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // finished functions
@@ -50,6 +92,16 @@ local rotation_by_rdir;
  @version 0.1.0
  */
 public func IsProjectile(){ return true;}
+
+
+/**
+ Identifies the object as a hitscan projectile.
+ @version 0.2.0
+ */
+public func IsHitscan()
+{
+	return instant;
+}
 
 
 /**
@@ -411,8 +463,10 @@ public func Launch(int angle, proplist deviation)
 		deviation = ScaleDeviation(deviation, precision);
 	}
 	
-	// get angle
+	// get angle and velocity
 	angle = GetLaunchAngle(angle, precision, deviation);
+	velocity_x = +Sin(angle, velocity, precision);
+	velocity_y = -Cos(angle, velocity, precision);
 
 	var self = this;
 
@@ -436,9 +490,6 @@ public func Launch(int angle, proplist deviation)
 
 private func LaunchAsProjectile(int angle, int precision)
 {
-	velocity_x = +Sin(angle, velocity, precision);
-	velocity_y = -Cos(angle, velocity, precision);
-
 	//Log("Launching projectile at angle %d (%d with precision %d), v_x = %d, v_y = %d", angle / precision, angle, precision, velocity_x, velocity_y);
 
 	SetXDir(velocity_x); SetYDir(velocity_y);
