@@ -590,14 +590,15 @@ private func Fire(object user, int x, int y)
 
 private func RejectUse(object user)
 {
-	return !IsReadyToUse() || !user->HasHandAction();
+	return !IsReadyToUse(user) || !user->HasHandAction();
 }
 
 /**
- Interface for signaling that the weapon is ready to use (attack). 
+ Interface for signaling that the weapon is ready to use (attack).
+ @par user The object that is trying to use this weapon. 
  @return true, if the object is ready to use.
  */
-private func IsReadyToUse()
+private func IsReadyToUse(object user)
 {
 	return true;
 }
