@@ -281,7 +281,7 @@ private func Initialize()
 {
 	shot_counter = {};
 	ammo_rate_counter = {};
-	_inherited();
+	_inherited(...);
 }
 
 public func GetCarryMode(object user) {    if (is_selected) return CARRY_Hand; }
