@@ -1055,13 +1055,14 @@ public func CanChangeFiremode()
  */
 public func HasAmmo(proplist firemode)
 {
-	return GetAmmo(firemode) >= firemode.ammo_usage // enough ammo for the firemode?
-	    || ammo_rate_counter[firemode.name] > 0;    // or ammo left from previously using the weapon?
+	return this->GetAmmo(firemode) >= firemode.ammo_usage // enough ammo for the firemode?
+	    || ammo_rate_counter[firemode.name] > 0     // or ammo left from previously using the weapon?
+	    || this->GetAmmoSource(firemode) == AMMO_Source_Infinite; // or infinite ammo
 }
 
 
 /**
- Overrides func Fx{@link Library_AmmoManager#GetAmmo}, so that you can ask theDamage(obj, effect)
+ Overrides func {@link Library_AmmoManager#GetAmmo}, so that you can ask the
  amount of ammunition for a specific firemode.
  
  @par type_or_firemode You can pass an ID as in the original implementation,
@@ -1092,6 +1093,47 @@ public func GetAmmo(type_or_firemode)
 		else
 		{
 			return GetAmmo(fm);
+		}
+	}
+	else
+	{
+		FatalError(Format("You have to specify an id or proplist (firemode), but you specified %v", GetType(type_or_firemode)));
+	}
+}
+
+
+/**
+ Overrides func {@link Library_AmmoManager#GetAmmoSource}, so that you can ask the
+ ammo source for a specific firemode.
+ 
+ @par type_or_firemode You can pass an ID as in the original implementation,
+                       or you can pass a firemode. If you pass {@code nil}
+                       the value for {@link Library_Weapon#func GetFiremode} is
+                       requested. The method will fail if the proplist is not a
+                       firemode.
+ @return int The current source of ammunition for an ID or firemode.
+ @version 0.2.0
+ */
+public func GetAmmoSource(type_or_firemode)
+{
+	if (GetType(type_or_firemode) == C4V_Def)
+	{
+		return _inherited(type_or_firemode, ...);
+	}
+	else if (GetType(type_or_firemode) == C4V_PropList)
+	{
+		return _inherited(type_or_firemode.ammo_id, ...);
+	}
+	else if (GetType(type_or_firemode) == C4V_Nil)
+	{
+		var fm = GetFiremode();
+		if (fm == nil)
+		{
+			FatalError("Cannot get firemode!");
+		}
+		else
+		{
+			return _inherited(fm, ...);
 		}
 	}
 	else
