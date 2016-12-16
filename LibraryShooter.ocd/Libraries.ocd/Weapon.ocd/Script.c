@@ -1,4 +1,4 @@
-#include Library_AmmoManager
+ï»¿#include Library_AmmoManager
 
 /**
  @note Firemodes
@@ -528,7 +528,7 @@ private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
  Converts coordinates to an aiming angle for the weapon.
  @par x The x coordinate, local.
  @par y The y coordinate, local.
- @return int The angle in degrees, normalized to the range of [-180°, 180°].
+ @return int The angle in degrees, normalized to the range of [-180Â°, 180Â°].
  @version 0.1.0
  */
 private func GetAngle(int x, int y)

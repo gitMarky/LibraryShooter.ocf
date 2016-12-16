@@ -1,2 +1,2 @@
-Name=Waffe
-Description=Eine Waffe, die Projektile verschie�t oder mit der man zuschlagen kann
+﻿Name=Waffe
+Description=Eine Waffe, die Projektile verschießt oder mit der man zuschlagen kann

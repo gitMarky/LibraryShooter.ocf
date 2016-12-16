@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  Library for projectiles.
  
  @author Marky
@@ -630,7 +630,7 @@ public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int
 		SetClrModulation(GlowColor(1),this(),1);
 	}
 
-	// Werte für Reflektionen speichern
+	// save values for reflections
 	iRefl = iReflections;
 
 		iTrailSize = iSize;
@@ -900,7 +900,7 @@ local Description = "$Description$";
 local iTime, lx, ly, pTrail, iDamage, iPrec, iRefl, iTrailLength, iTrailSize, iXDir, iYDir, DMG_Type;
 local shooter; // Dingens/Clonk das den Schuss abgefeuert hat.
 local bGlow, bNoRemove;
-local shooter_weapon; // ID des Schützen oder seiner Waffe
+local shooter_weapon; // ID des SchÃ¼tzen oder seiner Waffe
 
 public func GetDamageType(){ return DMG_Type; }
 public func DoCorrectPosition(){ return false; }
@@ -963,7 +963,7 @@ public func LaunchInstant(int iAngle, int iSpeed, int iDist, int iSize, int iTra
 }
 
 
-// Extern für Überladung
+// Extern fÃ¼r Ãœberladung
 private func CreateTrail(int iSize, int iTrail) {
 	pTrail = CreateObject(TrailID(),0,0,-1);
 	if(pTrail) {
@@ -985,10 +985,10 @@ private func Traveling()
 	if(bGlow) {
 		SetClrModulation(GlowColor(iATime),0,1);
 	}
-	// löschen
+	// lÃ¶schen
 	if(iATime >= iTime) return(Remove());
 
-	// außerhalb der Landschaft: löschen
+	// auÃŸerhalb der Landschaft: lÃ¶schen
 	if(GetY()<0) return(Remove());
 }
 
@@ -996,7 +996,7 @@ private func Traveling()
 
 private func Hit()
 {
-	// Reflektion an Wänden (Eintrittswinkel = Austrittwinkel)
+	// Reflektion an WÃ¤nden (Eintrittswinkel = Austrittwinkel)
 	if(iRefl)
 	{
 		if(!iXDir && !iYDir)
@@ -1006,7 +1006,7 @@ private func Hit()
 		}
 		if(iXDir != 0)
 		{
-			// Positive XDir -> Rechts auf Material prüfen
+			// Positive XDir -> Rechts auf Material prÃ¼fen
 			if(iXDir > 0)
 			{
 				if(GBackSolid(1,0))
@@ -1019,7 +1019,7 @@ private func Hit()
 		}
 		if(iYDir != 0)
 		{
-			// Positive YDir -> Unten auf Material prüfen
+			// Positive YDir -> Unten auf Material prÃ¼fen
 			if(iYDir > 0)
 			{
 				if(GBackSolid(0,1))
@@ -1030,7 +1030,7 @@ private func Hit()
 				if(GBackSolid(0,-1))
 					iYDir *= -1;
 		}
-		// Geschwindigkeit gehört neu gesetzt
+		// Geschwindigkeit gehÃ¶rt neu gesetzt
 		SetXDir(iXDir, 0, 100);
 		SetYDir(iYDir, 0, 100);
 		SetR(Angle(0, 0, iXDir, iYDir));
@@ -1050,7 +1050,7 @@ private func Hit()
 		return;
 	}
 
-	// umliegende Objekte beschädigen.
+	// umliegende Objekte beschÃ¤digen.
 	var objs = FindObjects(	Find_AtPoint(),
 							Find_NoContainer(),
 							Find_Or(
@@ -1098,15 +1098,15 @@ public func Remove() {
 	RemoveObject();
 }
 
-// Effekt für Trefferüberprüfung
+// Effekt fÃ¼r TrefferÃ¼berprÃ¼fung
 
 // EffectVars:
 // 0 - alte X-Position
 // 1 - alte Y-Position
-// 2 - Schütze (Objekt, das die Waffe abgefeuert hat, üblicherweise ein Clonk)
-// 3 - ID des Schützen
-// 4 - Scharf? Wenn true wird der Schütze vom Projektil getroffen 
-// 5 - niemals den Schützen treffen
+// 2 - SchÃ¼tze (Objekt, das die Waffe abgefeuert hat, Ã¼blicherweise ein Clonk)
+// 3 - ID des SchÃ¼tzen
+// 4 - Scharf? Wenn true wird der SchÃ¼tze vom Projektil getroffen 
+// 5 - niemals den SchÃ¼tzen treffen
 
 public func FxHitCheckStart(object target, int effect, int temp, object byObj, bool neverShooter)
 {
@@ -1142,7 +1142,7 @@ private func HitCheck(int x1, int y1, int x2, int y2, object pExclude )
 
 	SetPosition(x1,y1);
 
-	// Landschaftskollision prüfen
+	// Landschaftskollision prÃ¼fen
 	while(++dist)
 	{
 		if(GBackSolid(dx*dist/dmax,dy*dist/dmax))
@@ -1202,7 +1202,7 @@ private func HitCheck(int x1, int y1, int x2, int y2, object pExclude )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Geändertes
+// GeÃ¤ndertes
 
 private func HitObject(object pObject)
 {
