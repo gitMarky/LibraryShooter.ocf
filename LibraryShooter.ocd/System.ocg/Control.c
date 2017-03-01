@@ -11,11 +11,10 @@ global func Control2Player(int plr, int ctrl, int x, int y, int strength, bool r
 	
 	if(ctrl == CON_CaedesAimingCursor)
 	{
-		var c = GetCursor(plr);
-		if(c)
+		var cursor = GetCursor(plr);
+		if (cursor && ! cursor.aim_stop)
 		{
-			if(c.aim_stop) return true;
-			c->~SetAimPosition(Normalize(Angle(c->GetX(), c->GetY(), x, y), -180));
+			cursor->~SetAimPosition(Normalize(Angle(cursor->GetX(), cursor->GetY(), x, y), -180));
 		}
 		return true;
 	}
