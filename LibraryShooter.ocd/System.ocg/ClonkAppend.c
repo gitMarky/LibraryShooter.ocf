@@ -31,13 +31,11 @@ func FxIntAimRestarterTimer(object target, proplist effect, int time)
 {
 	// for a very quick check after cancelling the last aiming..
 	if (effect.Interval == 1) effect.Interval = 10;
-	
+
 	// calling this assumes that the Clonk is not aiming currently
 	var weapon = GetHandItem(0);
 	if (!weapon) return;
-	//if(!weapon.weapon_properties) return;
-	//if(weapon.weapon_properties.delay_shot) return;
-	if (target->GetAction() != "Walk" && target->GetAction() != "Jump") return;
+	if (weapon->~RejectUse(this)) return;
 	
 	aim_set = weapon.animation_set;
 	if (!aim_set) return;
