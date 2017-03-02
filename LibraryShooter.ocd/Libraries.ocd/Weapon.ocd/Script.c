@@ -877,7 +877,11 @@ private func IsReadyToFire()
 
 private func StartCooldown(object user, proplist firemode)
 {
-	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode)) return;
+	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode))
+	{
+		OnSkipCooldown(user, firemode);
+		return;
+	}
 	
 	var effect = IsCoolingDown();
 
@@ -928,6 +932,17 @@ public func OnStartCooldown(object user, proplist firemode)
  @version 0.1.0
  */
 public func OnFinishCooldown(object user, proplist firemode)
+{
+}
+
+
+/**
+ Callback: the weapon has skipped cooling down. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+ */
+public func OnSkipCooldown(object user, proplist firemode)
 {
 }
 
