@@ -48,7 +48,7 @@ func FxIntAimRestarterTimer(object target, proplist effect, int time)
 			aim_animation_index = PlayAnimation
 			(
 				aim_set["AnimationAim"],
-				10,
+				CLONK_ANIM_SLOT_Arms,
 				Anim_Const(GetAnimationLength(aim_set["AnimationAim"]) / 2),
 				Anim_Const(1000)
 			);
@@ -57,7 +57,7 @@ func FxIntAimRestarterTimer(object target, proplist effect, int time)
 			aim_animation_index = PlayAnimation
 			(
 				aim_set["AnimationAim"],
-				10,
+				CLONK_ANIM_SLOT_Arms,
 				Anim_Linear(0, 0, GetAnimationLength(aim_set["AnimationAim"]), aim_set["AimTime"], ANIM_Loop),
 				Anim_Const(1000)
 			);
@@ -127,12 +127,9 @@ func FxIntAimTimer(object target, proplist effect, int time)
 	if (effect.artificial)
 	{
 		var weapon = GetHandItem(0);
-		if (!aim_weapon || weapon != aim_weapon)
-			return -1;
-		if (aim_weapon->Contained() != target)
-			return -1;
-		if (target->GetAction() != "Walk" && target->GetAction() != "Jump")
-			return -1;
+		if (!aim_weapon || weapon != aim_weapon) return FX_Execute_Kill;
+		if (aim_weapon->Contained() != target) return FX_Execute_Kill;
+		if (aim_weapon->RejectUse(target)) return FX_Execute_Kill;
 	}
 	
 	if (!aim_set) return;
