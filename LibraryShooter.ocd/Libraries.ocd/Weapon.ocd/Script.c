@@ -1309,7 +1309,7 @@ private func IsWeaponLocked()
 //
 // Reloading the weapon
 
-private func StartReload(object user, int x, int y)
+private func StartReload(object user, int x, int y, bool forced)
 {
 	var firemode = GetFiremode();
 
@@ -1318,7 +1318,7 @@ private func StartReload(object user, int x, int y)
 		FatalError(Format("Fire mode '%s' not supported", firemode));
 	}
 
-	if (!is_using || !NeedsReload(user, firemode)) return false;
+	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
 
 	var effect = IsReloading();
 	
