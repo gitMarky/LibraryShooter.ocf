@@ -13,18 +13,6 @@ func Recruitment()
 	return _inherited(...);
 }
 
-func IsAiming()
-{
-	var e = GetEffect("IntAim", this);
-	if (!e || e.artificial)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
 
 // this has to be refactored, it still uses some of caedes weapon properties
 func FxIntAimRestarterTimer(object target, proplist effect, int time)
