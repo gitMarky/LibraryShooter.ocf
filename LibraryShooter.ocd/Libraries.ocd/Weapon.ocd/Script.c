@@ -751,9 +751,34 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 
 private func FireRecovery(object user, int x, int y, proplist firemode)
 {
-	var recovery = AddEffect("IntRecovery", this, 1, firemode.delay_recover, this, nil, user, x, y, firemode);
-	recovery.delay = firemode.delay_recover;
+	var delay;
+	if (!NeedsRecovery(user, firemode))
+	{
+		delay = firemode.delay_recover;
+	}
+	else
+	{
+		delay = 1;
+	}
+
+	var recovery = AddEffect("IntRecovery", this, 1, delay, this, nil, user, x, y, firemode);
+	recovery.delay = delay;
 }
+
+
+/**
+ Condition when the weapon needs to be recover after firing.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function
+         for a custom condition.
+ @version 0.2.0
+ */
+public func NeedsRecovery(object user, proplist firemode)
+{
+	return true;
+}
+
 
 private func FxIntRecoveryStart (object target, proplist effect, int temporary, object user, int x, int y, proplist firemode)
 {
