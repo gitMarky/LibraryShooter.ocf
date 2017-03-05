@@ -104,3 +104,13 @@ public func OnGUIChangeFiremode(id symbol, proplist action, object crew)
 {
 	action.weapon->~ScheduleChangeFiremode(action.firemode);
 }
+
+public func ChangeFiremode(firemode)
+{
+	_inherited(firemode);
+	
+	if (Contained())
+	{
+		Contained()->UpdateInteractionMenus();
+	}
+}
