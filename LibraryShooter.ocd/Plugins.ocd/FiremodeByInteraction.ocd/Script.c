@@ -19,7 +19,7 @@ public func GetInteractionMenus(object crew)
 
 	var change_firemode_menu =
 	{
-		title = Format("%s: %s", "$GUI_Change_Firemode$", this->GetName()),
+		title = Format("%s: %s ({{%i}})", "$GUI_Change_Firemode$", this->GetName(), this->GetID()),
 		entries_callback = this.GetGUIFiremodeMenuEntries,
 		entries_callback_parameter = this,
 		callback = "OnGUIChangeFiremode",
@@ -27,7 +27,6 @@ public func GetInteractionMenus(object crew)
 		callback_target = this,
 		BackgroundColor = GetGUIFiremodeMenuColor(),
 		Priority = GUI_PRIORITY_FIREMODE,
-		Symbol = this,
 	};
 
 	PushBack(menus, change_firemode_menu);
@@ -36,7 +35,8 @@ public func GetInteractionMenus(object crew)
 
 
 public func GetGUIFiremodeMenuColor(){ return RGB(0, 50, 50);}
-
+public func GetGUIFiremodeActiveColor(){ return "ffffff";}
+public func GetGUIFiremodeInactiveColor(){ return "bbbbbb";}
 
 public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 {
@@ -57,13 +57,26 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 	
 	if (!modes) return menu_entries;
 	
+	var selected = weapon->~GetFiremode();
+	
 	for (var firemode in modes)
 	{
 		var is_available = firemode.condition == nil || weapon->Call(firemode.condition);
 
 		if (!is_available) continue;
 		
-		var firemode_symbol = firemode.icon ?? weapon;
+		var firemode_symbol = firemode.icon ?? weapon->GetID();
+		
+		var text_color;
+		
+		if (firemode == selected)
+		{
+			text_color = GetGUIFiremodeActiveColor();
+		}
+		else
+		{
+			text_color = GetGUIFiremodeInactiveColor();
+		}
 
 		PushBack(menu_entries,
 		{
@@ -73,7 +86,7 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 			{
 				Prototype = custom_entry,
 				Priority = GUI_PRIORITY_FIREMODE,
-				text = {Prototype = custom_entry.text, Text = firemode.name},
+				text = {Prototype = custom_entry.text, Text = Format("<c %s>%s</c>", text_color, firemode.name)},
 				image = {Prototype = custom_entry.image, Symbol = firemode_symbol},
 			}
 		});
