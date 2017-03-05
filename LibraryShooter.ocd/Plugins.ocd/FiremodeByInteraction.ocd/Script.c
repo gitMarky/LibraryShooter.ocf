@@ -19,13 +19,15 @@ public func GetInteractionMenus(object crew)
 
 	var change_firemode_menu =
 	{
-		title = "$GUI_Change_Firemode$",
+		title = Format("%s: %s", "$GUI_Change_Firemode$", this->GetName()),
 		entries_callback = this.GetGUIFiremodeMenuEntries,
+		entries_callback_parameter = this,
 		callback = "OnGUIChangeFiremode",
 		callback_hover = "OnGUIHoverFiremode",
 		callback_target = this,
 		BackgroundColor = GetGUIFiremodeMenuColor(),
 		Priority = GUI_PRIORITY_FIREMODE,
+		Symbol = this,
 	};
 
 	PushBack(menus, change_firemode_menu);
@@ -36,10 +38,10 @@ public func GetInteractionMenus(object crew)
 public func GetGUIFiremodeMenuColor(){ return RGB(0, 50, 50);}
 
 
-public func GetGUIFiremodeMenuEntries(object crew)
+public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 {
 	var menu_entries = [];
-
+	
 	// default design of a control menu item
 	var custom_entry = 
 	{
@@ -51,21 +53,21 @@ public func GetGUIFiremodeMenuEntries(object crew)
 	
 		
 	// Add info message for every defender
-	var modes = this->~GetFiremodes();
+	var modes = weapon->~GetFiremodes();
 	
 	if (!modes) return menu_entries;
 	
 	for (var firemode in modes)
 	{
-		var is_available = firemode.condition == nil || Call(firemode.condition);
-		
+		var is_available = firemode.condition == nil || weapon->Call(firemode.condition);
+
 		if (!is_available) continue;
 		
-		var firemode_symbol = firemode.icon ?? this;
+		var firemode_symbol = firemode.icon ?? weapon;
 
 		PushBack(menu_entries,
 		{
-		    symbol = firemode_symbol,
+		    Symbol = firemode_symbol,
 		    extra_data = firemode.name,
 			custom = 
 			{
