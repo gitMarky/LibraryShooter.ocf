@@ -81,7 +81,7 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 		PushBack(menu_entries,
 		{
 		    Symbol = firemode_symbol,
-		    extra_data = firemode.name,
+		    extra_data = { weapon = weapon, firemode = firemode.name},
 			custom = 
 			{
 				Prototype = custom_entry,
@@ -95,12 +95,12 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 	return menu_entries;
 }
 
-public func OnGUIHoverFiremode(id symbol, string action, desc_menu_target, menu_id)
+public func OnGUIHoverFiremode(id symbol, proplist action, desc_menu_target, menu_id)
 {
 	// do nothing at the moment
 }
 
-public func OnGUIChangeFiremode(id symbol, string action, bool alt)
+public func OnGUIChangeFiremode(id symbol, proplist action, object crew)
 {
-	// do nothing on click, or maybe let the clonk play an idle animation :p
+	action.weapon->~ScheduleChangeFiremode(action.firemode);
 }
