@@ -1,13 +1,61 @@
 /**
- Allows fire mode selection via the use function:
- - normal use is firemode "primary"
- - alternative use is firemode "secondary"
+ Allows fire mode selection by cycling through the modes.
  */
 
 #include Plugin_Weapon_FiremodeBySelection
 
 local next_firemode_index = 0;
+local current_firemode_index = 0;
 
+local IntToggleFiremode = new Effect
+{
+	current_index = 0,
+	next_index = 0,
+	delay = 0,
+	modes = [],
+
+	Timer = func (int time)
+	{
+		if (delay <= 0)
+		{
+			if (current_index != next_index)
+			{
+				Target->ScheduleChangeFiremode(modes[next_index].name);
+			}
+			
+			return FX_Execute_Kill;
+		}
+		
+		delay -= 1;
+	},
+	
+	SetIndex = func (int index)
+	{
+		current_index = index;
+		next_index = index;
+		NextIndex();
+	},
+	
+	SetFiremodes = func (array firemodes)
+	{
+		modes = firemodes;
+	},
+	
+	SetDelay = func (int delay)
+	{
+		this.delay = delay;
+	},
+
+	NextIndex = func ()
+	{
+		next_index += 1;
+		if (next_index >= GetLength(modes) || next_index < 0 ) 
+		{
+			next_index = 0;
+		}
+		Target->~OnSelectFiremode(modes[next_index]);
+	},
+};
 
 public func ToggleFiremode()
 {
@@ -18,8 +66,32 @@ public func ToggleFiremode()
 		FatalError("Cannot toggle fire modes: The GetAvailableFiremodes() returns nothing or an empty array.");
 	}
 	
-	next_firemode_index += 1;
-	if (next_firemode_index >= modes.length) next_firemode_index = 0;
+	var toggle_effect = GetEffect("IntToggleFiremode", this);
 	
-	ScheduleChangeFiremode(modes[next_firemode_index]);
+	if (!toggle_effect)
+	{
+		toggle_effect = CreateEffect(IntToggleFiremode, 1, 1);
+		toggle_effect->SetFiremodes(modes);
+		toggle_effect->SetIndex(GetIndexOf(modes, GetFiremode()));
+		toggle_effect->SetDelay(ToggleFiremodeDelay());
+	}
+	else
+	{
+		toggle_effect->NextIndex();
+		toggle_effect->SetDelay(ToggleFiremodeDelay());
+	}
+}
+
+
+/**
+ Delay until the toggled firemode is activated.
+ 
+ @return int The delay, in frames.
+ @version 0.2.0
+ */
+public func ToggleFiremodeDelay(){ return 30;}
+
+public func OnSelectFiremode(proplist firemode)
+{
+	// do nothing at the moment
 }
