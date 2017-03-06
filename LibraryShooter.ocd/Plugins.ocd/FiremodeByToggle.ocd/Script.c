@@ -11,11 +11,11 @@ local next_firemode_index = 0;
 
 public func ToggleFiremode()
 {
-	var modes = this->GetFiremodes();
+	var modes = this->GetAvailableFiremodes();
 	
 	if (!modes || GetLength(modes) == 0)
 	{
-		FatalError("Cannot toggle fire modes: The GetFiremodes() returns nothing or an empty array.");
+		FatalError("Cannot toggle fire modes: The GetAvailableFiremodes() returns nothing or an empty array.");
 	}
 	
 	next_firemode_index += 1;

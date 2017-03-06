@@ -1037,6 +1037,25 @@ public func GetFiremodes()
 	return fire_modes;
 }
 
+
+public func GetAvailableFiremodes()
+{
+	var available = [];
+	
+	for (var firemode in GetFiremodes())
+	{
+		var is_available = firemode.condition == nil || this->Call(firemode.condition);
+
+		if (is_available)
+		{
+			PushBack(available, firemode);
+		}
+	}
+	
+	return available;
+}
+
+
 public func ClearFiremodes()
 {
 	fire_modes = [];

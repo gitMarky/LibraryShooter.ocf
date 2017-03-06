@@ -53,7 +53,7 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 	
 		
 	// Add info message for every defender
-	var modes = weapon->~GetFiremodes();
+	var modes = weapon->~GetAvailableFiremodes();
 	
 	if (!modes) return menu_entries;
 	
@@ -61,10 +61,6 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 	
 	for (var firemode in modes)
 	{
-		var is_available = firemode.condition == nil || weapon->Call(firemode.condition);
-
-		if (!is_available) continue;
-		
 		var firemode_symbol = firemode.icon ?? weapon->GetID();
 		
 		var text_color;
