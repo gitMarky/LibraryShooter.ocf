@@ -1042,8 +1042,10 @@ public func GetAvailableFiremodes()
 {
 	var available = [];
 	
-	for (var firemode in GetFiremodes())
+	for (var i = 0; i < GetLength(GetFiremodes()); ++i) // firemode in GetFiremodes())
 	{
+		var firemode = GetFiremodes()[i];
+	
 		var is_available = firemode.condition == nil || this->Call(firemode.condition);
 
 		if (is_available)
