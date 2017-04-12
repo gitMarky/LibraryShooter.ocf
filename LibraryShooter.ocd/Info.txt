@@ -1,0 +1,12 @@
+[Developer/Maintainer]
+Marky 
+
+[Folder Information]
+This folder contains objects that can be used for shooter scenarios games. 
+
+[Information for developers]
+Since this is a library, the folder should contain only objects that are useful for everyone, or base objects that can be included. Think 'abstract' functions in other programming languages.
+The implementation of these objects for specific packs should be done in those packs.
+
+If you want to contribute to this folder feel free to do so and in case of questions contact the maintainer
+in IRC or the forum.
