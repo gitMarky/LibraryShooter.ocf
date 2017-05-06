@@ -659,7 +659,7 @@ func FxPositionCheckTimer(target, effect, time)
 	nextY = lastY + GetYDir()/10;
 }
 
-protected func Travelling()
+public func Travelling()
 {
 	ControlSpeed();
 	

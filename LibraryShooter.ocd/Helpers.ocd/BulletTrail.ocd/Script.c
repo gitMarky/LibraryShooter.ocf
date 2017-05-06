@@ -100,7 +100,7 @@ public func TrailColor(int time)
 
 /* Timer */
 
-private func Travelling()
+public func Travelling()
 {
 	// The shot is gone -> remove
 	if (!do_fade && !projectile) Remove();

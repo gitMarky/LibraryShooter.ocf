@@ -1,6 +1,6 @@
 [DefCore]
 id=Bullet
-Version=7,0
+Version=8,0
 Category=C4D_Vehicle
 Width=3
 Height=3
