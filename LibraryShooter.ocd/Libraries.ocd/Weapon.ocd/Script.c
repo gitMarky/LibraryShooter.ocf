@@ -862,7 +862,7 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 
 private func CheckCooldown(object user, proplist firemode)
 {
-	if (!HasAmmo(firemode))
+	if (!HasAmmo(firemode) || !IsUserReadyToUse(user))
 	{
 		CancelUsing();
 	}
