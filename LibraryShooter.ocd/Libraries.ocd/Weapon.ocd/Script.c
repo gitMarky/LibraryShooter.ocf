@@ -597,11 +597,12 @@ private func RejectUse(object user)
 /**
  Interface for signaling that the weapon is ready to use (attack).
  @par user The object that is trying to use this weapon. 
- @return true, if the object is ready to use.
+ @return true, if the object is ready to use. By default this is true,
+         if the weapon is contained in the user.
  */
 private func IsWeaponReadyToUse(object user)
 {
-	return true;
+	return Contained() == user;
 }
 
 
@@ -862,7 +863,7 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 
 private func CheckCooldown(object user, proplist firemode)
 {
-	if (!HasAmmo(firemode) || !IsUserReadyToUse(user))
+	if (!HasAmmo(firemode) || RejectUse(user))
 	{
 		CancelUsing();
 	}
