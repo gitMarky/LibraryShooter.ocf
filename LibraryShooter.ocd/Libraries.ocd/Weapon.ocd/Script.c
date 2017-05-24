@@ -137,7 +137,7 @@ private func StartCharge(object user, int x, int y)
 			{
 				if (effect.progress > 0)
 				{
-					OnProgressCharge(user, x, y, firemode, effect.percent, effect.progress);
+					this->OnProgressCharge(user, x, y, firemode, effect.percent, effect.progress);
 					effect.percent_old = effect.percent;
 				}
 				return true; // keep charging
@@ -150,7 +150,7 @@ private func StartCharge(object user, int x, int y)
 	}
 
 	AddEffect("IntCharge", this, 1, 1, this, nil, user, firemode);
-	OnStartCharge(user, x, y, firemode);
+	this->OnStartCharge(user, x, y, firemode);
 	return true; // keep charging
 }
 
@@ -160,7 +160,7 @@ private func CancelCharge(object user, int x, int y, proplist firemode, bool cal
 	
 	if (effect != nil)
 	{
-		if (callback) OnCancelCharge(effect.user, x, y, effect.firemode);
+		if (callback) this->OnCancelCharge(effect.user, x, y, effect.firemode);
 		
 		RemoveEffect(nil, nil, effect);
 	}
@@ -168,7 +168,7 @@ private func CancelCharge(object user, int x, int y, proplist firemode, bool cal
 
 private func DoCharge(object user, int x, int y, proplist firemode)
 {
-	OnFinishCharge(user, x, y, firemode);
+	this->OnFinishCharge(user, x, y, firemode);
 	return true;
 }
 
@@ -360,7 +360,7 @@ protected func ControlUseStart(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 	
-	OnPressUse(user, x, y);
+	this->OnPressUse(user, x, y);
 
 //	if(!Ready(user, x, y)) return true; // checks loading etc
 
@@ -399,7 +399,7 @@ protected func ControlUseAltStart(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 	
-	OnPressUseAlt(user, x, y);
+	this->OnPressUseAlt(user, x, y);
 	
 	return true;
 }
@@ -416,7 +416,7 @@ protected func ControlUseAltStart(object user, int x, int y)
  */
 protected func ControlUseHolding(object user, int x, int y)
 {
-	OnHoldingUse(user, x, y);
+	this->OnHoldingUse(user, x, y);
 	return ControlFireHolding(user, x, y);
 }
 
@@ -450,7 +450,7 @@ protected func ControlFireHolding(object user, int x, int y)
 
 protected func ControlUseAltHolding(object user, int x, int y)
 {
-	OnHoldingUseAlt(user, x, y);
+	this->OnHoldingUseAlt(user, x, y);
 	return ControlFireHolding(user, x, y);
 }
 
@@ -481,7 +481,7 @@ protected func ControlUseStop(object user, int x, int y)
 		CheckCooldown(user, GetFiremode());
 	}
 	
-	OnUseStop(user, x, y);
+	this->OnUseStop(user, x, y);
 	
 	return true;
 }
@@ -645,7 +645,7 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 		          ->Velocity(SampleValue(firemode.projectile_speed))
 				  ->Range(SampleValue(firemode.projectile_range));
 
-		OnFireProjectile(user, projectile, firemode);
+		this->OnFireProjectile(user, projectile, firemode);
 		projectile->Launch(angle, GetSpread(firemode));
 	}
 	
@@ -831,7 +831,7 @@ private func DoRecovery(object user, int x, int y, proplist firemode)
 {
 	if (firemode == nil) return;
 	
-	OnRecovery(user, firemode);
+	this->OnRecovery(user, firemode);
 
 	if (firemode.burst)
 	{
@@ -904,7 +904,7 @@ private func StartCooldown(object user, proplist firemode)
 {
 	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode))
 	{
-		OnSkipCooldown(user, firemode);
+		this->OnSkipCooldown(user, firemode);
 		return;
 	}
 	
@@ -913,13 +913,13 @@ private func StartCooldown(object user, proplist firemode)
 	if (effect == nil)
 	{
 		AddEffect("IntCooldown", this, 1, firemode.delay_cooldown, this, nil, user, firemode);
-		OnStartCooldown(user, firemode);
+		this->OnStartCooldown(user, firemode);
 	}
 }
 
 private func DoCooldown(object user, proplist firemode)
 {
-	OnFinishCooldown(user, firemode);
+	this->OnFinishCooldown(user, firemode);
 }
 
 private func IsCoolingDown()
@@ -1368,7 +1368,7 @@ private func StartReload(object user, int x, int y, bool forced)
 	if (CanReload(user, firemode))
 	{
 		AddEffect("IntReload", this, 1, 1, this, nil, user, firemode);
-		OnStartReload(user, x, y, firemode);
+		this->OnStartReload(user, x, y, firemode);
 	}
 	return true; // keep reloading
 }
@@ -1381,7 +1381,7 @@ private func CancelReload(object user, int x, int y, proplist firemode, bool req
 
 	if (effect != nil)
 	{
-		OnCancelReload(effect.user, x, y, effect.firemode, requested_by_user);
+		this->OnCancelReload(effect.user, x, y, effect.firemode, requested_by_user);
 
 		if (!auto_reload) RemoveEffect(nil, nil, effect);
 	}
@@ -1390,7 +1390,7 @@ private func CancelReload(object user, int x, int y, proplist firemode, bool req
 private func DoReload(object user, int x, int y, proplist firemode)
 {
 	RemoveEffect(nil, this, IsReloading());
-	OnFinishReload(user, x, y, firemode);
+	this->OnFinishReload(user, x, y, firemode);
 	return true;
 }
 
