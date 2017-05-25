@@ -1,4 +1,7 @@
 ﻿Version 0.2.0
 ------------------------------------------------------------------------------------------------
+! fixed callbacks for cooldown when user dies or drops weapon (#13402)
+* made weapon callbacks runtime-replaceable
+* moved assertion to OC repository
 * updated version of all definitions to 8,0
 + added change log file
