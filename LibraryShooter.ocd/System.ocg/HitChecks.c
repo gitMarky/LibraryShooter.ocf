@@ -141,7 +141,7 @@ global func FxHitCheck2DoCheck(object target, proplist fx, int timer)
 								Find_Layer(target->GetObjectLayer()),
 								//Find_PathFree(target),
 								Sort_Distance(oldx, oldy)))
-		{	
+		{
 			// Excludes
 			if (obj == target) continue;
 			if (obj == shooter) continue;
@@ -159,7 +159,7 @@ global func FxHitCheck2DoCheck(object target, proplist fx, int timer)
 
 				target->SetPosition(oldx + diffx, oldy + diffy);
 
-				if(target.trail)
+				if (target.trail)
 					target.trail->~Travelling();
 
 				if (target) target->~HitObject(obj, true, fx);

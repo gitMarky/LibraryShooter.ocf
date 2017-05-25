@@ -89,7 +89,8 @@ public func Line(int x_start, int y_start, int x_end, int y_end)
 
 public func SetRange(int pixels)
 {
-	length = pixels;	
+	length = pixels;
+	return this;
 }
 
 public func GetRotation()
