@@ -6,3 +6,4 @@ Width=2
 Height=2
 Offset=-1,-1
 IncompleteActivity=1
+HideInCreator=true
