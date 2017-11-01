@@ -355,16 +355,16 @@ public func HoldingEnabled() { return true; }
  */
 protected func ControlUseStart(object user, int x, int y)
 {
-	if(user == nil)
+	if (user == nil)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
 	
 	this->OnPressUse(user, x, y);
 
-//	if(!Ready(user, x, y)) return true; // checks loading etc
+//	if (!Ready(user, x, y)) return true; // checks loading etc
 
-//	if(!ReadyToFire())
+//	if (!ReadyToFire())
 //	{
 //		CheckReload();
 //		Sound("DryFire?");
@@ -377,7 +377,7 @@ protected func ControlUseStart(object user, int x, int y)
 
 	//ControlUseHolding(user, x, y);
 	
-	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
+	//if (!weapon_properties.delay_shot && !weapon_properties.full_auto)
 	//	Fire(user, x, y); //user->GetAimPosition());
 	return true;
 }
@@ -394,7 +394,7 @@ protected func ControlUseStart(object user, int x, int y)
  */
 protected func ControlUseAltStart(object user, int x, int y)
 {
-	if(user == nil)
+	if (user == nil)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
@@ -432,7 +432,7 @@ protected func ControlUseHolding(object user, int x, int y)
  */
 protected func ControlFireHolding(object user, int x, int y)
 {
-	if(user == nil)
+	if (user == nil)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
@@ -466,7 +466,7 @@ protected func ControlUseAltHolding(object user, int x, int y)
  */
 protected func ControlUseStop(object user, int x, int y)
 {
-	if(user == nil)
+	if (user == nil)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
