@@ -1,18 +1,17 @@
 ﻿/**
- @note Firemodes
-  A firemode has three stages: Charge - (Fire/Recover) - Cooldown
- @author Marky
- @credits Hazard Team, Zapper
- @version 0.1.0
- */
+	Shared functions between all firearms.
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// definitions
+	Firearms need to have at least one fire mode defined (see below for firemodes)
+	Otherwise, nothing happens in a Use call.
 
-local Name = "$Name$";
-local Description = "$Description$";
+	@note Firemodes
+	A firemode has three stages: Charge - (Fire/Recover) - Cooldown
+	@author Marky
+	@credits Hazard Team, Zapper
+	@version 0.1.0
+*/
 
+/*-- Important Library Properties --*/
 
 local is_selected = true;  // bool: is the weapon currently selected?
 local is_using = false;    // bool: is the user holding the fire button
@@ -28,20 +27,14 @@ static const WEAPON_PR_Bullet = 1;
 static const WEAPON_PR_Ballistic = 2;
 static const WEAPON_PR_Hitscan = 3;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// global functions
-
-
 local fire_modes = [fire_mode_default];
-
 
 local fire_mode_default = 
 {
 	name = 				"default", // string - menu caption
 	icon = 				nil, // id - menu icon
 	condition = 		nil, // string - callback for a condition
-	
+
 	ammo_id = 			nil,
 	ammo_usage =		1, // int - this many units of ammo
 	ammo_rate =			1, // int - per this many shots fired
@@ -65,39 +58,219 @@ local fire_mode_default =
 	projectile_spread = [0, 100], // default inaccuracy of a single projectile
 
 	spread = [1, 100],			   // inaccuracy from prolonged firing
-	
+
 	burst = 0, // number of projectiles fired in a burst
-	
+
 	auto_reload = false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
-	
+
 	anim_shoot_name = nil,	// for animation set: shoot animation
 	anim_load_name = nil,	// for animation set: reload animation
 	walk_speed_front = nil,	// for animation set: relative walk speed
 	walk_speed_back = nil,	// for animation set: relative walk speed
 };
 
-
 local weapon_properties = 
 {
-		gfx_distance = 6,
-		gfx_offset_y = -6,
+	gfx_distance = 6,
+	gfx_offset_y = -6,
 };
-
 
 local shot_counter; // proplist
 local ammo_rate_counter; // proplist
 
+local animation_set = {
+	AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
+	AnimationAim   = "MusketAimArms",
+	AnimationLoad  = "MusketLoadArms",
+	LoadTime       = 80,
+	AnimationShoot = nil,
+	ShootTime      = 20,
+	WalkSpeed      = nil,
+	WalkBack       = nil,
+};
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// finished functions
+/*-- Engine Callbacks --*/
 
+func Initialize()
+{
+	shot_counter = {};
+	ammo_rate_counter = {};
+	_inherited(...);
+}
 
-//----------------------------------------------------------------------------------------------------------------
-//
-// charging the weapon
+/*-- Controls --*/
 
-private func StartCharge(object user, int x, int y)
+/**
+ This is executed each time the user presses the fire button.@br@br
+
+ The function does the following:@br
+ - tell the user to start aiming@br
+ - call {@link Library_Weapon#ControlUseHolding}@br
+ - call {@link Library_Weapon#Fire}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+public func ControlUseStart(object user, int x, int y)
+{
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+	
+	this->OnPressUse(user, x, y);
+
+//	if(!Ready(user, x, y)) return true; // checks loading etc
+
+//	if(!ReadyToFire())
+//	{
+//		CheckReload();
+//		Sound("DryFire?");
+//		return true;
+//	}
+
+//	AimStartSound();
+
+	//user->StartAim(this);
+
+	//ControlUseHolding(user, x, y);
+	
+	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
+	//	Fire(user, x, y); //user->GetAimPosition());
+	return true;
+}
+
+/**
+ The function does the following:@br
+ - tell the user to start aiming@br
+ - call {@link Library_Weapon#ControlUseHolding}@br
+ - call {@link Library_Weapon#Fire}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+public func ControlUseAltStart(object user, int x, int y)
+{
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+	
+	this->OnPressUseAlt(user, x, y);
+	
+	return true;
+}
+
+/**
+ This is executed while the user is holding the primary use button.@br@br
+
+ The function does the following:@br
+ - update the aiming angle according to the parameters
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+public func ControlUseHolding(object user, int x, int y)
+{
+	this->OnHoldingUse(user, x, y);
+	return ControlFireHolding(user, x, y);
+}
+
+/**
+ This is executed while the user is holding the fire button.@br@br
+
+ The function does the following:@br
+ - update the aiming angle according to the parameters
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ @version 0.2.0
+ */
+public func ControlFireHolding(object user, int x, int y)
+{
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+	
+	if (this->~RejectUse(user))
+	{
+		ControlUseStop(user, x, y);
+		return false;
+	}
+
+	DoFireCycle(user, x, y, true);
+	
+	return true;
+}
+
+public func ControlUseAltHolding(object user, int x, int y)
+{
+	this->OnHoldingUseAlt(user, x, y);
+	return ControlFireHolding(user, x, y);
+}
+
+/**
+ This is executed when the user stops holding the fire button.@br@br
+
+ The function does the following:@br
+ - tell the user to stop aiming.
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aimint at.
+ @version 0.1.0
+ */
+public func ControlUseStop(object user, int x, int y)
+{
+	if(user == nil)
+	{
+		FatalError("The function expects a user that is not nil");
+	}
+
+	CancelUsing();
+	
+	CancelCharge(user, x, y, GetFiremode(), true);
+	CancelReload(user, x, y, GetFiremode(), true);
+	
+	if (!IsRecovering())
+	{
+		CheckCooldown(user, GetFiremode());
+	}
+	
+	this->OnUseStop(user, x, y);
+	
+	return true;
+}
+
+public func ControlUseAltStop(object user, int x, int y)
+{
+	return ControlUseStop(user, x, y);
+}
+
+public func ControlUseCancel(object user, int x, int y)
+{
+	return ControlUseStop(user, x, y);
+}
+
+public func ControlUseAltCancel(object user, int x, int y)
+{
+	return ControlUseStop(user, x, y);
+}
+
+public func CancelUsing()
+{
+	is_using = false;
+}
+
+// holding callbacks are made
+public func HoldingEnabled() { return true; }
+
+/*-- Charging --*/
+
+func StartCharge(object user, int x, int y)
 {
 	var firemode = GetFiremode();
 
@@ -151,7 +324,7 @@ private func StartCharge(object user, int x, int y)
 	return true; // keep charging
 }
 
-private func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
+func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
 {
 	var effect = IsCharging();
 	
@@ -163,15 +336,64 @@ private func CancelCharge(object user, int x, int y, proplist firemode, bool cal
 	}
 }
 
-private func DoCharge(object user, int x, int y, proplist firemode)
+func DoCharge(object user, int x, int y, proplist firemode)
 {
 	this->OnFinishCharge(user, x, y, firemode);
 	return true;
 }
 
-private func IsCharging()
+func IsCharging()
 {
 	return GetEffect("IntCharge", this);
+}
+
+/**
+ Gets the current status of the charging process.
+ @return A value of 0 to 100, if the weapon is charging.@br
+         If the weapon is not charging, this function returns -1.
+ */
+public func GetChargeProgress()
+{
+	var effect = IsCharging();
+	
+	if (effect == nil)
+	{
+		return -1;
+	}
+	else
+	{
+		return effect.percent;
+	}
+}
+
+/**
+ Callback: the weapon user cancelled charging. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnCancelCharge(object user, int x, int y, proplist firemode)
+{
+}
+
+func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
+{
+	if (temp) return;
+	
+	effect.user = user;
+	effect.firemode = firemode;
+	effect.percent_old = 0;
+}
+
+func FxIntChargeTimer(object target, proplist effect, int time)
+{
+	effect.percent = BoundBy(time * 100 / effect.firemode.delay_charge, 0, 100);
+	effect.progress = effect.percent - effect.percent_old;
+
+	if (time > effect.firemode.delay_charge && !effect.is_charged)
+	{
+		effect.is_charged = true;
+	}
 }
 
 /**
@@ -221,281 +443,20 @@ public func OnProgressCharge(object user, int x, int y, proplist firemode, int c
 {
 }
 
-/**
- Gets the current status of the charging process.
- @return A value of 0 to 100, if the weapon is charging.@br
-         If the weapon is not charging, this function returns -1.
- */
-public func GetChargeProgress()
-{
-	var effect = IsCharging();
-	
-	if (effect == nil)
-	{
-		return -1;
-	}
-	else
-	{
-		return effect.percent;
-	}
-}
+/*-- Firing --*/
 
 /**
- Callback: the weapon user cancelled charging. Does nothing by default.
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
+ The weapon is ready to fire a shot.
  @version 0.1.0
  */
-public func OnCancelCharge(object user, int x, int y, proplist firemode)
+func IsReadyToFire()
 {
+	return !IsRecovering()
+	    && !IsCoolingDown()
+	    && !IsWeaponLocked();
 }
 
-private func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
-{
-	if (temp) return;
-	
-	effect.user = user;
-	effect.firemode = firemode;
-	effect.percent_old = 0;
-}
-
-private func FxIntChargeTimer(object target, proplist effect, int time)
-{
-	effect.percent = BoundBy(time * 100 / effect.firemode.delay_charge, 0, 100);
-	effect.progress = effect.percent - effect.percent_old;
-
-	if (time > effect.firemode.delay_charge && !effect.is_charged)
-	{
-		effect.is_charged = true;
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// non-functional and temporary stuff
-
-private func Initialize()
-{
-	shot_counter = {};
-	ammo_rate_counter = {};
-	_inherited(...);
-}
-
-local animation_set = {
-		AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
-		AnimationAim   = "MusketAimArms",
-		AnimationLoad  = "MusketLoadArms",
-		LoadTime       = 80,
-		AnimationShoot = nil,
-		ShootTime      = 20,
-		WalkSpeed      = nil,
-		WalkBack       = nil,
-	};
-
-
-public func GetAnimationSet()
-{
-	var firemode = GetFiremode();
-
-	var anim_shoot_name = nil;
-	var anim_shoot_time = nil;
-	var anim_load_name = nil;
-	var anim_load_time = nil;
-	var anim_walk_speed_front = nil;
-	var anim_walk_speed_back = nil;
-
-	if (firemode)
-	{
-		anim_shoot_name = firemode.anim_shoot_name;
-		anim_shoot_time = firemode.delay_recover;
-		anim_load_name = firemode.anim_load_name;
-		anim_load_time = firemode.delay_reload;
-		anim_walk_speed_front = firemode.walk_speed_front;	
-		anim_walk_speed_back = firemode.walk_speed_back;
-	}
-
-	return {
-		AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
-		AnimationAim   = "MusketAimArms",
-		AnimationLoad  = anim_load_name,
-		LoadTime       = anim_load_time,
-		AnimationShoot = anim_shoot_name,
-		ShootTime      = anim_shoot_time,
-		WalkSpeed      = anim_walk_speed_front,
-		WalkBack       = anim_walk_speed_back,
-	};
-}
-
-// holding callbacks are made
-public func HoldingEnabled() { return true; }
-
-
-/**
- This is executed each time the user presses the fire button.@br@br
-
- The function does the following:@br
- - tell the user to start aiming@br
- - call {@link Library_Weapon#ControlUseHolding}@br
- - call {@link Library_Weapon#Fire}@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
- @version 0.1.0
- */
-protected func ControlUseStart(object user, int x, int y)
-{
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
-	
-	this->OnPressUse(user, x, y);
-
-//	if(!Ready(user, x, y)) return true; // checks loading etc
-
-//	if(!ReadyToFire())
-//	{
-//		CheckReload();
-//		Sound("DryFire?");
-//		return true;
-//	}
-
-//	AimStartSound();
-
-	//user->StartAim(this);
-
-	//ControlUseHolding(user, x, y);
-	
-	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
-	//	Fire(user, x, y); //user->GetAimPosition());
-	return true;
-}
-
-/**
- The function does the following:@br
- - tell the user to start aiming@br
- - call {@link Library_Weapon#ControlUseHolding}@br
- - call {@link Library_Weapon#Fire}@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
- @version 0.1.0
- */
-protected func ControlUseAltStart(object user, int x, int y)
-{
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
-	
-	this->OnPressUseAlt(user, x, y);
-	
-	return true;
-}
-
-/**
- This is executed while the user is holding the primary use button.@br@br
-
- The function does the following:@br
- - update the aiming angle according to the parameters
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
- @version 0.1.0
- */
-protected func ControlUseHolding(object user, int x, int y)
-{
-	this->OnHoldingUse(user, x, y);
-	return ControlFireHolding(user, x, y);
-}
-
-/**
- This is executed while the user is holding the fire button.@br@br
-
- The function does the following:@br
- - update the aiming angle according to the parameters
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
- @version 0.2.0
- */
-protected func ControlFireHolding(object user, int x, int y)
-{
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
-	
-	if (this->~RejectUse(user))
-	{
-		ControlUseStop(user, x, y);
-		return false;
-	}
-
-	DoFireCycle(user, x, y, true);
-	
-	return true;
-}
-
-protected func ControlUseAltHolding(object user, int x, int y)
-{
-	this->OnHoldingUseAlt(user, x, y);
-	return ControlFireHolding(user, x, y);
-}
-
-/**
- This is executed when the user stops holding the fire button.@br@br
-
- The function does the following:@br
- - tell the user to stop aiming.
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
- @version 0.1.0
- */
-protected func ControlUseStop(object user, int x, int y)
-{
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
-
-	CancelUsing();
-	
-	CancelCharge(user, x, y, GetFiremode(), true);
-	CancelReload(user, x, y, GetFiremode(), true);
-	
-	if (!IsRecovering())
-	{
-		CheckCooldown(user, GetFiremode());
-	}
-	
-	this->OnUseStop(user, x, y);
-	
-	return true;
-}
-
-protected func ControlUseAltStop(object user, int x, int y)
-{
-	return ControlUseStop(user, x, y);
-}
-
-protected func ControlUseCancel(object user, int x, int y)
-{
-	return ControlUseStop(user, x, y);
-}
-
-protected func ControlUseAltCancel(object user, int x, int y)
-{
-	return ControlUseStop(user, x, y);
-}
-
-private func CancelUsing()
-{
-	is_using = false;
-}
-
-private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
+func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 {
 	var angle = GetAngle(x, y);
 	user->SetAimPosition(angle);
@@ -520,7 +481,7 @@ private func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
  @return int The angle in degrees, normalized to the range of [-180°, 180°].
  @version 0.1.0
  */
-private func GetAngle(int x, int y)
+func GetAngle(int x, int y)
 {
 	var angle = Angle(0, weapon_properties.gfx_offset_y, x, y);
 		angle = Normalize(angle, -180);
@@ -528,7 +489,7 @@ private func GetAngle(int x, int y)
 	return angle;
 }
 
-private func GetFireAngle(int x, int y, proplist firemode)
+func GetFireAngle(int x, int y, proplist firemode)
 {
 	var angle = Angle(0, firemode.projectile_offset_y, x, y);
 		angle = Normalize(angle, -180);
@@ -545,7 +506,7 @@ private func GetFireAngle(int x, int y, proplist firemode)
  @par angle The angle the weapon is aimed at.
  @version 0.1.0
  */
-private func Fire(object user, int x, int y)
+func Fire(object user, int x, int y)
 {
 	if (user == nil)
 	{
@@ -577,11 +538,10 @@ private func Fire(object user, int x, int y)
 	}
 }
 
-private func RejectUse(object user)
+func RejectUse(object user)
 {
 	return !IsWeaponReadyToUse(user) || !IsUserReadyToUse(user);
 }
-
 
 /**
  Interface for signaling that the weapon is ready to use (attack).
@@ -589,24 +549,22 @@ private func RejectUse(object user)
  @return true, if the object is ready to use. By default this is true,
          if the weapon is contained in the user.
  */
-private func IsWeaponReadyToUse(object user)
+func IsWeaponReadyToUse(object user)
 {
 	return Contained() == user;
 }
-
 
 /**
  Interface for signaling that the user is ready to use (attack).
  @par user The object that is trying to use this weapon. 
  @return true, if the object is ready to use.
  */
-private func IsUserReadyToUse(object user)
+func IsUserReadyToUse(object user)
 {
 	return user->HasHandAction();
 }
 
-
-private func FireProjectiles(object user, int angle, proplist firemode)
+func FireProjectiles(object user, int angle, proplist firemode)
 {
 	if (user == nil)
 	{
@@ -645,12 +603,12 @@ private func FireProjectiles(object user, int angle, proplist firemode)
 	HandleAmmoUsage(firemode);
 }
 
-private func GetProjectiles(proplist firemode)
+func GetProjectiles(proplist firemode)
 {
 	return firemode.projectile_number;
 }
 
-private func GetSpread(proplist firemode)
+func GetSpread(proplist firemode)
 {
 	if (firemode.spread || firemode.projectile_spread)
 	{
@@ -670,7 +628,6 @@ private func GetSpread(proplist firemode)
  */
 public func FireSound(object user, proplist firemode)
 {
-	
 }
 
 /**
@@ -702,7 +659,7 @@ public func OnUseStop(object user, int x, int y)
 {
 }
 
-private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light, int color, string particle)
+func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light, int color, string particle)
 {
 	if (user == nil)
 	{
@@ -738,326 +695,6 @@ private func EffectMuzzleFlash(object user, int x, int y, int angle, int size, b
 		user->CreateTemporaryLight(x, y)->LightRangeStart(3 * size)->SetLifetime(2)->Color(color)->Activate();
 	}
 }
-
-private func FireRecovery(object user, int x, int y, proplist firemode)
-{
-	var delay;
-	if (!NeedsRecovery(user, firemode))
-	{
-		delay = firemode.delay_recover;
-	}
-	else
-	{
-		delay = 1;
-	}
-
-	var recovery = AddEffect("IntRecovery", this, 1, delay, this, nil, user, x, y, firemode);
-	recovery.delay = delay;
-}
-
-
-/**
- Condition when the weapon needs to be recover after firing.
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @return {@c true} by default. Overload this function
-         for a custom condition.
- @version 0.2.0
- */
-public func NeedsRecovery(object user, proplist firemode)
-{
-	return true;
-}
-
-
-private func FxIntRecoveryStart (object target, proplist effect, int temporary, object user, int x, int y, proplist firemode)
-{
-	if (temporary) return;
-	
-	effect.user = user;
-	effect.x = x;
-	effect.y = y;
-	effect.firemode = firemode;
-	effect.start = FrameCounter();
-}
-
-private func FxIntRecoveryTimer(object target, proplist effect, int time)
-{
-	target->DoRecovery(effect.user, effect.x, effect.y, effect.firemode);
-
-	return FX_Execute_Kill;
-}
-
-private func CancelRecovery()
-{
-	var effect = IsRecovering();
-	
-	if (effect != nil)
-	{
-		RemoveEffect(nil, nil, effect);
-	}
-}
-
-private func GetRecoveryProgress()
-{
-	var recovery = IsRecovering();
-	if (recovery)
-	{
-		var progress = BoundBy(FrameCounter() - recovery.start, 0, recovery.delay);
-		return progress * 100 / recovery.delay;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-private func IsRecovering()
-{
-	return GetEffect("IntRecovery", this);
-}
-
-private func DoRecovery(object user, int x, int y, proplist firemode)
-{
-	if (firemode == nil) return;
-	
-	this->OnRecovery(user, firemode);
-
-	if (firemode.burst)
-	{
-		if (firemode.mode != WEAPON_FM_Burst)
-		{
-			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode.burst, firemode.mode));
-		}
-	
-		if (shot_counter[firemode.name] >= firemode.burst)
-		{
-			shot_counter[firemode.name] = 0;
-		}
-		else 
-		{
-			
-			if (!is_using)
-			{
-				CancelRecovery();
-				DoFireCycle(user, x, y, false);
-			}
-			
-			return; // prevent cooldown
-		}
-	}
-
-	CheckCooldown(user, firemode);
-}
-
-private func CheckCooldown(object user, proplist firemode)
-{
-	if (!HasAmmo(firemode) || RejectUse(user))
-	{
-		CancelUsing();
-	}
-
-	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
-	{
-		StartCooldown(user, firemode);
-	}
-}
-
-/**
- Callback: the weapon finished one firing cycle. Does nothing by default.
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @version 0.1.0
- */
-public func OnRecovery(object user, proplist firemode)
-{
-	
-}
-
-/**
- The weapon is ready to fire a shot.
- @version 0.1.0
- */
-private func IsReadyToFire()
-{
-	return !IsRecovering()
-	    && !IsCoolingDown()
-	    && !IsWeaponLocked();
-}
-
-
-//----------------------------------------------------------------------------------------------------------------
-//
-// charging the weapon
-
-private func StartCooldown(object user, proplist firemode)
-{
-	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode))
-	{
-		this->OnSkipCooldown(user, firemode);
-		return;
-	}
-	
-	var effect = IsCoolingDown();
-
-	if (effect == nil)
-	{
-		AddEffect("IntCooldown", this, 1, firemode.delay_cooldown, this, nil, user, firemode);
-		this->OnStartCooldown(user, firemode);
-	}
-}
-
-private func DoCooldown(object user, proplist firemode)
-{
-	this->OnFinishCooldown(user, firemode);
-}
-
-private func IsCoolingDown()
-{
-	return GetEffect("IntCooldown", this);
-}
-
-/**
- Condition when the weapon needs a cooldown.
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @return {@c true} by default. Overload this function
-         for a custom condition.
- @version 0.1.0
- */
-public func NeedsCooldown(object user, proplist firemode)
-{
-	return true;
-}
-
-/**
- Callback: the weapon starts cooldown. Does nothing by default.
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @version 0.1.0
- */
-public func OnStartCooldown(object user, proplist firemode)
-{
-}
-
-/**
- Callback: the weapon has successfully cooled down. Does nothing by default.
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @version 0.1.0
- */
-public func OnFinishCooldown(object user, proplist firemode)
-{
-}
-
-
-/**
- Callback: the weapon has skipped cooling down. Does nothing by default.
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @version 0.2.0
- */
-public func OnSkipCooldown(object user, proplist firemode)
-{
-}
-
-private func FxIntCooldownStart(object target, proplist effect, int temp, object user, proplist firemode)
-{
-	if (temp) return;
-	
-	effect.user = user;
-	effect.firemode = firemode;
-}
-
-private func FxIntCooldownTimer(object target, proplist effect, int time)
-{
-	target->DoCooldown(effect.user, effect.firemode);
-	
-	return FX_Execute_Kill;
-}
-
-
-/**
- Gets a sample of a random value.
- 
- @par value The value. This can be a {@code C4V_Int}, or {@code C4V_Array}. 
- @return int The sampled value. This is either the {@code value}, if {@code C4V_Int}
-         was passed, or if an array was passed: a random value between
-         {@code value[0]} and {@code value[1]}, where the possible increments are
-         {@code value[2]}.  
- */
-private func SampleValue(value)
-{
-	if (GetType(value) == C4V_Array)
-	{
-		var min = value[0];
-		var range = value[1] - min;
-		var step = Max(value[2], 1);
-		
-		return min + step * Random(range / step);
-	}
-	else if (GetType(value) == C4V_Int)
-	{
-		return value;
-	}
-	else
-	{
-		FatalError(Format("Expected int or array, got %v", value));
-	}
-}
-
-/**
- Callback: the current firemode. Overload this function for
- @return proplist The current firemode.
- @version 0.1.0
- */
-public func GetFiremode()
-{
-
-}
-
-
-public func GetFiremodes()
-{
-	if (!fire_modes)
-	{
-		FatalError("Fire modes is somehow empty??");
-	}
-
-	return fire_modes;
-}
-
-
-public func GetAvailableFiremodes()
-{
-	var available = [];
-	
-	for (var i = 0; i < GetLength(GetFiremodes()); ++i) // firemode in GetFiremodes())
-	{
-		var firemode = GetFiremodes()[i];
-	
-		var is_available = firemode.condition == nil || this->Call(firemode.condition);
-
-		if (is_available)
-		{
-			PushBack(available, firemode);
-		}
-	}
-	
-	return available;
-}
-
-
-public func ClearFiremodes()
-{
-	fire_modes = [];
-}
-
-public func AddFiremode(proplist fire_mode)
-{
-	PushBack(fire_modes, fire_mode);
-}
-
 
 /**
  Callback: Pressed the regular use button (fire).
@@ -1098,6 +735,277 @@ public func OnHoldingUseAlt(object user, int x, int y)
 {
 }
 
+/*-- Recovering --*/
+
+func FireRecovery(object user, int x, int y, proplist firemode)
+{
+	var delay;
+	if (!NeedsRecovery(user, firemode))
+	{
+		delay = firemode.delay_recover;
+	}
+	else
+	{
+		delay = 1;
+	}
+
+	var recovery = AddEffect("IntRecovery", this, 1, delay, this, nil, user, x, y, firemode);
+	recovery.delay = delay;
+}
+
+/**
+ Condition when the weapon needs to be recover after firing.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function
+         for a custom condition.
+ @version 0.2.0
+ */
+public func NeedsRecovery(object user, proplist firemode)
+{
+	return true;
+}
+
+func FxIntRecoveryStart (object target, proplist effect, int temporary, object user, int x, int y, proplist firemode)
+{
+	if (temporary) return;
+	
+	effect.user = user;
+	effect.x = x;
+	effect.y = y;
+	effect.firemode = firemode;
+	effect.start = FrameCounter();
+}
+
+func FxIntRecoveryTimer(object target, proplist effect, int time)
+{
+	target->DoRecovery(effect.user, effect.x, effect.y, effect.firemode);
+
+	return FX_Execute_Kill;
+}
+
+func CancelRecovery()
+{
+	var effect = IsRecovering();
+	
+	if (effect != nil)
+	{
+		RemoveEffect(nil, nil, effect);
+	}
+}
+
+func GetRecoveryProgress()
+{
+	var recovery = IsRecovering();
+	if (recovery)
+	{
+		var progress = BoundBy(FrameCounter() - recovery.start, 0, recovery.delay);
+		return progress * 100 / recovery.delay;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+func IsRecovering()
+{
+	return GetEffect("IntRecovery", this);
+}
+
+func DoRecovery(object user, int x, int y, proplist firemode)
+{
+	if (firemode == nil) return;
+	
+	this->OnRecovery(user, firemode);
+
+	if (firemode.burst)
+	{
+		if (firemode.mode != WEAPON_FM_Burst)
+		{
+			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode.burst, firemode.mode));
+		}
+	
+		if (shot_counter[firemode.name] >= firemode.burst)
+		{
+			shot_counter[firemode.name] = 0;
+		}
+		else 
+		{
+			
+			if (!is_using)
+			{
+				CancelRecovery();
+				DoFireCycle(user, x, y, false);
+			}
+			
+			return; // prevent cooldown
+		}
+	}
+
+	CheckCooldown(user, firemode);
+}
+
+func CheckCooldown(object user, proplist firemode)
+{
+	if (!HasAmmo(firemode) || RejectUse(user))
+	{
+		CancelUsing();
+	}
+
+	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
+	{
+		StartCooldown(user, firemode);
+	}
+}
+
+/**
+ Callback: the weapon finished one firing cycle. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnRecovery(object user, proplist firemode)
+{
+}
+
+/*-- Cooldown --*/
+
+func StartCooldown(object user, proplist firemode)
+{
+	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode))
+	{
+		this->OnSkipCooldown(user, firemode);
+		return;
+	}
+	
+	var effect = IsCoolingDown();
+
+	if (effect == nil)
+	{
+		AddEffect("IntCooldown", this, 1, firemode.delay_cooldown, this, nil, user, firemode);
+		this->OnStartCooldown(user, firemode);
+	}
+}
+
+func DoCooldown(object user, proplist firemode)
+{
+	this->OnFinishCooldown(user, firemode);
+}
+
+func IsCoolingDown()
+{
+	return GetEffect("IntCooldown", this);
+}
+
+/**
+ Condition when the weapon needs a cooldown.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function
+         for a custom condition.
+ @version 0.1.0
+ */
+public func NeedsCooldown(object user, proplist firemode)
+{
+	return true;
+}
+
+/**
+ Callback: the weapon starts cooldown. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnStartCooldown(object user, proplist firemode)
+{
+}
+
+/**
+ Callback: the weapon has successfully cooled down. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.1.0
+ */
+public func OnFinishCooldown(object user, proplist firemode)
+{
+}
+
+/**
+ Callback: the weapon has skipped cooling down. Does nothing by default.
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+ */
+public func OnSkipCooldown(object user, proplist firemode)
+{
+}
+
+func FxIntCooldownStart(object target, proplist effect, int temp, object user, proplist firemode)
+{
+	if (temp) return;
+
+	effect.user = user;
+	effect.firemode = firemode;
+}
+
+func FxIntCooldownTimer(object target, proplist effect, int time)
+{
+	target->DoCooldown(effect.user, effect.firemode);
+
+	return FX_Execute_Kill;
+}
+
+/*-- Firemodes --*/
+
+/**
+ Callback: the current firemode. Overload this function for
+ @return proplist The current firemode.
+ @version 0.1.0
+ */
+public func GetFiremode()
+{
+}
+
+public func GetFiremodes()
+{
+	if (!fire_modes)
+	{
+		FatalError("Fire modes is somehow empty??");
+	}
+
+	return fire_modes;
+}
+
+public func GetAvailableFiremodes()
+{
+	var available = [];
+	
+	for (var i = 0; i < GetLength(GetFiremodes()); ++i) // firemode in GetFiremodes())
+	{
+		var firemode = GetFiremodes()[i];
+	
+		var is_available = firemode.condition == nil || this->Call(firemode.condition);
+
+		if (is_available)
+		{
+			PushBack(available, firemode);
+		}
+	}
+
+	return available;
+}
+
+public func ClearFiremodes()
+{
+	fire_modes = [];
+}
+
+public func AddFiremode(proplist fire_mode)
+{
+	PushBack(fire_modes, fire_mode);
+}
+
 public func CanChangeFiremode()
 {
 	return !IsRecovering()
@@ -1106,9 +1014,7 @@ public func CanChangeFiremode()
 	    && !IsWeaponLocked();
 }
 
-//----------------------------------------------------------------------------------------------------------------
-//
-// ammo management
+/*-- Ammo --*/
 
 /**
  Checks whether the weapon has ammo.
@@ -1123,7 +1029,6 @@ public func HasAmmo(proplist firemode)
 	    || ammo_rate_counter[firemode.name] > 0     // or ammo left from previously using the weapon?
 	    || this->GetAmmoSource(firemode) == AMMO_Source_Infinite; // or infinite ammo
 }
-
 
 /**
  Overrides func {@link Library_AmmoManager#GetAmmo}, so that you can ask the
@@ -1165,7 +1070,6 @@ public func GetAmmo(type_or_firemode)
 	}
 }
 
-
 /**
  Overrides func {@link Library_AmmoManager#GetAmmoSource}, so that you can ask the
  ammo source for a specific firemode.
@@ -1206,7 +1110,6 @@ public func GetAmmoSource(type_or_firemode)
 	}
 }
 
-
 /**
  Callback: The weapon has no ammo during {@link Library_Weapon#DoFireCycle},
            see {@link Library_Weapon#HasAmmo}.
@@ -1219,7 +1122,6 @@ public func OnNoAmmo(object user, proplist firemode)
 {
 }
 
-
 /**
  Callback: The weapon ammo in the weapon changes.
 
@@ -1230,8 +1132,7 @@ public func OnAmmoChange(id ammo_type)
 {
 }
 
-
-protected func HandleAmmoUsage(proplist firemode)
+func HandleAmmoUsage(proplist firemode)
 {
 	// default values
 	var rate = firemode.ammo_rate ?? 1;
@@ -1275,10 +1176,7 @@ protected func HandleAmmoUsage(proplist firemode)
 	}
 }
 
-
-//----------------------------------------------------------------------------------------------------------------
-//
-// Locking the weapon
+/*-- Locking --*/
 
 /**
  Locks the weapon against interaction.
@@ -1311,7 +1209,7 @@ public func UnlockWeapon()
 	if (effect) RemoveEffect(nil, this, effect);
 }
 
-private func IsWeaponLocked()
+func IsWeaponLocked()
 {
 	return GetEffect("IntWeaponLocked", this);
 }
@@ -1320,7 +1218,7 @@ private func IsWeaponLocked()
 //
 // Reloading the weapon
 
-private func StartReload(object user, int x, int y, bool forced)
+func StartReload(object user, int x, int y, bool forced)
 {
 	var firemode = GetFiremode();
 
@@ -1363,7 +1261,7 @@ private func StartReload(object user, int x, int y, bool forced)
 	return true; // keep reloading
 }
 
-private func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
+func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
 	var effect = IsReloading();
 	
@@ -1377,14 +1275,14 @@ private func CancelReload(object user, int x, int y, proplist firemode, bool req
 	}
 }
 
-private func DoReload(object user, int x, int y, proplist firemode)
+func DoReload(object user, int x, int y, proplist firemode)
 {
 	RemoveEffect(nil, this, IsReloading());
 	this->OnFinishReload(user, x, y, firemode);
 	return true;
 }
 
-private func IsReloading()
+func IsReloading()
 {
 	return GetEffect("IntReload", this);
 }
@@ -1479,7 +1377,7 @@ public func OnCancelReload(object user, int x, int y, proplist firemode, bool re
 {
 }
 
-private func FxIntReloadStart(object target, proplist effect, int temp, object user, proplist firemode)
+func FxIntReloadStart(object target, proplist effect, int temp, object user, proplist firemode)
 {
 	if (temp) return;
 	
@@ -1488,7 +1386,7 @@ private func FxIntReloadStart(object target, proplist effect, int temp, object u
 	effect.percent_old = 0;
 }
 
-private func FxIntReloadTimer(object target, proplist effect, int time)
+func FxIntReloadTimer(object target, proplist effect, int time)
 {
 	effect.percent = BoundBy(time * 100 / effect.firemode.delay_reload, 0, 100);
 	effect.progress = effect.percent - effect.percent_old;
@@ -1510,3 +1408,70 @@ private func FxIntReloadTimer(object target, proplist effect, int time)
 		effect.percent_old = effect.percent;
 	}
 }
+
+/*-- Misc --*/
+
+public func GetAnimationSet()
+{
+	var firemode = GetFiremode();
+
+	var anim_shoot_name = nil;
+	var anim_shoot_time = nil;
+	var anim_load_name = nil;
+	var anim_load_time = nil;
+	var anim_walk_speed_front = nil;
+	var anim_walk_speed_back = nil;
+
+	if (firemode)
+	{
+		anim_shoot_name = firemode.anim_shoot_name;
+		anim_shoot_time = firemode.delay_recover;
+		anim_load_name = firemode.anim_load_name;
+		anim_load_time = firemode.delay_reload;
+		anim_walk_speed_front = firemode.walk_speed_front;	
+		anim_walk_speed_back = firemode.walk_speed_back;
+	}
+
+	return {
+		AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
+		AnimationAim   = "MusketAimArms",
+		AnimationLoad  = anim_load_name,
+		LoadTime       = anim_load_time,
+		AnimationShoot = anim_shoot_name,
+		ShootTime      = anim_shoot_time,
+		WalkSpeed      = anim_walk_speed_front,
+		WalkBack       = anim_walk_speed_back,
+	};
+}
+
+/**
+ Gets a sample of a random value.
+ 
+ @par value The value. This can be a {@code C4V_Int}, or {@code C4V_Array}. 
+ @return int The sampled value. This is either the {@code value}, if {@code C4V_Int}
+         was passed, or if an array was passed: a random value between
+         {@code value[0]} and {@code value[1]}, where the possible increments are
+         {@code value[2]}.  
+ */
+func SampleValue(value)
+{
+	if (GetType(value) == C4V_Array)
+	{
+		var min = value[0];
+		var range = value[1] - min;
+		var step = Max(value[2], 1);
+		
+		return min + step * Random(range / step);
+	}
+	else if (GetType(value) == C4V_Int)
+	{
+		return value;
+	}
+	else
+	{
+		FatalError(Format("Expected int or array, got %v", value));
+	}
+}
+
+local Name = "$Name$";
+local Description = "$Description$";
