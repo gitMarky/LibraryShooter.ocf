@@ -1,6 +1,4 @@
-﻿#include Library_AmmoManager
-
-/**
+﻿/**
  @note Firemodes
   A firemode has three stages: Charge - (Fire/Recover) - Cooldown
  @author Marky
