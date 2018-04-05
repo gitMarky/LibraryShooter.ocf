@@ -12,7 +12,6 @@
 
 local Name = "$Name$";
 local Description = "$Description$";
-local Collectible = 1;
 
 
 local is_selected = true;  // bool: is the weapon currently selected?
@@ -280,14 +279,6 @@ private func Initialize()
 	shot_counter = {};
 	ammo_rate_counter = {};
 	_inherited(...);
-}
-
-public func GetCarryMode(object user) {    if (is_selected) return CARRY_Hand; }
-public func GetCarrySpecial(object user) { if (is_selected) return "pos_hand2"; }
-public func GetCarryBone() { return "main"; }
-public func GetCarryTransform()
-{
-	return Trans_Rotate(-90, 0, 1, 0);
 }
 
 local animation_set = {
