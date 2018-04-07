@@ -10,7 +10,6 @@
 
 /*-- Important Library Properties --*/
 
-local is_selected = true;  // bool: is the weapon currently selected?
 local is_using = false;    // bool: is the user holding the fire button
 
 static const WEAPON_Firemode_Default = "default";
