@@ -1,9 +1,6 @@
 ﻿/**
 	Shared functions between all firearms.
 
-	Firearms need to have at least one fire mode defined (see below for firemodes)
-	Otherwise, nothing happens in a Use call.
-
 	@note Firemodes
 	A firemode has three stages: Charge - (Fire/Recover) - Cooldown
 	@author Marky
