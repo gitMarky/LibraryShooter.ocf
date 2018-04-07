@@ -4,7 +4,7 @@
  {@c public func HasInteractionMenu()} must be implemented in order for this to work.
  */
 
-#include Plugin_Weapon_FiremodeBySelection
+#include Plugin_Firearm_FiremodeBySelection
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

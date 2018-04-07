@@ -4,7 +4,7 @@
  - alternative use is firemode "secondary"
  */
 
-#include Plugin_Weapon_FiremodeBySelection
+#include Plugin_Firearm_FiremodeBySelection
 
 static const WEAPON_Firemode_Primary = "primary";
 static const WEAPON_Firemode_Secondary = "secondary";

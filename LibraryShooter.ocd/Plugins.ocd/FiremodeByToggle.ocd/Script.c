@@ -2,7 +2,7 @@
  Allows fire mode selection by cycling through the modes.
  */
 
-#include Plugin_Weapon_FiremodeBySelection
+#include Plugin_Firearm_FiremodeBySelection
 
 local next_firemode_index = 0;
 local current_firemode_index = 0;
