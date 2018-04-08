@@ -100,12 +100,13 @@ func Initialize()
  This is executed each time the user presses the fire button.@br@br
 
  The function does the following:@br
+ - call {@link Library_Firearm#OnPressUse}@br
  - tell the user to start aiming@br
- - call {@link Library_Weapon#ControlUseHolding}@br
- - call {@link Library_Weapon#Fire}@br
+ - call {@link Library_Firearm#ControlUseHolding}@br
+ - call {@link Library_Firearm#Fire}@br
  @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @version 0.1.0
  */
 public func ControlUseStart(object user, int x, int y)
@@ -114,37 +115,27 @@ public func ControlUseStart(object user, int x, int y)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
-	
-	this->OnPressUse(user, x, y);
 
-//	if(!Ready(user, x, y)) return true; // checks loading etc
+	if (this->OnPressUse(user, x, y))
+		return true;
 
-//	if(!ReadyToFire())
-//	{
-//		CheckReload();
-//		Sound("DryFire?");
-//		return true;
-//	}
+	user->StartAim(this);
 
-//	AimStartSound();
+	ControlUseHolding(user, x, y);
 
-	//user->StartAim(this);
-
-	//ControlUseHolding(user, x, y);
-	
 	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
 	//	Fire(user, x, y); //user->GetAimPosition());
 	return true;
 }
 
 /**
+ This is executed each time the user presses the alternative use button (must be defined, not standard in OpenClonk).@br@br
+
  The function does the following:@br
- - tell the user to start aiming@br
- - call {@link Library_Weapon#ControlUseHolding}@br
- - call {@link Library_Weapon#Fire}@br
+ - call {@link Library_Firearm#OnPressUseAlt} (which should define some kind of behaviour)@br
  @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @version 0.1.0
  */
 public func ControlUseAltStart(object user, int x, int y)
@@ -153,36 +144,40 @@ public func ControlUseAltStart(object user, int x, int y)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
-	
+
 	this->OnPressUseAlt(user, x, y);
-	
+
 	return true;
 }
 
 /**
- This is executed while the user is holding the primary use button.@br@br
+ This is executed regularly while the user is holding the primary use button.@br@br
 
  The function does the following:@br
- - update the aiming angle according to the parameters
+ - call {@link Library_Firearm#OnHoldingUse}@br
+ - call {@link Library_Firearm#ControlFireHolding}@br
  @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @version 0.1.0
  */
 public func ControlUseHolding(object user, int x, int y)
 {
-	this->OnHoldingUse(user, x, y);
+	if (this->OnHoldingUse(user, x, y))
+		return true;
+
 	return ControlFireHolding(user, x, y);
 }
 
 /**
- This is executed while the user is holding the fire button.@br@br
+ This should be executed while the user is holding the fire button.@br@br
 
  The function does the following:@br
- - update the aiming angle according to the parameters
+ - check if the {@link Library_Firearm#RejectUse} is true, if it is, {@link Library_Firearm#ControlUseStop} is called@br
+ - call {@link Library_Firearm#DoFireCycle}
  @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aiming at. Relative to the user.
  @version 0.2.0
  */
 public func ControlFireHolding(object user, int x, int y)
@@ -191,7 +186,7 @@ public func ControlFireHolding(object user, int x, int y)
 	{
 		FatalError("The function expects a user that is not nil");
 	}
-	
+
 	if (this->~RejectUse(user))
 	{
 		ControlUseStop(user, x, y);
@@ -199,24 +194,39 @@ public func ControlFireHolding(object user, int x, int y)
 	}
 
 	DoFireCycle(user, x, y, true);
-	
+
 	return true;
 }
 
+/**
+ This is executed regularly while the user is holding the alternative use button (must be defined, not standard in OpenClonk).@br@br
+
+ The function does the following:@br
+ - call {@link Library_Firearm#OnHoldingUseAlt} (which should define some kind of behaviour)@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @version 0.1.0
+ */
 public func ControlUseAltHolding(object user, int x, int y)
 {
 	this->OnHoldingUseAlt(user, x, y);
-	return ControlFireHolding(user, x, y);
+
+	return true;
 }
 
 /**
  This is executed when the user stops holding the fire button.@br@br
 
  The function does the following:@br
- - tell the user to stop aiming.
+ - call {@link Library_Firearm#OnUseStop}@br
+ - call {@link Library_Firearm#CancelUsing}@br
+ - call {@link Library_Firearm#CancelCharge}@br
+ - call {@link Library_Firearm#CancelReload}@br
+ - check if the weapon is not {@link Library_Firearm#IsRecovering} and if not, call {@link Library_Firearm#CheckCooldown}@br
  @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aimint at.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @version 0.1.0
  */
 public func ControlUseStop(object user, int x, int y)
@@ -226,46 +236,95 @@ public func ControlUseStop(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
+	if (this->OnUseStop(user, x, y))
+		return true;
+
 	CancelUsing();
-	
+
 	CancelCharge(user, x, y, GetFiremode(), true);
 	CancelReload(user, x, y, GetFiremode(), true);
-	
+
 	if (!IsRecovering())
 	{
 		CheckCooldown(user, GetFiremode());
 	}
-	
-	this->OnUseStop(user, x, y);
-	
+
 	return true;
 }
 
+/**
+ This is executed when the user stops holding the alternative use button (must be defined, not standard in OpenClonk).@br@br
+
+ The function does the following:@br
+ - call {@link Library_Firearm#OnStopUseAlt}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @version 0.1.0
+ */
 public func ControlUseAltStop(object user, int x, int y)
 {
-	return ControlUseStop(user, x, y);
+	this->OnStopUseAlt(user, x, y);
+
+	return true;
 }
 
+/**
+ This is executed when the user cancels the fire procedure (usually by pressing a dedicated cancel button).@br@br
+
+ The function does the following:@br
+ - call {@link Library_Firearm#OnUseCancel}@br
+ - call {@link Library_Firearm#ControlUseStop}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @version 0.1.0
+ */
 public func ControlUseCancel(object user, int x, int y)
 {
+	if (this->OnUseCancel(user, x, y))
+		return true;
+
 	return ControlUseStop(user, x, y);
 }
 
+/**
+ This is executed when the user cancels the alternative use (usually by pressing a dedicated cancel button; must be defined, not standard in OpenClonk).@br@br
+
+ The function does the following:@br
+ - call {@link Library_Firearm#OnCancelUseAlt}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @version 0.1.0
+ */
 public func ControlUseAltCancel(object user, int x, int y)
 {
-	return ControlUseStop(user, x, y);
+	this->OnCancelUseAlt(user, x, y);
+
+	return true;
 }
 
+/**
+ Sets is_using to false.
+ @version 0.2.0
+*/
 public func CancelUsing()
 {
 	is_using = false;
 }
 
-// holding callbacks are made
+/**
+ Must return true if the weapon wants to receive holding updates for controls.
+ @version 0.1.0
+*/
 public func HoldingEnabled() { return true; }
 
 /*-- Charging --*/
 
+/**
+ Charging
+*/
 func StartCharge(object user, int x, int y)
 {
 	var firemode = GetFiremode();
@@ -452,36 +511,47 @@ func IsReadyToFire()
 	    && !IsWeaponLocked();
 }
 
+/**
+ This function will go through the fire cycle: reloading, charging, firing and recovering, checking for cooldown.@br@br
+
+ This function does the following:@br
+ - set the aiming angle for the user@br
+ - check {@link Library_Firearm#IsReadyToFire}@br
+ - check {@link Library_Firearm#StartReload}@br
+ - check {@link Library_Firearm#StartCharge}@br
+ - if all of the above check out, call {@link Library_Firearm#Fire}@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par is_pressing_trigger Should be true if the fire button is held to indicate the is_using state.
+ @version 0.2.0
+*/
 func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 {
 	var angle = GetAngle(x, y);
-	user->SetAimPosition(angle);
-	
+	user->~SetAimPosition(angle);
+
 	if (is_pressing_trigger)
-	{
-	 	is_using = true;	
-	}
+		is_using = true;
 
 	if (IsReadyToFire())
-	{
 		if (!StartReload(user, x, y))
-		if (!StartCharge(user, x, y))
-			Fire(user, x, y);
-	}
+			if (!StartCharge(user, x, y))
+				Fire(user, x, y);
 }
 
 /**
  Converts coordinates to an aiming angle for the weapon.
  @par x The x coordinate, local.
  @par y The y coordinate, local.
- @return int The angle in degrees, normalized to the range of [-180°, 180°].
+ @return int The angle in degrees, normalized to the range of -180° to 180°.
  @version 0.1.0
  */
 func GetAngle(int x, int y)
 {
 	var angle = Angle(0, weapon_properties.gfx_offset_y, x, y);
 		angle = Normalize(angle, -180);
-		
+
 	return angle;
 }
 
@@ -489,43 +559,42 @@ func GetFireAngle(int x, int y, proplist firemode)
 {
 	var angle = Angle(0, firemode.projectile_offset_y, x, y);
 		angle = Normalize(angle, -180);
-		
+
 	return angle;
 }
 
 /**
- Fires the weapon.@br
- 
+ Fires the weapon.@br@br
+
  The function does the following:@br
- - write a message saying 'pew pew'
+ - check ammo ({@link Library_Firearm#HasAmmo}) for the selected firemode (should be fine if this was called through {@link Library_Firearm#DoFireCycle)).@br
+ - call {@link Library_Firearm#OnNoAmmo} if no ammunition was found.@br
+ - call {@link Library_Firearm#FireSound}.@br
+ - call {@link Library_Firearm#FireEffect}.@br
+ - call {@link Library_Firearm#FireProjectiles}.@br
+ - call {@link Library_Firearm#FireRecovery}.@br
  @par user The object that is using the weapon.
- @par angle The angle the weapon is aimed at.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @version 0.1.0
  */
 func Fire(object user, int x, int y)
 {
 	if (user == nil)
-	{
 		FatalError("The function expects a user that is not nil");
-	}
-	
+
 	var firemode = GetFiremode();
-	
+
 	if (firemode == nil)
-	{
 		FatalError(Format("Fire mode '%s' not supported", firemode));
-	}
-	
+
 	if (HasAmmo(firemode))
 	{
 		var angle = GetFireAngle(x, y, firemode);
-	
+
 		FireSound(user, firemode);
 		FireEffect(user, angle, firemode);
-	
 		FireProjectiles(user, angle, firemode);
-	//	AddDeviation();
-	
 		FireRecovery(user, x, y, firemode);
 	}
 	else
@@ -1210,10 +1279,24 @@ func IsWeaponLocked()
 	return GetEffect("IntWeaponLocked", this);
 }
 
-//----------------------------------------------------------------------------------------------------------------
-//
-// Reloading the weapon
+/*-- Reloading --*/
 
+/**
+ Will start the reloading process if the weapon needs reloading. Can be called multiple times even if already reloading to check if the reload process is done.@br@br
+
+ This function does the following:
+ - check if a reload is needed ({@link Library_Firearm#NeedsReload}).@br
+ - check if there is a reloading effect running ({@link Library_Firearm#IsReloading}).@br
+ - if yes, check if that effect is still in the process of reloading.@br
+ - if no, check if reloading is possible ({@link Library_Firearm#CanReload}).@br
+ - if yes, create a reloading effect and call {@link Library_Firearm#OnStartReload}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par forced If true, the weapon will reload even if it is currently not in use ({@link Library_Firearm#IsInUse}).@br
+ @return {@c true} if any kind of reloading process is happening or reloading is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no reloading is necessary at the moment.
+ @version 0.2.0
+*/
 func StartReload(object user, int x, int y, bool forced)
 {
 	var firemode = GetFiremode();
@@ -1226,7 +1309,7 @@ func StartReload(object user, int x, int y, bool forced)
 	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
 
 	var effect = IsReloading();
-	
+
 	if (effect != nil)
 	{
 		if (effect.user == user && effect.firemode == firemode)
@@ -1251,17 +1334,29 @@ func StartReload(object user, int x, int y, bool forced)
 
 	if (CanReload(user, firemode))
 	{
-		AddEffect("IntReload", this, 1, 1, this, nil, user, firemode);
+		CreateEffect(IntReloadEffect, 1, 1, user, x, y, firemode);
 		this->OnStartReload(user, x, y, firemode);
 	}
+
 	return true; // keep reloading
 }
 
+/**
+ Will cancel the reloading process currently running. Is automatically called by {@link Library_Firearm#StartReload} if the user or firemode changed during a reloading process.@br@br
+
+ Calls {@link Library_Firearm#OnCancelReload}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @par requested_by_user Set to true, if the stopping was a user's choice (usually when the fire button was released). If true, auto reloading weapon will also stop reloading.
+ @version 0.2.0
+*/
 func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
 	var effect = IsReloading();
-	
-	var auto_reload = firemode.auto_reload && requested_by_user; 
+
+	var auto_reload = firemode.auto_reload && requested_by_user;
 
 	if (effect != nil)
 	{
@@ -1271,24 +1366,52 @@ func CancelReload(object user, int x, int y, proplist firemode, bool requested_b
 	}
 }
 
+/**
+ Called by the reloading effect if reloading should be finished. If it returns false, the reloading effect will linger and assumes that something else needs to be done. If it returns true, the reloading effect will end.@br@br
+
+ Calls {@link Library_Firearm#OnFinishReload}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default.
+*/
 func DoReload(object user, int x, int y, proplist firemode)
 {
-	RemoveEffect(nil, this, IsReloading());
 	this->OnFinishReload(user, x, y, firemode);
 	return true;
 }
 
+/**
+ Checks if the weapon is currently reloading.@br
+ @return The reloading effect.
+ @version 0.2.0
+*/
 func IsReloading()
 {
-	return GetEffect("IntReload", this);
+	return GetEffect("IntReloadEffect", this);
 }
 
 /**
- Condition when the weapon can be reloaded.
+ Gets the current status of the reloading process.@br
+ @return A value of 0 to 100, if the weapon is reloading.@br
+         If the weapon is not reloading, this function returns -1.
+ */
+public func GetReloadProgress()
+{
+	var effect = IsReloading();
+
+	if (effect == nil)
+		return -1;
+	else
+		return effect.percentage;
+}
+
+/**
+ Condition if the weapon can be reloaded.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @return {@c true} by default. Overload this function
-         for a custom condition.
+ @return {@c true} by default. Overload this function for a custom condition.
  @version 0.2.0
  */
 public func CanReload(object user, proplist firemode)
@@ -1297,11 +1420,10 @@ public func CanReload(object user, proplist firemode)
 }
 
 /**
- Condition when the weapon needs to be reloaded.
+ Condition if the weapon needs to be reloaded.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @return {@c false} by default. Overload this function
-         for a custom condition.
+ @return {@c false} by default. Overload this function for a custom condition. Otherwise no reloading needs ever to be done.
  @version 0.2.0
  */
 public func NeedsReload(object user, proplist firemode)
@@ -1310,8 +1432,10 @@ public func NeedsReload(object user, proplist firemode)
 }
 
 /**
- Callback: the weapon starts reloading. Does nothing by default.
+ Callback: the weapon starts reloading. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @version 0.2.0
  */
@@ -1320,8 +1444,10 @@ public func OnStartReload(object user, int x, int y, proplist firemode)
 }
 
 /**
- Callback: the weapon has successfully reloaded. Does nothing by default.
+ Callback: the weapon has successfully reloaded. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @version 0.2.0
  */
@@ -1330,8 +1456,10 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 }
 
 /**
- Callback: the weapon has successfully reloaded. Does nothing by default.
+ Callback: called each time during the reloading process if the percentage of the reload progress changed. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @par current_percent The progress of reloading, in percent.
  @par change_percent The change of progress, since the last update.
@@ -1342,68 +1470,56 @@ public func OnProgressReload(object user, int x, int y, proplist firemode, int c
 }
 
 /**
- Gets the current status of the reloading process.
- @return A value of 0 to 100, if the weapon is reloading.@br
-         If the weapon is not reloading, this function returns -1.
- */
-public func GetReloadProgress()
-{
-	var effect = IsReloading();
-	
-	if (effect == nil)
-	{
-		return -1;
-	}
-	else
-	{
-		return effect.percent;
-	}
-}
-
-/**
- Callback: the weapon user cancelled reloading. Does nothing by default.
+ Callback: the weapon user cancelled reloading. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @par requested_by_user Is {@code true} if the user releases the use button while
-                        the weapon is reloading. Otherwise, for example if the
-                        user changes the parameter is {@code false}.
+ @par requested_by_user Is {@c true} if the user releases the use button while the weapon is reloading. Otherwise, for example if the user changes the firemode is {@c false}.
  @version 0.2.0
  */
 public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
 }
 
-func FxIntReloadStart(object target, proplist effect, int temp, object user, proplist firemode)
-{
-	if (temp) return;
-	
-	effect.user = user;
-	effect.firemode = firemode;
-	effect.percent_old = 0;
-}
-
-func FxIntReloadTimer(object target, proplist effect, int time)
-{
-	effect.percent = BoundBy(time * 100 / effect.firemode.delay_reload, 0, 100);
-	effect.progress = effect.percent - effect.percent_old;
-
-	if (time > effect.firemode.delay_reload && !effect.is_reloaded)
+local IntReloadEffect = new Effect {
+	Construction = func(object user, int x, int y, proplist firemode)
 	{
-		effect.is_reloaded = true;
-		
-		if (target->DoReload(effect.user, effect.x, effect.y, effect.firemode))
+		this.user = user;
+		this.x = x; // x and y will be updated by StartReload
+		this.y = y;
+		this.firemode = firemode;
+
+		this.percent_old = 0;
+		this.percentage = 0;
+		this.progress = 0;
+		this.is_reloaded = false;
+	},
+	Timer = func(int time)
+	{
+		// Increase progress percentage depending on the reloading delay of the firemode
+		this.percentage = BoundBy(time * 100 / this.firemode.delay_reload, 0, 100);
+		// Save the progress (i.e. the difference between the current percentage and during the last update)
+		this.progress = this.percentage - this.percent_old;
+
+		// Check if the reloading process is finished based on the reloading delay of the firemode
+		if (time > this.firemode.delay_reload && !this.is_reloaded)
 		{
-			effect.has_reloaded = true;
-			return FX_Execute_Kill;
+			this.is_reloaded = true;
+
+			// Do the reload if anything is necessary and end the effect if successful
+			if (this.Target->DoReload(this.user, this.x, this.y, this.firemode))
+				return FX_Execute_Kill;
+		}
+
+		// Do a progress update if necessary
+		if (this.progress > 0)
+		{
+			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
+			this.percent_old = this.progress;
 		}
 	}
-
-	if (effect.progress > 0)
-	{
-		target->OnProgressReload(effect.user, effect.x, effect.y, effect.firemode, effect.percent, effect.progress);
-		effect.percent_old = effect.percent;
-	}
-}
+};
 
 /*-- Misc --*/
 
