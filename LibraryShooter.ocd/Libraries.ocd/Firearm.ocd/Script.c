@@ -320,10 +320,69 @@ public func CancelUsing()
 */
 public func HoldingEnabled() { return true; }
 
+/**
+ Callback: Pressed the regular use button (fire).
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ */
+public func OnPressUse(object user, int x, int y)
+{
+}
+
+/**
+ Callback: Holding the regular use button (fire).
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ */
+public func OnHoldingUse(object user, int x, int y)
+{
+}
+
+/**
+ Callback from {@link Library_Weapon#ControlUserStop}, 
+ so that you do not have to overload the entire function.
+ */
+public func OnUseStop(object user, int x, int y)
+{
+}
+
+/**
+ Callback: Pressed the alternate use button (fire secondary).
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ @version 0.1.0
+ */
+public func OnPressUseAlt(object user, int x, int y)
+{
+}
+
+/**
+ Callback: Holding the alternate use button (fire secondary).
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at.
+ @par y The y coordinate the user is aiming at.
+ */
+public func OnHoldingUseAlt(object user, int x, int y)
+{
+}
+
 /*-- Charging --*/
 
 /**
- Charging
+ Will start the charging process if the weapon needs charging. Can be called multiple times even if already charging to check if the charge process is done.@br@br
+
+ This function does the following:
+ - check if a reload is needed ({@link Library_Firearm#NeedsReload}).@br
+ - check if there is a reloading effect running ({@link Library_Firearm#IsReloading}).@br
+ - if yes, check if that effect is still in the process of reloading.@br
+ - if no, check if reloading is possible ({@link Library_Firearm#CanReload}).@br
+ - if yes, create a reloading effect and call {@link Library_Firearm#OnStartReload}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+  @return {@c true} if any kind of charging process is happening or charging is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no charging is necessary at the moment.
+ @version 0.2.0
 */
 func StartCharge(object user, int x, int y)
 {
@@ -716,14 +775,6 @@ public func OnFireProjectile(object user, object projectile, proplist firemode)
 {
 }
 
-/**
- Callback from {@link Library_Weapon#ControlUserStop}, 
- so that you do not have to overload the entire function.
- */
-public func OnUseStop(object user, int x, int y)
-{
-}
-
 func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light, int color, string particle)
 {
 	if (user == nil)
@@ -759,45 +810,6 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
 	{
 		user->CreateTemporaryLight(x, y)->LightRangeStart(3 * size)->SetLifetime(2)->Color(color)->Activate();
 	}
-}
-
-/**
- Callback: Pressed the regular use button (fire).
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
- */
-public func OnPressUse(object user, int x, int y)
-{
-}
-
-/**
- Callback: Holding the regular use button (fire).
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
- */
-public func OnHoldingUse(object user, int x, int y)
-{
-}
-
-/**
- Callback: Pressed the alternate use button (fire secondary).
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
- @version 0.1.0
- */
-public func OnPressUseAlt(object user, int x, int y)
-{
-}
-
-/**
- Callback: Holding the alternate use button (fire secondary).
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
- */
-public func OnHoldingUseAlt(object user, int x, int y)
-{
 }
 
 /*-- Recovering --*/
