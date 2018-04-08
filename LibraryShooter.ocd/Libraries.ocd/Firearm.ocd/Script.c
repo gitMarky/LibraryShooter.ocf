@@ -321,47 +321,56 @@ public func CancelUsing()
 public func HoldingEnabled() { return true; }
 
 /**
- Callback: Pressed the regular use button (fire).
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
+ Callback: Pressed the regular use button (fire). Called by {@link Library_Firearm#ControlUseStart}.@br@br
+
+ If return value is true, the regular execution of {@link Library_Firearm#ControlUseStart} is skipped.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  */
 public func OnPressUse(object user, int x, int y)
 {
 }
 
 /**
- Callback: Holding the regular use button (fire).
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
+ Callback: The regular use button (fire) is held. Called in regular intervals by {@link Library_Firearm#ControlUseHolding}.@br@br
+
+ If return value is true, the regular execution of {@link Library_Firearm#ControlUseHolding} is skipped.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  */
 public func OnHoldingUse(object user, int x, int y)
 {
 }
 
 /**
- Callback from {@link Library_Weapon#ControlUserStop}, 
- so that you do not have to overload the entire function.
+ Callback: Released the regular use button (fire). Called by {@link Library_Firearm#ControlUseStop}.@br@br
+
+ If return value is true, the regular execution of {@link Library_Firearm#ControlUseStop} is skipped.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  */
 public func OnUseStop(object user, int x, int y)
 {
 }
 
 /**
- Callback: Pressed the alternate use button (fire secondary).
+ Callback: Pressed the alternative use button. Called by {@link Library_Firearm#ControlUseAltStart}.@br
  @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
- @version 0.1.0
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  */
 public func OnPressUseAlt(object user, int x, int y)
 {
 }
 
 /**
- Callback: Holding the alternate use button (fire secondary).
+ Callback: The alternative use button is held. Called in regular intervals by {@link Library_Firearm#ControlUseAltHolding}.@br
  @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at.
- @par y The y coordinate the user is aiming at.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  */
 public func OnHoldingUseAlt(object user, int x, int y)
 {
