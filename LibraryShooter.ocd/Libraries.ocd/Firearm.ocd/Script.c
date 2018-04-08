@@ -357,6 +357,18 @@ public func OnUseStop(object user, int x, int y)
 }
 
 /**
+ Callback: Use (fire) was cancelled. Called by {@link Library_Firearm#ControlUseCancel}.@br@br
+
+ If return value is true, the regular execution of {@link Library_Firearm#ControlUseCancel} is skipped.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ */
+public func OnUseCancel(object user, int x, int y)
+{
+}
+
+/**
  Callback: Pressed the alternative use button. Called by {@link Library_Firearm#ControlUseAltStart}.@br
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
@@ -373,6 +385,26 @@ public func OnPressUseAlt(object user, int x, int y)
  @par y The y coordinate the user is aimint at. Relative to the user.
  */
 public func OnHoldingUseAlt(object user, int x, int y)
+{
+}
+
+/**
+ Callback: Released the alternative use button. Called by {@link Library_Firearm#ControlUseAltStop}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ */
+public func OnUseAltStop(object user, int x, int y)
+{
+}
+
+/**
+ Callback: Alternative use was cancelled. Called by {@link Library_Firearm#ControlUseAltCancel}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ */
+public func OnUseAltCancel(object user, int x, int y)
 {
 }
 
