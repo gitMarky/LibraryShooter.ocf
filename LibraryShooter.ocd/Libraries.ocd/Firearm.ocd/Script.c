@@ -1082,6 +1082,25 @@ public func CanChangeFiremode()
 /*-- Ammo --*/
 
 /**
+ Changes the amount of ammunition that the object currently has.
+ @par ammo The type of the ammunition.
+ @par amount The change, can be positive or negative.
+             The amount of ammunition cannot be changed beyond the capacity
+             of the object, so the actual amount by which the ammunition was
+             changed will be returned. 
+ @return The actual change that happened.
+ @author Marky
+ @version 0.3.0
+ @note This function should be implemented by the weapon. A quick implementation
+       is available by including {@link Library_AmmoManager}.
+ @related {@link Library_AmmoManager#DoAmmo}, {@link Library_AmmoManager#SetAmmo}
+ */
+public func DoAmmo(id ammo, int amount)
+{
+	return _inherited(ammo, amount, ...);
+}
+
+/**
  Checks whether the weapon has ammo.
  
  @par firemode The ammo type for this firemode is checked.
