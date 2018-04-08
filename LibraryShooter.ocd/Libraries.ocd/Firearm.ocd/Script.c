@@ -300,7 +300,7 @@ public func ControlUseCancel(object user, int x, int y)
  */
 public func ControlUseAltCancel(object user, int x, int y)
 {
-	this->OnCancelUseAlt(user, x, y);
+	this->OnUseAltCancel(user, x, y);
 
 	return true;
 }
