@@ -930,7 +930,7 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
 func FireRecovery(object user, int x, int y, proplist firemode)
 {
 	var delay;
-	if (!NeedsRecovery(user, firemode))
+	if (NeedsRecovery(user, firemode))
 	{
 		delay = firemode.delay_recover;
 	}
