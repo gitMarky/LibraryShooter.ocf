@@ -172,10 +172,10 @@ global func Test1_OnStart()
 
 global func Test1_Completed()
 {
-	var test_data = [[0, -1000], // 0°, aim up
-	                 [1000, -1000], // 45°
-	                 [1000, 0], // 90°
-	                 [1000, 1000]]; // 135°
+	var test_data = [[0, -1000], // 0ï¿½, aim up
+	                 [1000, -1000], // 45ï¿½
+	                 [1000, 0], // 90ï¿½
+	                 [1000, 1000]]; // 135ï¿½
 	                 
 	                 
 	for (var coordinates in test_data)
