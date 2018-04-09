@@ -318,11 +318,32 @@ public func CancelUsing()
  Check if the weapon should not be used right now.@br@br
 
  Checks {@link Library_Firearm#IsWeaponReadyToUse} and {@link Library_Firearm#IsUserReadyToUse}. For custom behaviour, modify those functions.
+ @par user The object that is trying to use this weapon.
  @version 0.2.0
 */
 func RejectUse(object user)
 {
 	return !IsWeaponReadyToUse(user) || !IsUserReadyToUse(user);
+}
+
+/**
+ Interface for signaling that the weapon is ready to use (attack).
+ @par user The object that is trying to use this weapon.
+ @return true, if the object is ready to use. By default this is true, if the weapon is contained in the user.
+ */
+func IsWeaponReadyToUse(object user)
+{
+	return Contained() == user;
+}
+
+/**
+ Interface for signaling that the user is ready to use (attack).
+ @par user The object that is trying to use this weapon. 
+ @return true, if the object is ready to use. By default, this is returns HasHandAction from the user.
+ */
+func IsUserReadyToUse(object user)
+{
+	return user->HasHandAction();
 }
 
 /**
@@ -756,27 +777,6 @@ func Fire(object user, int x, int y)
 	{
 		this->OnNoAmmo(user, firemode);
 	}
-}
-
-/**
- Interface for signaling that the weapon is ready to use (attack).
- @par user The object that is trying to use this weapon. 
- @return true, if the object is ready to use. By default this is true,
-         if the weapon is contained in the user.
- */
-func IsWeaponReadyToUse(object user)
-{
-	return Contained() == user;
-}
-
-/**
- Interface for signaling that the user is ready to use (attack).
- @par user The object that is trying to use this weapon. 
- @return true, if the object is ready to use.
- */
-func IsUserReadyToUse(object user)
-{
-	return user->HasHandAction();
 }
 
 /**
