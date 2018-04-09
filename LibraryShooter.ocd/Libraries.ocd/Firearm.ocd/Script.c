@@ -778,7 +778,7 @@ func IsUserReadyToUse(object user)
 
  The function will create new bullet objects, as many as the firemode defines. Since no actual ammo objects are taken or consumed, this should be handled in {@link Library_Firearm#HandleAmmoUsage}.@br
  Each time a single projectile is fired, {@link Library_Firearm#OnFireProjectile} is called.@br
- {@link Library_Firearm#GetProjectiles} and {@link Library_Firearm#GetSpread} can be used for custom behaviour.@br
+ {@link Library_Firearm#GetProjectileAmount} and {@link Library_Firearm#GetSpread} can be used for custom behaviour.@br
  @par user The object that is using the weapon.
  @par angle The firing angle.
  @par firemode A proplist containing the fire mode information.
@@ -802,10 +802,10 @@ func FireProjectiles(object user, int angle, proplist firemode)
 	var y = -Cos(angle, firemode.projectile_distance) + user_y + firemode.projectile_offset_y;
 
 	// launch the single projectiles
-	for (var i = 0; i < Max(1, GetProjectiles(firemode)); i++)
+	for (var i = 0; i < Max(1, GetProjectileAmount(firemode)); i++)
 	{
 		var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
-	
+
 		projectile->Shooter(user)
 		          ->Weapon(this)
 		          ->DamageAmount(firemode.damage)
@@ -829,7 +829,7 @@ func FireProjectiles(object user, int angle, proplist firemode)
  @return By default, the return value is simple the projectile_number of the firemode. Can be overloaded for custom behaviour.
  @version 0.2.0
 */
-func GetProjectiles(proplist firemode)
+func GetProjectileAmount(proplist firemode)
 {
 	return firemode.projectile_number;
 }
