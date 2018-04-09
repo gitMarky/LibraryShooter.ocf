@@ -315,6 +315,17 @@ public func CancelUsing()
 }
 
 /**
+ Check if the weapon should not be used right now.@br@br
+
+ Checks {@link Library_Firearm#IsWeaponReadyToUse} and {@link Library_Firearm#IsUserReadyToUse}. For custom behaviour, modify those functions.
+ @version 0.2.0
+*/
+func RejectUse(object user)
+{
+	return !IsWeaponReadyToUse(user) || !IsUserReadyToUse(user);
+}
+
+/**
  Must return true if the weapon wants to receive holding updates for controls.
  @version 0.1.0
 */
@@ -745,11 +756,6 @@ func Fire(object user, int x, int y)
 	{
 		this->OnNoAmmo(user, firemode);
 	}
-}
-
-func RejectUse(object user)
-{
-	return !IsWeaponReadyToUse(user) || !IsUserReadyToUse(user);
 }
 
 /**
