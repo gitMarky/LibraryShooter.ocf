@@ -542,38 +542,6 @@ public func GetChargeProgress()
 }
 
 /**
- Callback: the weapon user cancelled charging. Does nothing by default.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par firemode A proplist containing the fire mode information.
- @version 0.2.0
- */
-public func OnCancelCharge(object user, int x, int y, proplist firemode)
-{
-}
-
-func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
-{
-	if (temp) return;
-	
-	effect.user = user;
-	effect.firemode = firemode;
-	effect.percent_old = 0;
-}
-
-func FxIntChargeTimer(object target, proplist effect, int time)
-{
-	effect.percent = BoundBy(time * 100 / effect.firemode.delay_charge, 0, 100);
-	effect.progress = effect.percent - effect.percent_old;
-
-	if (time > effect.firemode.delay_charge && !effect.is_charged)
-	{
-		effect.is_charged = true;
-	}
-}
-
-/**
  Condition if the weapon needs to be charged.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
@@ -622,6 +590,38 @@ public func OnFinishCharge(object user, int x, int y, proplist firemode)
  */
 public func OnProgressCharge(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
+}
+
+/**
+ Callback: the weapon user cancelled charging. Does nothing by default.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+ */
+public func OnCancelCharge(object user, int x, int y, proplist firemode)
+{
+}
+
+func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
+{
+	if (temp) return;
+	
+	effect.user = user;
+	effect.firemode = firemode;
+	effect.percent_old = 0;
+}
+
+func FxIntChargeTimer(object target, proplist effect, int time)
+{
+	effect.percent = BoundBy(time * 100 / effect.firemode.delay_charge, 0, 100);
+	effect.progress = effect.percent - effect.percent_old;
+
+	if (time > effect.firemode.delay_charge && !effect.is_charged)
+	{
+		effect.is_charged = true;
+	}
 }
 
 /*-- Firing --*/
