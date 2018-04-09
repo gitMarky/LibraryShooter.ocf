@@ -414,15 +414,14 @@ public func OnUseAltCancel(object user, int x, int y)
  Will start the charging process if the weapon needs charging. Can be called multiple times even if already charging to check if the charge process is done.@br@br
 
  This function does the following:
- - check if a reload is needed ({@link Library_Firearm#NeedsReload}).@br
- - check if there is a reloading effect running ({@link Library_Firearm#IsReloading}).@br
- - if yes, check if that effect is still in the process of reloading.@br
- - if no, check if reloading is possible ({@link Library_Firearm#CanReload}).@br
- - if yes, create a reloading effect and call {@link Library_Firearm#OnStartReload}.@br
+ - check if charging is needed ({@link Library_Firearm#NeedsCharge}).@br
+ - check if there is a charging effect running ({@link Library_Firearm#IsCharging}).@br
+ - if yes, check if that effect is still in the process of charging.@br
+ - if no, create a charging effect and call {@link Library_Firearm#OnStartCharge}.@br
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
-  @return {@c true} if any kind of charging process is happening or charging is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no charging is necessary at the moment.
+ @return {@c true} if any kind of charging process is happening or charging is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no charging is necessary at the moment.
  @version 0.2.0
 */
 func StartCharge(object user, int x, int y)
@@ -435,9 +434,9 @@ func StartCharge(object user, int x, int y)
 	}
 
 	if (!is_using || firemode.delay_charge < 1 || !NeedsCharge(user, firemode)) return false;
-	
+
 	var effect = IsCharging();
-	
+
 	if (effect != nil)
 	{
 		if (effect.user == user && effect.firemode == firemode)
@@ -455,7 +454,7 @@ func StartCharge(object user, int x, int y)
 				}
 				else
 				{
-					return true; // keep charging, because someone overrided DoCharge()
+					return true; // keep charging, because someone overrode DoCharge()
 				}
 			}
 			else
@@ -479,24 +478,49 @@ func StartCharge(object user, int x, int y)
 	return true; // keep charging
 }
 
+/**
+ Will cancel the charging process currently running. Is automatically called by {@link Library_Firearm#StartCharge} if the user or firemode changed during a charging process.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @par callback Set to true to call {@link Library_Firearm#OnCancelCharge}.
+ @version 0.2.0
+*/
 func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
 {
 	var effect = IsCharging();
-	
+
 	if (effect != nil)
 	{
 		if (callback) this->OnCancelCharge(effect.user, x, y, effect.firemode);
-		
+
 		RemoveEffect(nil, nil, effect);
 	}
 }
 
+/**
+ Called by {@link Library_Firearm#StartCharge} if charging should be finished. If it returns false, the firing process holds and assumes that something else needs to be done.@br@br
+
+ Calls {@link Library_Firearm#OnFinishCharge}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default.
+ @version 0.2.0
+*/
 func DoCharge(object user, int x, int y, proplist firemode)
 {
 	this->OnFinishCharge(user, x, y, firemode);
 	return true;
 }
 
+/**
+ Checks if the weapon is currently charging.@br
+ @return The charging effect.
+ @version 0.2.0
+*/
 func IsCharging()
 {
 	return GetEffect("IntCharge", this);
@@ -510,22 +534,20 @@ func IsCharging()
 public func GetChargeProgress()
 {
 	var effect = IsCharging();
-	
+
 	if (effect == nil)
-	{
 		return -1;
-	}
 	else
-	{
 		return effect.percent;
-	}
 }
 
 /**
- Callback: the weapon user cancelled charging. Does nothing by default.
+ Callback: the weapon user cancelled charging. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.1.0
+ @version 0.2.0
  */
 public func OnCancelCharge(object user, int x, int y, proplist firemode)
 {
@@ -552,11 +574,10 @@ func FxIntChargeTimer(object target, proplist effect, int time)
 }
 
 /**
- Condition when the weapon needs to be charged.
+ Condition if the weapon needs to be charged.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @return {@c true} by default. Overload this function
-         for a custom condition.
+ @return {@c true} by default. Overload this function for a custom condition.
  @version 0.1.0
  */
 public func NeedsCharge(object user, proplist firemode)
@@ -565,8 +586,10 @@ public func NeedsCharge(object user, proplist firemode)
 }
 
 /**
- Callback: the weapon starts charging. Does nothing by default.
+ Callback: the weapon starts charging. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
  */
@@ -575,8 +598,10 @@ public func OnStartCharge(object user, int x, int y, proplist firemode)
 }
 
 /**
- Callback: the weapon has successfully charged. Does nothing by default.
+ Callback: the weapon has successfully charged. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
  */
@@ -585,14 +610,15 @@ public func OnFinishCharge(object user, int x, int y, proplist firemode)
 }
 
 /**
- Callback: the weapon has successfully charged. Does nothing by default.
+ Callback: called each time during the charging process if the percentage of the charge progress changed. Does nothing by default.@br
  @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @par current_percent The progress of charging, in percent.
- @par change_percent The change since the last update, in percent.
+ @par change_percent The change of progress, since the last update.
  @version 0.2.0
- @note The function existed in version 0.1.0 too, passing {@code change_percent} in place
-       of {@code current_percent}.
+ @note The function existed in version 0.1.0 too, passing {@code change_percent} in place of {@code current_percent}.
  */
 public func OnProgressCharge(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
