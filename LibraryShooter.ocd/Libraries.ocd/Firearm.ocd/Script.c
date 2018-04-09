@@ -461,8 +461,8 @@ func StartCharge(object user, int x, int y)
 			{
 				if (effect.progress > 0)
 				{
-					this->OnProgressCharge(user, x, y, firemode, effect.percent, effect.progress);
-					effect.percent_old = effect.percent;
+					this->OnProgressCharge(user, x, y, firemode, effect.percentage, effect.progress);
+					effect.percent_old = effect.percentage;
 				}
 				return true; // keep charging
 			}
@@ -473,7 +473,7 @@ func StartCharge(object user, int x, int y)
 		}
 	}
 
-	AddEffect("IntCharge", this, 1, 1, this, nil, user, firemode);
+	CreateEffect(IntChargeEffect, 1, 1, user, firemode);
 	this->OnStartCharge(user, x, y, firemode);
 	return true; // keep charging
 }
@@ -523,7 +523,7 @@ func DoCharge(object user, int x, int y, proplist firemode)
 */
 func IsCharging()
 {
-	return GetEffect("IntCharge", this);
+	return GetEffect("IntChargeEffect", this);
 }
 
 /**
@@ -604,25 +604,35 @@ public func OnCancelCharge(object user, int x, int y, proplist firemode)
 {
 }
 
-func FxIntChargeStart(object target, proplist effect, int temp, object user, proplist firemode)
-{
-	if (temp) return;
-	
-	effect.user = user;
-	effect.firemode = firemode;
-	effect.percent_old = 0;
-}
-
-func FxIntChargeTimer(object target, proplist effect, int time)
-{
-	effect.percent = BoundBy(time * 100 / effect.firemode.delay_charge, 0, 100);
-	effect.progress = effect.percent - effect.percent_old;
-
-	if (time > effect.firemode.delay_charge && !effect.is_charged)
+local IntChargeEffect = new Effect {
+	Construction = func(object user, int x, int y, proplist firemode)
 	{
-		effect.is_charged = true;
+		this.user = user;
+		this.firemode = firemode;
+
+		this.percent_old = 0;
+		this.percentage = 0;
+		this.progress = 0;
+		this.is_charged = false;
+		this.has_charged = false;
+	},
+	Timer = func(int time)
+	{
+		// Increase progress percentage depending on the charging delay of the firemode
+		this.percentage = BoundBy(time * 100 / this.firemode.delay_charge, 0, 100);
+		// Save the progress (i.e. the difference between the current percentage and during the last update)
+		this.progress = this.percentage - this.percent_old;
+
+		// Check if the charging process is finished based on the charging delay of the firemode
+		if (time > this.firemode.delay_charge && !this.is_charged)
+		{
+			this.is_charged = true;
+			// Do not make subsequent calls of the timer function because every-frame-effects do hurt performance
+			this.Interval = 0;
+			// However, keep the effect, to track that this weapon is now charged
+		}
 	}
-}
+};
 
 /*-- Firing --*/
 
