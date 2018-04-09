@@ -1234,9 +1234,15 @@ public func DoAmmo(id ammo, int amount)
  */
 public func HasAmmo(proplist firemode)
 {
-	return this->GetAmmo(firemode) >= firemode.ammo_usage // enough ammo for the firemode?
-	    || ammo_rate_counter[firemode.name] > 0     // or ammo left from previously using the weapon?
-	    || this->GetAmmoSource(firemode) == AMMO_Source_Infinite; // or infinite ammo
+	// Has no ammo if outside of a container
+	if (this->GetAmmoSource(firemode) == AMMO_Source_Container && !this->GetAmmoContainer())
+	{
+		return false;
+	}
+
+	return this->GetAmmo(firemode) >= firemode.ammo_usage			// enough ammo for the firemode?
+	    || ammo_rate_counter[firemode.name] > 0						// or ammo left from previously using the weapon?
+	    || this->GetAmmoSource(firemode) == AMMO_Source_Infinite;	// or infinite ammo
 }
 
 /**
