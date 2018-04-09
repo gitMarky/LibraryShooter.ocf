@@ -691,6 +691,14 @@ func GetAngle(int x, int y)
 	return angle;
 }
 
+/**
+ Converts coordinates to a firing angle for the weapon, respecting the projectile_offset_y from the fire mode.@br
+ @par x The x coordinate, local.
+ @par y The y coordinate, local.
+ @par firemode A proplist containing the fire mode information.
+ @return int The angle in degrees, normalized to the range of -180° to 180°.
+ @version 0.2.0
+*/
 func GetFireAngle(int x, int y, proplist firemode)
 {
 	var angle = Angle(0, firemode.projectile_offset_y, x, y);
@@ -765,6 +773,17 @@ func IsUserReadyToUse(object user)
 	return user->HasHandAction();
 }
 
+/**
+ The actual firing function.@br@br
+
+ The function will create new bullet objects, as many as the firemode defines. Since no actual ammo objects are taken or consumed, this should be handled in {@link Library_Firearm#HandleAmmoUsage}.@br
+ Each time a single projectile is fired, {@link Library_Firearm#OnFireProjectile} is called.@br
+ {@link Library_Firearm#GetProjectiles} and {@link Library_Firearm#GetSpread} can be used for custom behaviour.@br
+ @par user The object that is using the weapon.
+ @par angle The firing angle.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+*/
 func FireProjectiles(object user, int angle, proplist firemode)
 {
 	if (user == nil)
@@ -788,27 +807,38 @@ func FireProjectiles(object user, int angle, proplist firemode)
 		var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
 	
 		projectile->Shooter(user)
-				  ->Weapon(this)
-				  ->DamageAmount(firemode.damage)
+		          ->Weapon(this)
+		          ->DamageAmount(firemode.damage)
 		          ->DamageType(firemode.damage_type)
 		          ->Velocity(SampleValue(firemode.projectile_speed))
-				  ->Range(SampleValue(firemode.projectile_range));
+		          ->Range(SampleValue(firemode.projectile_range));
 
 		this->OnFireProjectile(user, projectile, firemode);
 		projectile->Launch(angle, GetSpread(firemode));
 	}
-	
+
 	shot_counter[firemode.name]++;
 	ammo_rate_counter[firemode.name]--;
-	
+
 	HandleAmmoUsage(firemode);
 }
 
+/**
+ Gets the number of projectiles to be fired by a single shot.@br
+ @par firemode A proplist containing the fire mode information.
+ @return By default, the return value is simple the projectile_number of the firemode. Can be overloaded for custom behaviour.
+ @version 0.2.0
+*/
 func GetProjectiles(proplist firemode)
 {
 	return firemode.projectile_number;
 }
 
+/**
+ Gets bullet deviations for a shot.@br
+ @par firemode A proplist containing the fire mode information.
+ @return By default, will compose the spread and projectile_spread values from the fire mode into an array and pass over to {@link NormalizeDeviations} or returns nil.
+*/
 func GetSpread(proplist firemode)
 {
 	if (firemode.spread || firemode.projectile_spread)
