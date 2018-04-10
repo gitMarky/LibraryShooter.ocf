@@ -1220,6 +1220,11 @@ public func GetFiremode()
 {
 }
 
+/**
+ Gets all configured fire modes for this weapon.@br
+ @return An array of all fire modes.
+ @version 0.2.0
+*/
 public func GetFiremodes()
 {
 	if (!fire_modes)
@@ -1230,35 +1235,52 @@ public func GetFiremodes()
 	return fire_modes;
 }
 
+/**
+ Gets all available fire modes. Available fire modes are only those where the configured condition is met.@br
+ @return An array of all available fire modes.
+ @version 0.2.0
+*/
 public func GetAvailableFiremodes()
 {
 	var available = [];
-	
+
 	for (var i = 0; i < GetLength(GetFiremodes()); ++i) // firemode in GetFiremodes())
 	{
 		var firemode = GetFiremodes()[i];
-	
+
 		var is_available = firemode.condition == nil || this->Call(firemode.condition);
 
 		if (is_available)
-		{
 			PushBack(available, firemode);
-		}
 	}
 
 	return available;
 }
 
+/**
+ Delete all configured fire modes.@br
+ @version 0.2.0
+*/
 public func ClearFiremodes()
 {
 	fire_modes = [];
 }
 
-public func AddFiremode(proplist fire_mode)
+/**
+ Add a fire mode to the list of configured fire modes.@br
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+*/
+public func AddFiremode(proplist firemode)
 {
-	PushBack(fire_modes, fire_mode);
+	PushBack(fire_modes, firemode);
 }
 
+/**
+ Checks whether the weapon is currently recovering, charging, reloading or locked.@br
+ @return {@c true} if change if fire modes is possible.
+ @version 0.2.0
+*/
 public func CanChangeFiremode()
 {
 	return !IsRecovering()
