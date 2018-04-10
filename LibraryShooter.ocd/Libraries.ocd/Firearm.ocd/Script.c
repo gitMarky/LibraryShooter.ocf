@@ -291,7 +291,7 @@ public func ControlUseStop(object user, int x, int y)
  */
 public func ControlUseAltStop(object user, int x, int y)
 {
-	this->OnStopUseAlt(user, x, y);
+	this->OnUseAltStop(user, x, y);
 
 	return true;
 }
