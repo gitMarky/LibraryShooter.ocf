@@ -1126,6 +1126,25 @@ func DoCooldown(object user, proplist firemode)
 }
 
 /**
+ Gets the current status of the cooldown process.
+ @return A value of 0 to 100, if the weapon is cooling down.@br
+         If the weapon is not cooling down, this function returns -1.
+ */
+func GetCooldownProgress()
+{
+	var cooldown = IsCoolingDown();
+	if (cooldown)
+	{
+		var progress = BoundBy(cooldown.Time, 0, cooldown.Interval);
+		return progress * 100 / cooldown.Interval;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
  Checks if the weapon is currently cooling down.@br
  @return The cooldown effect.
  @version 0.2.0
