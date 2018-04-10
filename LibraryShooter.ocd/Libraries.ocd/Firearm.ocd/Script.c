@@ -1047,21 +1047,6 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 }
 
 /**
- Called by {@link Library_Firearm#DoRecovery}.@br
- Will call {@link Library_Firearm#StartCooldown} if the weapon has still ammunition left and is not an automatic weapon.@br
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
-*/
-func CheckCooldown(object user, proplist firemode)
-{
-	if (!HasAmmo(firemode) || RejectUse(user))
-		CancelUsing();
-
-	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
-		StartCooldown(user, firemode);
-}
-
-/**
  Callback: the weapon finished one firing cycle. Does nothing by default.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
@@ -1087,6 +1072,21 @@ local IntRecoveryEffect = new Effect {
 };
 
 /*-- Cooldown --*/
+
+/**
+ Called by {@link Library_Firearm#DoRecovery}.@br
+ Will call {@link Library_Firearm#StartCooldown} if the weapon has still ammunition left and is not an automatic weapon.@br
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+*/
+func CheckCooldown(object user, proplist firemode)
+{
+	if (!HasAmmo(firemode) || RejectUse(user))
+		CancelUsing();
+
+	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
+		StartCooldown(user, firemode);
+}
 
 func StartCooldown(object user, proplist firemode)
 {
