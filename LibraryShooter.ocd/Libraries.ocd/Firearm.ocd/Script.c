@@ -49,16 +49,9 @@
 
 local is_using = false;    // bool: is the user holding the fire button
 
-static const WEAPON_Firemode_Default = "default";
-
-static const WEAPON_FM_Single	= 1;
-static const WEAPON_FM_Burst 	= 2;
-static const WEAPON_FM_Auto 	= 3;
-
-
-static const WEAPON_PR_Bullet = 1;
-static const WEAPON_PR_Ballistic = 2;
-static const WEAPON_PR_Hitscan = 3;
+static const WEAPON_FM_Single = 1;
+static const WEAPON_FM_Burst  = 2;
+static const WEAPON_FM_Auto   = 3;
 
 local fire_modes = [fire_mode_default];
 
