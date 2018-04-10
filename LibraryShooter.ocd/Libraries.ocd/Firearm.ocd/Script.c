@@ -927,28 +927,35 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
 
 /*-- Recovering --*/
 
+/**
+ Will start the recovery process if the weapon needs recovering.@br@br
+
+ This function does the following:
+ - check if recovering is needed ({@link Library_Firearm#NeedsRecovery}).@br
+ - if yes, create a recovery effect.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+*/
 func FireRecovery(object user, int x, int y, proplist firemode)
 {
 	var delay;
 	if (NeedsRecovery(user, firemode))
-	{
 		delay = firemode.delay_recover;
-	}
 	else
-	{
 		delay = 1;
-	}
 
 	var recovery = AddEffect("IntRecovery", this, 1, delay, this, nil, user, x, y, firemode);
 	recovery.delay = delay;
 }
 
 /**
- Condition when the weapon needs to be recover after firing.
+ Condition when the weapon needs to recover (pause between two consecutive shots) after firing.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @return {@c true} by default. Overload this function
-         for a custom condition.
+ @return {@c true} by default. Overload this function for a custom condition.
  @version 0.2.0
  */
 public func NeedsRecovery(object user, proplist firemode)
@@ -974,16 +981,23 @@ func FxIntRecoveryTimer(object target, proplist effect, int time)
 	return FX_Execute_Kill;
 }
 
+/**
+ Will cancel the recovering process currently running.@br
+ @version 0.2.0
+*/
 func CancelRecovery()
 {
 	var effect = IsRecovering();
 	
 	if (effect != nil)
-	{
 		RemoveEffect(nil, nil, effect);
-	}
 }
 
+/**
+ Gets the current status of the recovering process.
+ @return A value of 0 to 100, if the weapon is recovering.@br
+         If the weapon is not recovering, this function returns -1.
+ */
 func GetRecoveryProgress()
 {
 	var recovery = IsRecovering();
@@ -994,19 +1008,35 @@ func GetRecoveryProgress()
 	}
 	else
 	{
-		return 0;
+		return -1;
 	}
 }
 
+/**
+ Checks if the weapon is currently charging.@br
+ @return The charging effect.
+ @version 0.2.0
+*/
 func IsRecovering()
 {
 	return GetEffect("IntRecovery", this);
 }
 
+/**
+ This function is called after the recovery process is done.@br
+ It calls {@link Library_Firearm#OnRecovery}.@br
+ On a fire mode with burst set, it will go through {@link Library_Firearm#CancelRecovery} and {@link Library_Firearm#DoFireCycle} until the appropriate amounts of shot is fired.@br
+ Otherwise {@link Library_Firearm#CheckCooldown} is called.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+*/
 func DoRecovery(object user, int x, int y, proplist firemode)
 {
 	if (firemode == nil) return;
-	
+
 	this->OnRecovery(user, firemode);
 
 	if (firemode.burst)
@@ -1015,20 +1045,19 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 		{
 			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode.burst, firemode.mode));
 		}
-	
+
 		if (shot_counter[firemode.name] >= firemode.burst)
 		{
 			shot_counter[firemode.name] = 0;
 		}
-		else 
+		else
 		{
-			
 			if (!is_using)
 			{
 				CancelRecovery();
 				DoFireCycle(user, x, y, false);
 			}
-			
+
 			return; // prevent cooldown
 		}
 	}
@@ -1036,21 +1065,23 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 	CheckCooldown(user, firemode);
 }
 
+/**
+ Called by {@link Library_Firearm#DoRecovery}.@br
+ Will call {@link Library_Firearm#StartCooldown} if the weapon has still ammunition left and is not an automatic weapon.@br
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+*/
 func CheckCooldown(object user, proplist firemode)
 {
 	if (!HasAmmo(firemode) || RejectUse(user))
-	{
 		CancelUsing();
-	}
 
 	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
-	{
 		StartCooldown(user, firemode);
-	}
 }
 
 /**
- Callback: the weapon finished one firing cycle. Does nothing by default.
+ Callback: the weapon finished one firing cycle. Does nothing by default.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
