@@ -1111,7 +1111,7 @@ func StartCooldown(object user, proplist firemode)
 
 	if (effect == nil)
 	{
-		AddEffect("IntCooldown", this, 1, firemode.delay_cooldown, this, nil, user, firemode);
+		CreateEffect(IntCooldownEffect, 1, firemode.delay_cooldown, user, firemode);
 		this->OnStartCooldown(user, firemode);
 	}
 }
@@ -1132,7 +1132,7 @@ func DoCooldown(object user, proplist firemode)
 */
 func IsCoolingDown()
 {
-	return GetEffect("IntCooldown", this);
+	return GetEffect("IntCooldownEffect", this);
 }
 
 /**
@@ -1177,20 +1177,18 @@ public func OnSkipCooldown(object user, proplist firemode)
 {
 }
 
-func FxIntCooldownStart(object target, proplist effect, int temp, object user, proplist firemode)
-{
-	if (temp) return;
-
-	effect.user = user;
-	effect.firemode = firemode;
-}
-
-func FxIntCooldownTimer(object target, proplist effect, int time)
-{
-	target->DoCooldown(effect.user, effect.firemode);
-
-	return FX_Execute_Kill;
-}
+local IntCooldownEffect = new Effect {
+	Construction = func(object user, proplist firemode)
+	{
+		this.user = user;
+		this.firemode = firemode;
+	},
+	Timer = func()
+	{
+		this.Target->DoCooldown(this.user, this.firemode);
+		return FX_Execute_Kill;
+	}
+};
 
 /*-- Firemodes --*/
 
