@@ -637,7 +637,7 @@ public func OnCancelCharge(object user, int x, int y, proplist firemode)
 }
 
 local IntChargeEffect = new Effect {
-	Construction = func(object user, int x, int y, proplist firemode)
+	Construction = func(object user, proplist firemode)
 	{
 		this.user = user;
 		this.firemode = firemode;
