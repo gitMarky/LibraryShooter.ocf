@@ -994,8 +994,8 @@ func GetRecoveryProgress()
 }
 
 /**
- Checks if the weapon is currently charging.@br
- @return The charging effect.
+ Checks if the weapon is currently recovering.@br
+ @return The recovering effect.
  @version 0.2.0
 */
 func IsRecovering()
