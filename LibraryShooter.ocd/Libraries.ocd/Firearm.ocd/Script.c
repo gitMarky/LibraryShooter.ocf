@@ -947,8 +947,7 @@ func FireRecovery(object user, int x, int y, proplist firemode)
 	else
 		delay = 1;
 
-	var recovery = AddEffect("IntRecovery", this, 1, delay, this, nil, user, x, y, firemode);
-	recovery.delay = delay;
+	CreateEffect(IntRecoveryEffect, 1, delay, user, x, y, firemode);
 }
 
 /**
@@ -961,24 +960,6 @@ func FireRecovery(object user, int x, int y, proplist firemode)
 public func NeedsRecovery(object user, proplist firemode)
 {
 	return true;
-}
-
-func FxIntRecoveryStart (object target, proplist effect, int temporary, object user, int x, int y, proplist firemode)
-{
-	if (temporary) return;
-	
-	effect.user = user;
-	effect.x = x;
-	effect.y = y;
-	effect.firemode = firemode;
-	effect.start = FrameCounter();
-}
-
-func FxIntRecoveryTimer(object target, proplist effect, int time)
-{
-	target->DoRecovery(effect.user, effect.x, effect.y, effect.firemode);
-
-	return FX_Execute_Kill;
 }
 
 /**
@@ -1003,8 +984,8 @@ func GetRecoveryProgress()
 	var recovery = IsRecovering();
 	if (recovery)
 	{
-		var progress = BoundBy(FrameCounter() - recovery.start, 0, recovery.delay);
-		return progress * 100 / recovery.delay;
+		var progress = BoundBy(recovery.Time, 0, recovery.Interval);
+		return progress * 100 / recovery.Interval;
 	}
 	else
 	{
@@ -1019,7 +1000,7 @@ func GetRecoveryProgress()
 */
 func IsRecovering()
 {
-	return GetEffect("IntRecovery", this);
+	return GetEffect("IntRecoveryEffect", this);
 }
 
 /**
@@ -1089,6 +1070,21 @@ func CheckCooldown(object user, proplist firemode)
 public func OnRecovery(object user, proplist firemode)
 {
 }
+
+local IntRecoveryEffect = new Effect {
+	Construction = func(object user, int x, int y, proplist firemode)
+	{
+		this.user = user;
+		this.x = x;
+		this.y = y;
+		this.firemode = firemode;
+	},
+	Timer = func()
+	{
+		this.Target->DoRecovery(this.user, this.x, this.y, this.firemode);
+		return FX_Execute_Kill;
+	}
+};
 
 /*-- Cooldown --*/
 
