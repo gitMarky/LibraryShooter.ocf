@@ -118,13 +118,16 @@ local animation_set = {
 
 /*-- Engine Callbacks --*/
 
+/**
+ Make sure to call this via _inherited();
+*/
 func Initialize()
 {
 	shot_counter = {};
 	ammo_rate_counter = {};
 	selected_firemode = 0;
 
-	_inherited(...);
+	_inherited();
 }
 
 /*-- Controls --*/
