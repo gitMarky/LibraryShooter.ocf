@@ -1467,7 +1467,7 @@ public func SetFiremode(int number, bool force)
 {
 	if (number < 0 || number >= GetLength(fire_modes))
 	{
-		FatalError("The new fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes));
+		FatalError(Format("The new fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
 		return;
 	}
 
@@ -1475,7 +1475,7 @@ public func SetFiremode(int number, bool force)
 	{
 		if (!CanChangeFiremode())
 			return false;
-		var available = fire_modes[number].condition == nil || this->Call(fire_modes[i].condition);
+		var available = fire_modes[number].condition == nil || this->Call(fire_modes[number].condition);
 		if (!available)
 			return false;
 	}
@@ -1493,7 +1493,7 @@ public func GetFiremode()
 {
 	if (selected_firemode < 0 || selected_firemode >= GetLength(fire_modes))
 	{
-		FatalError("The selected fire mode (%v) is out of range of all configured fire modes (%v)", selected_firemode, GetLength(fire_modes));
+		FatalError(Format("The selected fire mode (%v) is out of range of all configured fire modes (%v)", selected_firemode, GetLength(fire_modes)));
 		return;
 	}
 	return fire_modes[selected_firemode];
