@@ -73,6 +73,7 @@ local weapon_properties =
 
 local shot_counter; // proplist
 local ammo_rate_counter; // proplist
+local selected_firemode; // int
 
 local animation_set = {
 	AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
@@ -91,6 +92,8 @@ func Initialize()
 {
 	shot_counter = {};
 	ammo_rate_counter = {};
+	selected_firemode = 0;
+
 	_inherited(...);
 }
 
@@ -1212,12 +1215,46 @@ local IntCooldownEffect = new Effect {
 /*-- Firemodes --*/
 
 /**
- Callback: the current firemode. Overload this function for
- @return proplist The current firemode.
+ Sets a new fire mode.@br
+ @par number The number key in the fire modes array to select.
+ @par force If true, the fire mode is changed without checking whether the fire mode can currently be changed or if the condition is met.
+ @return {@c true} if the fire mode was changed, {@c false} if it failed.
+ @version 0.3.0
+*/
+public func SetFiremode(int number, bool force)
+{
+	if (number < 0 || number >= GetLength(fire_modes))
+	{
+		FatalError("The new fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes));
+		return;
+	}
+
+	if (!force)
+	{
+		if (!CanChangeFiremode())
+			return false;
+		var available = fire_modes[number].condition == nil || this->Call(fire_modes[i].condition);
+		if (!available)
+			return false;
+	}
+
+	selected_firemode = number;
+	return true;
+}
+
+/**
+ Gets the currently selected fire mode.@br
+ @return A {@c proplist} containing the fire mode information.
  @version 0.1.0
  */
 public func GetFiremode()
 {
+	if (selected_firemode < 0 || selected_firemode >= GetLength(fire_modes))
+	{
+		FatalError("The selected fire mode (%v) is out of range of all configured fire modes (%v)", selected_firemode, GetLength(fire_modes));
+		return;
+	}
+	return fire_modes[selected_firemode];
 }
 
 /**
