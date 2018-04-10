@@ -57,42 +57,33 @@ local fire_modes = [fire_mode_default];
 
 local fire_mode_default = 
 {
-	mode = 			 WEAPON_FM_Single,
-
-	name = 				"$DefaultFireMode$", // string - menu caption
-	icon = 				nil, // id - menu icon
-	condition = 		nil, // string - callback for a condition
-
-	ammo_id = 			nil,
-	ammo_usage =		1, // int - this many units of ammo
-	ammo_rate =			1, // int - per this many shots fired
-
-	delay_charge  =     0, // int, frames - time that the button must be held before the shot is fired
-	delay_recover = 	7, // int, frames - time between consecutive shots
-	delay_cooldown =    0, // int, frames - time of cooldown after the last shot is fired
-	delay_reload =		6, // int, frames - time to reload
-
-	damage = 			10,
-	damage_type = 		nil,
-
-	projectile_id = 	NormalBullet,
-	projectile_speed = 	100,
-	projectile_range = 600,
+	mode =                WEAPON_FM_Single,
+	name =                "$DefaultFireMode$", // string - menu caption
+	icon =                nil, // id - menu icon
+	condition =           nil, // string - callback for a condition
+	ammo_id =             nil,
+	ammo_usage =          1, // int - this many units of ammo
+	ammo_rate =           1, // int - per this many shots fired
+	delay_charge =        0, // int, frames - time that the button must be held before the shot is fired
+	delay_recover =       7, // int, frames - time between consecutive shots
+	delay_cooldown =      0, // int, frames - time of cooldown after the last shot is fired
+	delay_reload =        6, // int, frames - time to reload
+	damage =              10,
+	damage_type =         nil,
+	projectile_id =       NormalBullet,
+	projectile_speed =    100,
+	projectile_range =    600,
 	projectile_distance = 10,
 	projectile_offset_y = -6,
-	projectile_number = 1,
-	projectile_spread = [0, 100], // default inaccuracy of a single projectile
-
-	spread = [1, 100], // inaccuracy from prolonged firing
-
-	burst = 0, // number of projectiles fired in a burst
-
-	auto_reload = false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
-
-	anim_shoot_name = nil,	// for animation set: shoot animation
-	anim_load_name = nil,	// for animation set: reload animation
-	walk_speed_front = nil,	// for animation set: relative walk speed
-	walk_speed_back = nil,	// for animation set: relative walk speed
+	projectile_number =   1,
+	projectile_spread =   [0, 100], // default inaccuracy of a single projectile
+	spread =              [1, 100], // inaccuracy from prolonged firing
+	burst =               0, // number of projectiles fired in a burst
+	auto_reload =         false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
+	anim_shoot_name =     nil, // for animation set: shoot animation
+	anim_load_name =      nil, // for animation set: reload animation
+	walk_speed_front =    nil, // for animation set: relative walk speed
+	walk_speed_back =     nil, // for animation set: relative walk speed
 };
 
 local weapon_properties = 
