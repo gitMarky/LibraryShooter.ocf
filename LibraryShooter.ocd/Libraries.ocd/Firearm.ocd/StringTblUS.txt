@@ -1,2 +1,4 @@
 Name=Weapon
 Description=A weapon.
+
+DefaultFireMode=Standard

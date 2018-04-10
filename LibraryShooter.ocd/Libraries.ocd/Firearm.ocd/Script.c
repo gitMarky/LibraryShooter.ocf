@@ -59,7 +59,7 @@ local fire_mode_default =
 {
 	mode = 			 WEAPON_FM_Single,
 
-	name = 				"default", // string - menu caption
+	name = 				"$DefaultFireMode$", // string - menu caption
 	icon = 				nil, // id - menu icon
 	condition = 		nil, // string - callback for a condition
 
