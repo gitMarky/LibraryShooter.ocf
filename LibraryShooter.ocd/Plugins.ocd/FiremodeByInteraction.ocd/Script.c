@@ -76,7 +76,7 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 		PushBack(menu_entries,
 		{
 		    Symbol = firemode_symbol,
-		    extra_data = { weapon = weapon, firemode = firemode.name},
+		    extra_data = { weapon = weapon, firemode = weapon->GetFiremodeIndex(firemode)},
 			custom = 
 			{
 				Prototype = custom_entry,
