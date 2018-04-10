@@ -32,7 +32,7 @@
 	projectile_distance: Integer. Distance the projectile is being created away from the shooting object.@br
 	projectile_offset_y: Integer. Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center.@br
 	projectile_number: Integer. How many projectiles are fired in a single shot.@br
-	projectile_spread: Array with two integers. Minimum and maximum deviation of a projectile from the firing angle.@br
+	projectile_spread: Array with two integers. Deviation of a projectile from the firing angle and a precision parameter.@br
 	spread: Array of integers. Additional deviation added by certain effects (e.g. continuous firing).@br
 	burst: Integer. Number of shots being fired when using burst mode style.@br
 	auto_reload: Boolean. If true, the weapon reloads even if the use button is not held.@br
