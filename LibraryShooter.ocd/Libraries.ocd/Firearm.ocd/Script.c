@@ -1758,28 +1758,21 @@ func HandleAmmoUsage(proplist firemode)
 /*-- Locking --*/
 
 /**
- Locks the weapon against interaction.
-
- @par lock_time The weapon will be locked for this many frames. On a lock time of {@code 0}
-                the weapon stays locked until you call {@link Library_Weapon#UnlockWeapon}
+ Locks the weapon so it cannot be used.@br
+ @par lock_time The weapon will be locked for this many frames. On a lock time of {@code 0} the weapon stays locked until you call {@link Library_Weapon#UnlockWeapon}.
  @version 0.2.0
  */
 public func LockWeapon(int lock_time)
 {
 	var effect = IsWeaponLocked();
 	if (effect == nil)
-	{
 		AddEffect("IntWeaponLocked", this, 1, lock_time, this, nil);
-	}
 	else
-	{
 		effect.Interval = lock_time;
-	}
 }
 
 /**
- Unlocks the weapon, so that it can be interacted with
-
+ Unlocks the weapon, so that it can be used again.@br
  @version 0.2.0
  */
 public func UnlockWeapon()
@@ -1788,6 +1781,11 @@ public func UnlockWeapon()
 	if (effect) RemoveEffect(nil, this, effect);
 }
 
+/**
+ Checks if the weapon is currently locked against usage.@br
+ @return The weapon locking effect.
+ @version 0.2.0
+*/
 func IsWeaponLocked()
 {
 	return GetEffect("IntWeaponLocked", this);
