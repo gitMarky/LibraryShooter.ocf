@@ -1212,6 +1212,248 @@ local IntCooldownEffect = new Effect {
 	}
 };
 
+/*-- Reloading --*/
+
+/**
+ Will start the reloading process if the weapon needs reloading. Can be called multiple times even if already reloading to check if the reload process is done.@br@br
+
+ This function does the following:
+ - check if a reload is needed ({@link Library_Firearm#NeedsReload}).@br
+ - check if there is a reloading effect running ({@link Library_Firearm#IsReloading}).@br
+ - if yes, check if that effect is still in the process of reloading.@br
+ - if no, check if reloading is possible ({@link Library_Firearm#CanReload}).@br
+ - if yes, create a reloading effect and call {@link Library_Firearm#OnStartReload}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par forced If true, the weapon will reload even if it is currently not in use ({@link Library_Firearm#IsInUse}).@br
+ @return {@c true} if any kind of reloading process is happening or reloading is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no reloading is necessary at the moment.
+ @version 0.2.0
+*/
+func StartReload(object user, int x, int y, bool forced)
+{
+	var firemode = GetFiremode();
+
+	if (firemode == nil)
+	{
+		FatalError(Format("Fire mode '%s' not supported", firemode));
+	}
+
+	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
+
+	var effect = IsReloading();
+
+	if (effect != nil)
+	{
+		if (effect.user == user && effect.firemode == firemode)
+		{
+			effect.x = x;
+			effect.y = y;
+
+			if (effect.has_reloaded)
+			{
+				return false; // fire away
+			}
+			else
+			{
+				return true; // keep reloading
+			}
+		}
+		else
+		{
+			CancelReload(user, x, y, firemode, false);
+		}
+	}
+
+	if (CanReload(user, firemode))
+	{
+		CreateEffect(IntReloadEffect, 1, 1, user, x, y, firemode);
+		this->OnStartReload(user, x, y, firemode);
+	}
+
+	return true; // keep reloading
+}
+
+/**
+ Will cancel the reloading process currently running. Is automatically called by {@link Library_Firearm#StartReload} if the user or firemode changed during a reloading process.@br@br
+
+ Calls {@link Library_Firearm#OnCancelReload}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @par requested_by_user Set to true, if the stopping was a user's choice (usually when the fire button was released). If true, auto reloading weapon will also stop reloading.
+ @version 0.2.0
+*/
+func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
+{
+	var effect = IsReloading();
+
+	var auto_reload = firemode.auto_reload && requested_by_user;
+
+	if (effect != nil)
+	{
+		this->OnCancelReload(effect.user, x, y, effect.firemode, requested_by_user);
+
+		if (!auto_reload) RemoveEffect(nil, nil, effect);
+	}
+}
+
+/**
+ Called by the reloading effect if reloading should be finished. If it returns false, the reloading effect will linger and assumes that something else needs to be done. If it returns true, the reloading effect will end.@br@br
+
+ Calls {@link Library_Firearm#OnFinishReload}.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default.
+*/
+func DoReload(object user, int x, int y, proplist firemode)
+{
+	this->OnFinishReload(user, x, y, firemode);
+	return true;
+}
+
+/**
+ Checks if the weapon is currently reloading.@br
+ @return The reloading effect.
+ @version 0.2.0
+*/
+func IsReloading()
+{
+	return GetEffect("IntReloadEffect", this);
+}
+
+/**
+ Gets the current status of the reloading process.@br
+ @return A value of 0 to 100, if the weapon is reloading.@br
+         If the weapon is not reloading, this function returns -1.
+ */
+public func GetReloadProgress()
+{
+	var effect = IsReloading();
+
+	if (effect == nil)
+		return -1;
+	else
+		return effect.percentage;
+}
+
+/**
+ Condition if the weapon can be reloaded.@br
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c true} by default. Overload this function for a custom condition.
+ @version 0.2.0
+ */
+public func CanReload(object user, proplist firemode)
+{
+	return true;
+}
+
+/**
+ Condition if the weapon needs to be reloaded.@br
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @return {@c false} by default. Overload this function for a custom condition. Otherwise no reloading needs ever to be done.
+ @version 0.2.0
+ */
+public func NeedsReload(object user, proplist firemode)
+{
+	return false;
+}
+
+/**
+ Callback: the weapon starts reloading. Does nothing by default.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+ */
+public func OnStartReload(object user, int x, int y, proplist firemode)
+{
+}
+
+/**
+ Callback: the weapon has successfully reloaded. Does nothing by default.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+ */
+public func OnFinishReload(object user, int x, int y, proplist firemode)
+{
+}
+
+/**
+ Callback: called each time during the reloading process if the percentage of the reload progress changed. Does nothing by default.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @par current_percent The progress of reloading, in percent.
+ @par change_percent The change of progress, since the last update.
+ @version 0.2.0
+ */
+public func OnProgressReload(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
+{
+}
+
+/**
+ Callback: the weapon user cancelled reloading. Does nothing by default.@br
+ @par user The object that is using the weapon.
+ @par x The x coordinate the user is aiming at. Relative to the user.
+ @par y The y coordinate the user is aimint at. Relative to the user.
+ @par firemode A proplist containing the fire mode information.
+ @par requested_by_user Is {@c true} if the user releases the use button while the weapon is reloading. Otherwise, for example if the user changes the firemode is {@c false}.
+ @version 0.2.0
+ */
+public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
+{
+}
+
+local IntReloadEffect = new Effect {
+	Construction = func(object user, int x, int y, proplist firemode)
+	{
+		this.user = user;
+		this.x = x; // x and y will be updated by StartReload
+		this.y = y;
+		this.firemode = firemode;
+
+		this.percent_old = 0;
+		this.percentage = 0;
+		this.progress = 0;
+		this.is_reloaded = false;
+	},
+	Timer = func(int time)
+	{
+		// Increase progress percentage depending on the reloading delay of the firemode
+		this.percentage = BoundBy(time * 100 / this.firemode.delay_reload, 0, 100);
+		// Save the progress (i.e. the difference between the current percentage and during the last update)
+		this.progress = this.percentage - this.percent_old;
+
+		// Check if the reloading process is finished based on the reloading delay of the firemode
+		if (time > this.firemode.delay_reload && !this.is_reloaded)
+		{
+			this.is_reloaded = true;
+
+			// Do the reload if anything is necessary and end the effect if successful
+			if (this.Target->DoReload(this.user, this.x, this.y, this.firemode))
+				return FX_Execute_Kill;
+		}
+
+		// Do a progress update if necessary
+		if (this.progress > 0)
+		{
+			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
+			this.percent_old = this.progress;
+		}
+	}
+};
+
 /*-- Firemodes --*/
 
 /**
@@ -1550,248 +1792,6 @@ func IsWeaponLocked()
 {
 	return GetEffect("IntWeaponLocked", this);
 }
-
-/*-- Reloading --*/
-
-/**
- Will start the reloading process if the weapon needs reloading. Can be called multiple times even if already reloading to check if the reload process is done.@br@br
-
- This function does the following:
- - check if a reload is needed ({@link Library_Firearm#NeedsReload}).@br
- - check if there is a reloading effect running ({@link Library_Firearm#IsReloading}).@br
- - if yes, check if that effect is still in the process of reloading.@br
- - if no, check if reloading is possible ({@link Library_Firearm#CanReload}).@br
- - if yes, create a reloading effect and call {@link Library_Firearm#OnStartReload}.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par forced If true, the weapon will reload even if it is currently not in use ({@link Library_Firearm#IsInUse}).@br
- @return {@c true} if any kind of reloading process is happening or reloading is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no reloading is necessary at the moment.
- @version 0.2.0
-*/
-func StartReload(object user, int x, int y, bool forced)
-{
-	var firemode = GetFiremode();
-
-	if (firemode == nil)
-	{
-		FatalError(Format("Fire mode '%s' not supported", firemode));
-	}
-
-	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
-
-	var effect = IsReloading();
-
-	if (effect != nil)
-	{
-		if (effect.user == user && effect.firemode == firemode)
-		{
-			effect.x = x;
-			effect.y = y;
-
-			if (effect.has_reloaded)
-			{
-				return false; // fire away
-			}
-			else
-			{
-				return true; // keep reloading
-			}
-		}
-		else
-		{
-			CancelReload(user, x, y, firemode, false);
-		}
-	}
-
-	if (CanReload(user, firemode))
-	{
-		CreateEffect(IntReloadEffect, 1, 1, user, x, y, firemode);
-		this->OnStartReload(user, x, y, firemode);
-	}
-
-	return true; // keep reloading
-}
-
-/**
- Will cancel the reloading process currently running. Is automatically called by {@link Library_Firearm#StartReload} if the user or firemode changed during a reloading process.@br@br
-
- Calls {@link Library_Firearm#OnCancelReload}.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par firemode A proplist containing the fire mode information.
- @par requested_by_user Set to true, if the stopping was a user's choice (usually when the fire button was released). If true, auto reloading weapon will also stop reloading.
- @version 0.2.0
-*/
-func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
-{
-	var effect = IsReloading();
-
-	var auto_reload = firemode.auto_reload && requested_by_user;
-
-	if (effect != nil)
-	{
-		this->OnCancelReload(effect.user, x, y, effect.firemode, requested_by_user);
-
-		if (!auto_reload) RemoveEffect(nil, nil, effect);
-	}
-}
-
-/**
- Called by the reloading effect if reloading should be finished. If it returns false, the reloading effect will linger and assumes that something else needs to be done. If it returns true, the reloading effect will end.@br@br
-
- Calls {@link Library_Firearm#OnFinishReload}.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par firemode A proplist containing the fire mode information.
- @return {@c true} by default.
-*/
-func DoReload(object user, int x, int y, proplist firemode)
-{
-	this->OnFinishReload(user, x, y, firemode);
-	return true;
-}
-
-/**
- Checks if the weapon is currently reloading.@br
- @return The reloading effect.
- @version 0.2.0
-*/
-func IsReloading()
-{
-	return GetEffect("IntReloadEffect", this);
-}
-
-/**
- Gets the current status of the reloading process.@br
- @return A value of 0 to 100, if the weapon is reloading.@br
-         If the weapon is not reloading, this function returns -1.
- */
-public func GetReloadProgress()
-{
-	var effect = IsReloading();
-
-	if (effect == nil)
-		return -1;
-	else
-		return effect.percentage;
-}
-
-/**
- Condition if the weapon can be reloaded.@br
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @return {@c true} by default. Overload this function for a custom condition.
- @version 0.2.0
- */
-public func CanReload(object user, proplist firemode)
-{
-	return true;
-}
-
-/**
- Condition if the weapon needs to be reloaded.@br
- @par user The object that is using the weapon.
- @par firemode A proplist containing the fire mode information.
- @return {@c false} by default. Overload this function for a custom condition. Otherwise no reloading needs ever to be done.
- @version 0.2.0
- */
-public func NeedsReload(object user, proplist firemode)
-{
-	return false;
-}
-
-/**
- Callback: the weapon starts reloading. Does nothing by default.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par firemode A proplist containing the fire mode information.
- @version 0.2.0
- */
-public func OnStartReload(object user, int x, int y, proplist firemode)
-{
-}
-
-/**
- Callback: the weapon has successfully reloaded. Does nothing by default.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par firemode A proplist containing the fire mode information.
- @version 0.2.0
- */
-public func OnFinishReload(object user, int x, int y, proplist firemode)
-{
-}
-
-/**
- Callback: called each time during the reloading process if the percentage of the reload progress changed. Does nothing by default.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par firemode A proplist containing the fire mode information.
- @par current_percent The progress of reloading, in percent.
- @par change_percent The change of progress, since the last update.
- @version 0.2.0
- */
-public func OnProgressReload(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
-{
-}
-
-/**
- Callback: the weapon user cancelled reloading. Does nothing by default.@br
- @par user The object that is using the weapon.
- @par x The x coordinate the user is aiming at. Relative to the user.
- @par y The y coordinate the user is aimint at. Relative to the user.
- @par firemode A proplist containing the fire mode information.
- @par requested_by_user Is {@c true} if the user releases the use button while the weapon is reloading. Otherwise, for example if the user changes the firemode is {@c false}.
- @version 0.2.0
- */
-public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
-{
-}
-
-local IntReloadEffect = new Effect {
-	Construction = func(object user, int x, int y, proplist firemode)
-	{
-		this.user = user;
-		this.x = x; // x and y will be updated by StartReload
-		this.y = y;
-		this.firemode = firemode;
-
-		this.percent_old = 0;
-		this.percentage = 0;
-		this.progress = 0;
-		this.is_reloaded = false;
-	},
-	Timer = func(int time)
-	{
-		// Increase progress percentage depending on the reloading delay of the firemode
-		this.percentage = BoundBy(time * 100 / this.firemode.delay_reload, 0, 100);
-		// Save the progress (i.e. the difference between the current percentage and during the last update)
-		this.progress = this.percentage - this.percent_old;
-
-		// Check if the reloading process is finished based on the reloading delay of the firemode
-		if (time > this.firemode.delay_reload && !this.is_reloaded)
-		{
-			this.is_reloaded = true;
-
-			// Do the reload if anything is necessary and end the effect if successful
-			if (this.Target->DoReload(this.user, this.x, this.y, this.firemode))
-				return FX_Execute_Kill;
-		}
-
-		// Do a progress update if necessary
-		if (this.progress > 0)
-		{
-			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
-			this.percent_old = this.progress;
-		}
-	}
-};
 
 /*-- Misc --*/
 
