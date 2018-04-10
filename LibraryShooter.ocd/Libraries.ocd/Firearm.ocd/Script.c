@@ -1525,6 +1525,26 @@ public func GetFiremode(int number)
 }
 
 /**
+ Gets the index of a fire mode.
+ 
+ @par firemode The fire mode proplist
+ @par available If set to {@c false} this will check {@link Library_Firearm#GetFiremodes()}, and if 
+                set to {@c true} it will check {@link Library_Firearm#GetAvailableFiremodes()}.
+ @return the fire mode index. Can be used in {@link Library_Firearm#SetFiremode}.
+ */
+public func GetFiremodeIndex(proplist firemode, bool available)
+{
+	if (available)
+	{
+		return GetIndexOf(GetAvailableFiremodes(), firemode);
+	}
+	else
+	{
+		return GetIndexOf(GetFiremodes(), firemode);
+	}
+}
+
+/**
  Gets all configured fire modes for this weapon.@br
  @return An array of all fire modes.
  @version 0.2.0
@@ -1608,6 +1628,77 @@ public func CanChangeFiremode()
 	    && !IsReloading()
 	    && !IsWeaponLocked();
 }
+
+
+/**
+ Changes the firemode at the next possible time.
+ 
+ @par number the desired fire mode index.
+ @version 0.3.0
+ */
+public func ScheduleSetFiremode(int number)
+{
+	if (this->~CanChangeFiremode())
+	{
+		SetFiremode(number);
+	}
+	else
+	{
+		var schedule = GetEffect("IntChangeFiremodeEffect", this) ?? CreateEffect(IntChangeFiremodeEffect, 1, 1);
+		schedule.mode = number;
+	}
+}
+
+
+/**
+ Gets the scheduled fire mode
+ 
+ @return the fire mode index.
+ @version 0.3.0
+ */
+public func GetScheduledFiremode()
+{
+	var schedule = GetEffect("IntChangeFiremodeEffect", this);
+	
+	if (schedule)
+	{
+		return schedule.mode;
+	}
+	return nil;
+}
+
+
+/**
+ Cancels a scheduled fire mode change.
+
+ @version 0.3.0
+ */
+public func ResetScheduledFiremode()
+{
+	var schedule = GetEffect("IntChangeFiremodeEffect", this);
+	if (schedule)
+	{
+		schedule.mode = nil;
+	}
+}
+
+local IntChangeFiremodeEffect = new Effect
+{
+	Timer = func()
+	{
+		// Stop if there is no mode
+		if (this.mode == nil) return FX_Execute_Kill;
+
+		if (Target->~CanChangeFiremode())
+		{
+			Target->SetFiremode(this.mode);
+			return FX_Execute_Kill;
+		}
+		
+		return FX_OK;
+	}
+};
+
 
 /*-- Ammo --*/
 

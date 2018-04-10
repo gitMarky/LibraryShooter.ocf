@@ -4,7 +4,6 @@
  {@c public func HasInteractionMenu()} must be implemented in order for this to work.
  */
 
-#include Plugin_Firearm_FiremodeBySelection
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -98,15 +97,16 @@ public func OnGUIHoverFiremode(id symbol, proplist action, desc_menu_target, men
 
 public func OnGUIChangeFiremode(id symbol, proplist action, object crew)
 {
-	action.weapon->~ScheduleChangeFiremode(action.firemode);
+	action.weapon->~ScheduleSetFiremode(action.firemode);
 }
 
-public func ChangeFiremode(firemode)
+public func SetFiremode(int number, bool force)
 {
-	_inherited(firemode);
+	var return_value = _inherited(number, force, ...);
 	
 	if (Contained())
 	{
 		Contained()->UpdateInteractionMenus();
 	}
+	return return_value;
 }
