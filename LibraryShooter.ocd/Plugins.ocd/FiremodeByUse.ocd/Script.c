@@ -12,7 +12,7 @@ static const WEAPON_Firemode_Secondary = "secondary";
  */
 public func OnPressUse(object user, int x, int y)
 {
-	this->ScheduleSetFiremode(WEAPON_Firemode_Primary);// TODO - will not work for now, because the function needs an index, not a string
+	this->ScheduleSetFiremode(this->~GetFiremodeByName(WEAPON_Firemode_Primary) ?? 0); // TODO - better than not working at all, but still a temporary solution
 }
 
 /**
@@ -24,7 +24,7 @@ public func OnPressUse(object user, int x, int y)
  */
 public func OnPressUseAlt(object user, int x, int y)
 {
-	this->ScheduleSetFiremode(WEAPON_Firemode_Secondary); // TODO - will not work for now, because the function needs an index, not a string
+	this->ScheduleSetFiremode(this->~GetFiremodeByName(WEAPON_Firemode_Secondary) ?? 1); // TODO - better than not working at all, but still a temporary solution
 }
 
 
