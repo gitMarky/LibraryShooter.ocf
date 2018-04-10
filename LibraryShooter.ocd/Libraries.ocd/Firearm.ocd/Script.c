@@ -1495,32 +1495,33 @@ public func SetFiremode(int number, bool force)
 		return;
 	}
 
-	if (!force)
+	if (force || CanChangeFiremode() || IsFiremodeAvailable(GetFiremode(number)))
 	{
-		if (!CanChangeFiremode())
-			return false;
-		var available = fire_modes[number].condition == nil || this->Call(fire_modes[number].condition);
-		if (!available)
-			return false;
+		selected_firemode = number;
+		return true;
 	}
-
-	selected_firemode = number;
-	return true;
+	else
+	{
+		return false;
+	}
 }
 
 /**
- Gets the currently selected fire mode.@br
+ Gets the currently selected fire mode, or an indexed fire mode.@br
+ @par number The fire mode index in the array {@link Library_Firearm#GetFiremodes}, 
+             or if you pass {@c nil} the currently selected fire mode.
  @return A {@c proplist} containing the fire mode information.
  @version 0.1.0
  */
-public func GetFiremode()
+public func GetFiremode(int number)
 {
-	if (selected_firemode < 0 || selected_firemode >= GetLength(fire_modes))
+	number = number ?? selected_firemode;
+	if (number < 0 || number >= GetLength(fire_modes))
 	{
-		FatalError(Format("The selected fire mode (%v) is out of range of all configured fire modes (%v)", selected_firemode, GetLength(fire_modes)));
+		FatalError(Format("The fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
 		return;
 	}
-	return fire_modes[selected_firemode];
+	return fire_modes[number];
 }
 
 /**
@@ -1549,16 +1550,32 @@ public func GetAvailableFiremodes()
 
 	for (var i = 0; i < GetLength(GetFiremodes()); ++i) // firemode in GetFiremodes())
 	{
-		var firemode = GetFiremodes()[i];
+		var firemode = GetFiremode(i);
 
-		var is_available = firemode.condition == nil || this->Call(firemode.condition);
+		var is_available = IsFiremodeAvailable(firemode);
 
 		if (is_available)
+		{
 			PushBack(available, firemode);
+		}
 	}
 
 	return available;
 }
+
+
+func IsFiremodeAvailable(proplist firemode) // TODO: Temporary function => firemode should be base on a proplist prototype that has a function IsAvailable()
+{
+	if (firemode)
+	{
+		return firemode.condition == nil || this->Call(firemode.condition);
+	}
+	else
+	{
+		return false;
+	}
+}
+
 
 /**
  Delete all configured fire modes.@br
