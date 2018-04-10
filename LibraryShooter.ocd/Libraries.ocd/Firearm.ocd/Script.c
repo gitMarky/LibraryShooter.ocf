@@ -1088,6 +1088,17 @@ func CheckCooldown(object user, proplist firemode)
 		StartCooldown(user, firemode);
 }
 
+/**
+ Will start the cooldown process if the weapon or fire mode need cooling down. Can be called multiple times even if the cooldown is already in progress.@br@br
+
+ This function does the following:
+ - check if cooldown is needed ({@link Library_Firearm#NeedsCooldown}) or if the fire mode requires a cooldown.@br
+ - if no, call {@link Library_Firearm#OnSkipCooldown}.@br
+ - if yes, create a cooldown effect if not already present, call {@link Library_Firearm#OnStartCooldown}.@br
+ @par user The object that is using the weapon.
+ @par firemode A proplist containing the fire mode information.
+ @version 0.2.0
+*/
 func StartCooldown(object user, proplist firemode)
 {
 	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode))
@@ -1095,7 +1106,7 @@ func StartCooldown(object user, proplist firemode)
 		this->OnSkipCooldown(user, firemode);
 		return;
 	}
-	
+
 	var effect = IsCoolingDown();
 
 	if (effect == nil)
@@ -1105,11 +1116,20 @@ func StartCooldown(object user, proplist firemode)
 	}
 }
 
+/**
+ Simply forwards a call to {@link Library_Firearm#OnFinishCooldown}.@br
+ @version 0.2.0
+*/
 func DoCooldown(object user, proplist firemode)
 {
 	this->OnFinishCooldown(user, firemode);
 }
 
+/**
+ Checks if the weapon is currently cooling down.@br
+ @return The cooldown effect.
+ @version 0.2.0
+*/
 func IsCoolingDown()
 {
 	return GetEffect("IntCooldown", this);
@@ -1119,8 +1139,7 @@ func IsCoolingDown()
  Condition when the weapon needs a cooldown.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @return {@c true} by default. Overload this function
-         for a custom condition.
+ @return {@c true} by default. Overload this function for a custom condition.
  @version 0.1.0
  */
 public func NeedsCooldown(object user, proplist firemode)
@@ -1129,7 +1148,7 @@ public func NeedsCooldown(object user, proplist firemode)
 }
 
 /**
- Callback: the weapon starts cooldown. Does nothing by default.
+ Callback: the weapon starts cooling down. Does nothing by default.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
  @version 0.1.0
