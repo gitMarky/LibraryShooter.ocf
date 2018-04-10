@@ -366,11 +366,11 @@ func IsWeaponReadyToUse(object user)
 /**
  Interface for signaling that the user is ready to use (attack).
  @par user The object that is trying to use this weapon. 
- @return true, if the object is ready to use. By default, this is returns HasHandAction from the user.
+ @return true, if the object is ready to use. By default, it is true.
  */
 func IsUserReadyToUse(object user)
 {
-	return user->HasHandAction();
+	return true;
 }
 
 /**
