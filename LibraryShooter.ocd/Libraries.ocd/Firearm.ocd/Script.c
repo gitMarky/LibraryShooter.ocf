@@ -1622,8 +1622,7 @@ public func SetFiremode(int number, bool force)
  */
 public func GetFiremode(int number)
 {
-	if (number == nil)
-		number = selected_firemode;
+	number = number ?? selected_firemode;
 	if (number < 0 || number >= GetLength(fire_modes))
 	{
 		FatalError(Format("The fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
