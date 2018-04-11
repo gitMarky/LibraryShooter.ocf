@@ -45,6 +45,8 @@
 	@version 0.1.0
 */
 
+local shoot_on_release = true;
+
 /*-- Important Library Properties --*/
 
 local is_using = false;    // bool: is the user holding the fire button
@@ -146,9 +148,9 @@ public func ControlUseStart(object user, int x, int y)
 	if (this->OnPressUse(user, x, y))
 		return true;
 
-	user->StartAim(this);
+	//user->StartAim(this);
 
-	ControlUseHolding(user, x, y);
+	//ControlUseHolding(user, x, y);
 
 	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
 	//	Fire(user, x, y); //user->GetAimPosition());
@@ -266,6 +268,10 @@ public func ControlUseStop(object user, int x, int y)
 	if (this->OnUseStop(user, x, y))
 		return true;
 
+	if (shoot_on_release)
+	{
+		DoFireCycle(user, x, y, false);
+	}
 	CancelUsing();
 
 	CancelCharge(user, x, y, GetFiremode(), true);
@@ -723,16 +729,27 @@ func IsReadyToFire()
 */
 func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 {
+	if (!user->IsAiming())
+	{
+		user->StartAim(this);
+	}
+	
 	var angle = GetAngle(x, y);
 	user->~SetAimPosition(angle);
-
+	
 	if (is_pressing_trigger)
+	{
 		is_using = true;
-
-	if (IsReadyToFire())
-		if (!StartReload(user, x, y))
-			if (!StartCharge(user, x, y))
-				Fire(user, x, y);
+	}
+	
+	var fire_now = is_pressing_trigger != shoot_on_release;
+	if (fire_now
+	&&  IsReadyToFire()
+	&& !StartReload(user, x, y)
+	&& !StartCharge(user, x, y))
+	{
+		Fire(user, x, y);
+	}
 }
 
 /**
@@ -1140,6 +1157,12 @@ func StartCooldown(object user, proplist firemode)
 	{
 		CreateEffect(IntCooldownEffect, 1, firemode.delay_cooldown, user, firemode);
 		this->OnStartCooldown(user, firemode);
+	}
+	
+	// TODO: Not sure if this is the best place to stop aiming
+	if (shoot_on_release && user->IsAiming())
+	{
+		user->StopAim();
 	}
 }
 
