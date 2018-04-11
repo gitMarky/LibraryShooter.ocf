@@ -7,39 +7,39 @@
 	After that, one shot will be fired. A shot can, however, fire multiple projectiles at once (e.g. firing a shotgun).@br
 	The weapon will then start the recovery process if needed. Recovery is the delay between two consecutive shots and is therefore only necessary for automatic or burst fire modes. The weapon will go over to firing shots again after recovery finished.@br
 	Last, the cooldown procedure will start. Weapons cannot fire again until the cooldown has been finished. Example: A powerful railgun that needs some time to cool off after a shot.@br
-	@note Firemodes
-	Each weapon must define at least one fire mode. fire_mode_default provides an example of how these could look and can also be used as a Prototype.@br
+	@note Fire modes
+	Each weapon must define at least one fire mode. fire_mode_default provides an example of how these could look and should also be used as a Prototype, to provide default values.@br
 	A fire mode is a proplist that can define the following properties:@br
 	mode: Integer. Must be set. This defines the basic firing mode. Can simply be one of the following constants:@br
-	- WEAPON_FM_Single: single shot style, only shot per click is fired.@br
+	- WEAPON_FM_Single: single shot style, only shot per click is fired (default).@br
 	- WEAPON_FM_Burst: burst style, firing a set number of shot in short succession.@br
 	- WEAPON_FM_Auto: auto style, firing as long as the use button is pressed.@br
-	name: A string containing the name of this fire mode. Unnecessary if no GUI exists that displays the name.@br
-	icon: ID of a definition icon for the fire mode. Unnecessary if no GUI exists that displays the icon.@br
-	condition: A string corresponding to a function name. The fire mode will not be marked as 'available' unless the condition functions return true. Example: An upgraded weapon could offer more fire modes.@br
-	ammo_id: A definition that represents ammunition for the fire mode.@br
-	ammo_usage: Integer. How much ammunition is needed per ammo_rate shots.@br
-	ammo_rate: Integer. See ammo_usage.@br
-	delay_charge: Integer. Charge duration in frames. If 0 or nil, no charge is required.@br
-	delay_recover: Integer. Recovery duration in frames. If 0 or nil, no recovery is required.@br
-	delay_cooldown: Integer. Cooldown duration in frames. If 0 or nil, no cooldown is required.@br
-	delay_reload: Integer. Reload duration in frames. If 0 or nil, reloading is instantaneous.@br
-	damage: Integer. Amount of damage a projectile does.@br
-	damage_type: Integer. Defining a damage type. Damage type handling is not done by this library and should be handled by any implementation.@br
-	projectile_id: A definition of the actual projectile that is being fired. These are created on the fly and must therefore not be created beforehand.@br
-	projectile_speed: Integer. Firing speed of a projectile.@br
-	projectile_range: Integer. Maximum range a projectile flies.@br
-	projectile_distance: Integer. Distance the projectile is being created away from the shooting object.@br
-	projectile_offset_y: Integer. Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center.@br
-	projectile_number: Integer. How many projectiles are fired in a single shot.@br
+	name: A string containing the name of this fire mode. Unnecessary if no GUI exists that displays the name (default: Standard).@br
+	icon: ID of a definition icon for the fire mode. Unnecessary if no GUI exists that displays the icon (default: nil).@br
+	condition: A string corresponding to a function name. The fire mode will not be marked as 'available' unless the condition functions return true. Example: An upgraded weapon could offer more fire modes (default: nil).@br
+	ammo_id: A definition that represents ammunition for the fire mode (default: nil).@br
+	ammo_usage: Integer. How much ammunition is needed per ammo_rate shots (default: 1).@br
+	ammo_rate: Integer. See ammo_usage (default: 1).@br
+	delay_charge: Integer. Charge duration in frames. If 0 or nil, no charge is required (default: 0).@br
+	delay_recover: Integer. Recovery duration in frames. If 0 or nil, no recovery is required (default: 0).@br
+	delay_cooldown: Integer. Cooldown duration in frames. If 0 or nil, no cooldown is required (default: 0).@br
+	delay_reload: Integer. Reload duration in frames. If 0 or nil, reloading is instantaneous (default: 0).@br
+	damage: Integer. Amount of damage a projectile does (default: 10).@br
+	damage_type: Integer. Defining a damage type. Damage type handling is not done by this library and should be handled by any implementation (default: nil).@br
+	projectile_id: A definition of the actual projectile that is being fired. These are created on the fly and must therefore not be created beforehand (default: NormalBullet).@br
+	projectile_speed: Integer. Firing speed of a projectile (default: 100).@br
+	projectile_range: Integer. Maximum range a projectile flies (default: 600).@br
+	projectile_distance: Integer. Distance the projectile is being created away from the shooting object (default: 10).@br
+	projectile_offset_y: Integer. Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center (default: -6).@br
+	projectile_number: Integer. How many projectiles are fired in a single shot (default: 1).@br
 	projectile_spread: Array with two integers. Deviation of a projectile from the firing angle and a precision parameter.@br
-	spread: Array of integers. Additional deviation added by certain effects (e.g. continuous firing).@br
-	burst: Integer. Number of shots being fired when using burst mode style.@br
-	auto_reload: Boolean. If true, the weapon reloads even if the use button is not held.@br
-	anim_shoot_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general aim animation.@br
-	anim_load_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general reload animation.@br
-	walk_speed_front: Integer. Forwards walking speed to be returned for the animation set (usually when being used by a Clonk).@br
-	walk_speed_back: Integer. Backwards walking speed to be returned for the animation set (usually when being used by a Clonk).@br
+	spread: Array of integers. Additional deviation added by certain effects (e.g. continuous firing) (default: [1, 100]).@br
+	burst: Integer. Number of shots being fired when using burst mode style (default: 0).@br
+	auto_reload: Boolean. If true, the weapon reloads even if the use button is not held (default: false).@br
+	anim_shoot_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general aim animation (default: nil).@br
+	anim_load_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general reload animation (default: nil).@br
+	walk_speed_front: Integer. Forwards walking speed to be returned for the animation set (usually when being used by a Clonk) (default: nil).@br
+	walk_speed_back: Integer. Backwards walking speed to be returned for the animation set (usually when being used by a Clonk) (default: nil).@br
 	@author Marky
 	@credits Hazard Team, Zapper
 	@version 0.1.0
@@ -65,9 +65,9 @@ local fire_mode_default =
 	ammo_usage =          1, // int - this many units of ammo
 	ammo_rate =           1, // int - per this many shots fired
 	delay_charge =        0, // int, frames - time that the button must be held before the shot is fired
-	delay_recover =       7, // int, frames - time between consecutive shots
+	delay_recover =       0, // int, frames - time between consecutive shots
 	delay_cooldown =      0, // int, frames - time of cooldown after the last shot is fired
-	delay_reload =        6, // int, frames - time to reload
+	delay_reload =        0, // int, frames - time to reload
 	damage =              10,
 	damage_type =         nil,
 	projectile_id =       NormalBullet,
@@ -84,6 +84,9 @@ local fire_mode_default =
 	anim_load_name =      nil, // for animation set: reload animation
 	walk_speed_front =    nil, // for animation set: relative walk speed
 	walk_speed_back =     nil, // for animation set: relative walk speed
+
+	// Getters and Setters
+	Prototype = Library_Firearm_Firemode,
 };
 
 local weapon_properties = 
@@ -1553,6 +1556,38 @@ local IntReloadEffect = new Effect {
 /*-- Firemodes --*/
 
 /**
+ Create a new, writable fire mode.@br
+ With this function, fire modes can be created during runtime. However, this should not be used to create all fire modes of a weapon, if it is not intended to ever write new values into these. In that case, fire modes should be defined as static (read-only) proplists in the definition.@br
+ The newly created fire mode will inherit all information from fire_mode_default.@br
+ @par add A boolean, if true the fire mode will be added to the weapon ({@link Library_Firearm#AddFiremode}).
+ @return The proplist of the newly created firemode
+ @version 0.3.0
+*/
+public func CreateFiremode(bool add)
+{
+	var new_mode = { Prototype = fire_mode_default };
+	if (add)
+		AddFiremode(new_mode);
+	return add;
+}
+
+/**
+ Replace a fire mode with a writable copy of itself. With this, you can make fire modes writable during runtime if needed.@br
+ @par number The index of the fire mode in the fire modes array.
+ @version 0.3.0
+*/
+public func MakeFiremodeWritable(int number)
+{
+	if (number < 0 || number >= GetLength(fire_modes))
+	{
+		FatalError(Format("The fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
+		return;
+	}
+
+	fire_modes[number] = { Prototype = fire_modes[number] };
+}
+
+/**
  Sets a new fire mode.@br
  @par number The number key in the fire modes array to select.
  @par force If true, the fire mode is changed without checking whether the fire mode can currently be changed or if the condition is met.
@@ -1598,7 +1633,7 @@ public func GetFiremode(int number)
 
 /**
  Gets the index of a fire mode.
- 
+
  @par firemode The fire mode proplist
  @par available If set to {@c false} this will check {@link Library_Firearm#GetFiremodes()}, and if 
                 set to {@c true} it will check {@link Library_Firearm#GetAvailableFiremodes()}.
@@ -1655,7 +1690,6 @@ public func GetAvailableFiremodes()
 	return available;
 }
 
-
 func IsFiremodeAvailable(proplist firemode) // TODO: Temporary function => firemode should be base on a proplist prototype that has a function IsAvailable()
 {
 	if (firemode)
@@ -1667,7 +1701,6 @@ func IsFiremodeAvailable(proplist firemode) // TODO: Temporary function => firem
 		return false;
 	}
 }
-
 
 /**
  Delete all configured fire modes.@br
@@ -1701,7 +1734,6 @@ public func CanChangeFiremode()
 	    && !IsWeaponLocked();
 }
 
-
 /**
  Changes the firemode at the next possible time.
  
@@ -1721,7 +1753,6 @@ public func ScheduleSetFiremode(int number)
 	}
 }
 
-
 /**
  Gets the scheduled fire mode
  
@@ -1731,14 +1762,13 @@ public func ScheduleSetFiremode(int number)
 public func GetScheduledFiremode()
 {
 	var schedule = GetEffect("IntChangeFiremodeEffect", this);
-	
+
 	if (schedule)
 	{
 		return schedule.mode;
 	}
 	return nil;
 }
-
 
 /**
  Cancels a scheduled fire mode change.
@@ -1766,11 +1796,10 @@ local IntChangeFiremodeEffect = new Effect
 			Target->SetFiremode(this.mode);
 			return FX_Execute_Kill;
 		}
-		
+
 		return FX_OK;
 	}
 };
-
 
 /*-- Ammo --*/
 
