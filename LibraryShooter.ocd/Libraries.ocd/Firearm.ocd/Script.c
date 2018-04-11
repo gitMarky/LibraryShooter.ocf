@@ -107,6 +107,43 @@ local animation_set = {
 	WalkBack       = nil,
 };
 
+/*-- Settings --*/
+
+/**
+ An important general setting that should be decided on for as a whole in an implementation and best not be mixed throughout a pack.@br
+ If returns true, {@link Library_Firearm#ControlUseStart} will initiate the aiming procedure. As long as the use button is not pressed, it is then assumed that the weapon is simply held ready.@br
+ Single shot and burst fire modes will only fire on {@link Library_Firearm#ControlUseStop}, giving the user time to take aim as long as the use button is held.@br
+ Automatic weapons will fire right away.@br
+ If set to false, the weapon itself will not make the user aim and it must be initiated elsewhere, e.g. a clonk can always aim when the weapon is selected.@br
+ You can use the Mouse1Move key assignment to continuously forward cursor updates to the script.@br
+ @return {@c true} by default.
+ @version 0.3.0
+*/
+public func Setting_AimOnUseStart()
+{
+	return true;
+}
+
+/**
+ Check if the weapon should fire on a call of {@link Library_Firearm#ControlUseHolding}.@br
+ @return {@c true} if either {@link Library_Firearm#Setting_AimOnUseStart} is false or if the selected fire mode is an automatic one.
+ @version 0.3.0
+*/
+func FireOnHolding()
+{
+	return !Setting_AimOnUseStart() || GetFiremode().mode == WEAPON_FM_Auto;
+}
+
+/**
+ Check if the weapon should fire on a call of {@link Library_Firearm#ControlUseStop}.@br
+ @return {@c true} if {@link Library_Firearm#Setting_AimOnUseStart} is true and if the selected fire mode is not an automatic one.
+ @version 0.3.0
+*/
+func FireOnStopping()
+{
+	return Setting_AimOnUseStart() && GetFiremode().mode != WEAPON_FM_Auto;
+}
+
 /*-- Engine Callbacks --*/
 
 /**
@@ -128,8 +165,7 @@ func Initialize()
 
  The function does the following:@br
  - call {@link Library_Firearm#OnPressUse}@br
- - tell the user to start aiming@br
- - call {@link Library_Firearm#ControlUseHolding}@br
+ - tell the user to start aiming if {@link Library_Firearm#Setting_AimOnUseStart} is set and call {@link Library_Firearm#ControlUseHolding}@br
  - call {@link Library_Firearm#Fire}@br
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
@@ -146,12 +182,12 @@ public func ControlUseStart(object user, int x, int y)
 	if (this->OnPressUse(user, x, y))
 		return true;
 
-	user->StartAim(this);
+	if (Setting_AimOnUseStart())
+	{
+		user->StartAim(this);
+		ControlUseHolding(user, x, y);
+	}
 
-	ControlUseHolding(user, x, y);
-
-	//if(!weapon_properties.delay_shot && !weapon_properties.full_auto)
-	//	Fire(user, x, y); //user->GetAimPosition());
 	return true;
 }
 
@@ -247,6 +283,8 @@ public func ControlUseAltHolding(object user, int x, int y)
 
  The function does the following:@br
  - call {@link Library_Firearm#OnUseStop}@br
+ - check {@link Library_Firearm#FireOnStopping} and if true, stop aiming, leave the rest to {@link Library_Firearm#FinishedAiming}, otherwise do the following:@br
+ - still stop aiming if {@link Library_Firearm#Setting_AimOnUseStart} is true.@br
  - call {@link Library_Firearm#CancelUsing}@br
  - call {@link Library_Firearm#CancelCharge}@br
  - call {@link Library_Firearm#CancelReload}@br
@@ -266,14 +304,24 @@ public func ControlUseStop(object user, int x, int y)
 	if (this->OnUseStop(user, x, y))
 		return true;
 
-	CancelUsing();
-
-	CancelCharge(user, x, y, GetFiremode(), true);
-	CancelReload(user, x, y, GetFiremode(), true);
-
-	if (!IsRecovering())
+	if (FireOnStopping())
 	{
-		CheckCooldown(user, GetFiremode());
+		user->~StopAim();
+	}
+	else
+	{
+		if (Setting_AimOnUseStart())
+			user->~StopAim();
+
+		CancelUsing();
+
+		CancelCharge(user, x, y, GetFiremode(), true);
+		CancelReload(user, x, y, GetFiremode(), true);
+
+		if (!IsRecovering())
+		{
+			CheckCooldown(user, GetFiremode());
+		}
 	}
 
 	return true;
@@ -712,8 +760,9 @@ func IsReadyToFire()
  This function does the following:@br
  - set the aiming angle for the user@br
  - check {@link Library_Firearm#IsReadyToFire}@br
- - check {@link Library_Firearm#StartReload}@br
+ - check {@link Library_Firearm#IsReadyToFire}@br
  - check {@link Library_Firearm#StartCharge}@br
+ - check {@link Library_Firearm#FireOnHolding}@br
  - if all of the above check out, call {@link Library_Firearm#Fire}@br
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
@@ -732,7 +781,30 @@ func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 	if (IsReadyToFire())
 		if (!StartReload(user, x, y))
 			if (!StartCharge(user, x, y))
-				Fire(user, x, y);
+				if (FireOnHolding())
+					Fire(user, x, y);
+}
+
+/**
+ Called by the clonk (Aim Manager) when aiming is stopped. Fires a shot if ready.@br
+ Checks: {@link Library_Firearm#IsReadyToFire}.@br
+ @par user The object that is using the weapon.
+ @par angle The firing angle the user is aiming at.
+ @version 0.3.0
+*/
+func FinishedAiming(object user, int angle)
+{
+	if (!FireOnStopping())
+		return;
+	if (!is_using)
+		return;
+	if (!IsReadyToFire())
+		return;
+
+	var x = +Sin(angle, 20);
+	var y = -Cos(angle, 20);
+
+	Fire(user, x, y);
 }
 
 /**
