@@ -12,9 +12,7 @@
  - two modes for distributing/saving ammo: abstract (variables) or with objects
 */
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// global functions
+/* --- Global functions and constants --- */
 
 // these are numbers and should not be used as bits
 static const AMMO_Source_Local = 1;	// ammo is saved as numbers
@@ -22,18 +20,6 @@ static const AMMO_Source_Items = 2;		// ammo is saved from collected items, such
 
 static const AMMO_Source_Container = 3;	// ammo is saved in the carrier of the weapon (as in arcade games)
 static const AMMO_Source_Infinite = 4;	// ammo is unlimited - yay for cheats
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// definitions
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// finished functions
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// non-functional and temporary stuff
 
 /**
  Tells the object where to get its ammunition from.@br
