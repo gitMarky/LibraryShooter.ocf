@@ -302,15 +302,11 @@ public func ControlUseStop(object user, int x, int y)
 	if (this->OnUseStop(user, x, y))
 		return true;
 
-	if (FireOnStopping())
-	{
+	if (FireOnStopping() || Setting_AimOnUseStart())
 		user->~StopAim();
-	}
-	else
-	{
-		if (Setting_AimOnUseStart())
-			user->~StopAim();
 
+	if (FireOnHolding())
+	{
 		CancelUsing();
 
 		CancelCharge(user, x, y, GetFiremode(), true);
@@ -779,7 +775,7 @@ func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 	if (IsReadyToFire())
 		if (!StartReload(user, x, y))
 			if (!StartCharge(user, x, y))
-				if (FireOnHolding())
+				if (FireOnHolding() || !is_pressing_trigger)
 					Fire(user, x, y);
 }
 
