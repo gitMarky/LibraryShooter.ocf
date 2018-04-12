@@ -168,8 +168,6 @@ func Initialize()
 
  The function does the following:@br
  - call {@link Library_Firearm#OnPressUse}@br
- - tell the user to start aiming if {@link Library_Firearm#Setting_AimOnUseStart} is set and call {@link Library_Firearm#ControlUseHolding}@br
- - call {@link Library_Firearm#Fire}@br
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
@@ -182,14 +180,7 @@ public func ControlUseStart(object user, int x, int y)
 		FatalError("The function expects a user that is not nil");
 	}
 
-	if (this->OnPressUse(user, x, y))
-		return true;
-
-	if (Setting_AimOnUseStart())
-	{
-		user->StartAim(this);
-		ControlUseHolding(user, x, y);
-	}
+	this->OnPressUse(user, x, y);
 
 	return true;
 }
@@ -240,7 +231,8 @@ public func ControlUseHolding(object user, int x, int y)
 
  The function does the following:@br
  - check if the {@link Library_Firearm#RejectUse} is true, if it is, {@link Library_Firearm#ControlUseStop} is called@br
- - call {@link Library_Firearm#DoFireCycle}
+ - start aiming if {@link Library_Firearm#Setting_AimOnUseStart} is set.@br
+ - call {@link Library_Firearm#DoFireCycle}@br
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aiming at. Relative to the user.
@@ -258,6 +250,9 @@ public func ControlFireHolding(object user, int x, int y)
 		ControlUseStop(user, x, y);
 		return false;
 	}
+
+	if (Setting_AimOnUseStart() && !user->~IsAiming())
+		user->~StartAim(this);
 
 	DoFireCycle(user, x, y, true);
 
