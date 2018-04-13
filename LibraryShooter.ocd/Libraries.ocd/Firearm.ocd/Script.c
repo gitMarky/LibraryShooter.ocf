@@ -21,7 +21,7 @@
 	ammo_usage: Integer. How much ammunition is needed per ammo_rate shots (default: 1).@br
 	ammo_rate: Integer. See ammo_usage (default: 1). As ammo handling is not part the library, this has to be implemented (or include {@link Library_Firearm_AmmoLogic}).@br
 	delay_charge: Integer. Charge duration in frames. If 0 or nil, no charge is required (default: 0).@br
-	delay_recover: Integer. Recovery duration in frames. If 0 or nil, no recovery is required (default: 0).@br
+	delay_recover: Integer. Recovery duration in frames. If 0 or nil, no recovery is required (default: 1).@br
 	delay_cooldown: Integer. Cooldown duration in frames. If 0 or nil, no cooldown is required (default: 0).@br
 	delay_reload: Integer. Reload duration in frames. If 0 or nil, reloading is instantaneous (default: 0).@br
 	damage: Integer. Amount of damage a projectile does (default: 10).@br
@@ -65,7 +65,7 @@ local fire_mode_default =
 	ammo_usage =          1, // int - this many units of ammo
 	ammo_rate =           1, // int - per this many shots fired
 	delay_charge =        0, // int, frames - time that the button must be held before the shot is fired
-	delay_recover =       0, // int, frames - time between consecutive shots
+	delay_recover =       1, // int, frames - time between consecutive shots
 	delay_cooldown =      0, // int, frames - time of cooldown after the last shot is fired
 	delay_reload =        0, // int, frames - time to reload
 	damage =              10,
