@@ -19,7 +19,7 @@
 	condition: A string corresponding to a function name. The fire mode will not be marked as 'available' unless the condition functions return true. Example: An upgraded weapon could offer more fire modes (default: nil).@br
 	ammo_id: A definition that represents ammunition for the fire mode (default: nil).@br
 	ammo_usage: Integer. How much ammunition is needed per ammo_rate shots (default: 1).@br
-	ammo_rate: Integer. See ammo_usage (default: 1).@br
+	ammo_rate: Integer. See ammo_usage (default: 1). As ammo handling is not part the library, this has to be implemented (or include {@link Library_Firearm_AmmoLogic}).@br
 	delay_charge: Integer. Charge duration in frames. If 0 or nil, no charge is required (default: 0).@br
 	delay_recover: Integer. Recovery duration in frames. If 0 or nil, no recovery is required (default: 0).@br
 	delay_cooldown: Integer. Cooldown duration in frames. If 0 or nil, no cooldown is required (default: 0).@br
@@ -96,7 +96,6 @@ local weapon_properties =
 };
 
 local shot_counter; // proplist
-local ammo_rate_counter; // proplist
 local selected_firemode; // int
 
 local animation_set = {
@@ -147,6 +146,17 @@ func FireOnStopping()
 	return Setting_AimOnUseStart() && GetFiremode().mode != WEAPON_FM_Auto;
 }
 
+/**
+ If returns true, it is assumed that all functions regarding ammunition handling are configured as desired.@br
+ Ammunition handling can be done by for example by including {@link Library_AmmoManager}@br
+ @return {@link Global#inherited} by default.
+ @version 0.3.0
+*/
+public func Setting_WithAmmoLogic()
+{
+	return _inherited();
+}
+
 /*-- Engine Callbacks --*/
 
 /**
@@ -155,7 +165,6 @@ func FireOnStopping()
 func Initialize()
 {
 	shot_counter = {};
-	ammo_rate_counter = {};
 	selected_firemode = 0;
 
 	_inherited();
@@ -917,7 +926,6 @@ func FireProjectiles(object user, int angle, proplist firemode)
 	}
 
 	shot_counter[firemode.name]++;
-	ammo_rate_counter[firemode.name]--;
 
 	HandleAmmoUsage(firemode);
 }
@@ -1800,7 +1808,7 @@ local IntChangeFiremodeEffect = new Effect
  @par amount The change, can be positive or negative.
              The amount of ammunition cannot be changed beyond the capacity
              of the object, so the actual amount by which the ammunition was
-             changed will be returned. 
+             changed will be returned.
  @return The actual change that happened.
  @author Marky
  @version 0.3.0
@@ -1814,103 +1822,19 @@ public func DoAmmo(id ammo, int amount)
 }
 
 /**
- Checks whether the weapon has ammo.
- 
+ Checks whether the weapon has ammo.@br
+ Not implemented by default and will always return true (infinite ammo) as long as {@link Library_Firearm#Setting_WithAmmoLogic} is not implemented. Otherwise calls _inherited.@br
  @par firemode The ammo type for this firemode is checked.
  @return bool Returns {@code true} if the weapon has enough ammo for the firemode
  @version 0.2.0
  */
 public func HasAmmo(proplist firemode)
 {
-	// Has no ammo if outside of a container
-	if (this->GetAmmoSource(firemode) == AMMO_Source_Container && !this->GetAmmoContainer())
-	{
-		return false;
-	}
+	// No ammo handling set up, infinite ammo
+	if (!Setting_WithAmmoLogic())
+		return true;
 
-	return this->GetAmmo(firemode) >= firemode.ammo_usage			// enough ammo for the firemode?
-	    || ammo_rate_counter[firemode.name] > 0						// or ammo left from previously using the weapon?
-	    || this->GetAmmoSource(firemode) == AMMO_Source_Infinite;	// or infinite ammo
-}
-
-/**
- Overrides func {@link Library_AmmoManager#GetAmmo}, so that you can ask the
- amount of ammunition for a specific firemode.
- 
- @par type_or_firemode You can pass an ID as in the original implementation,
-                       or you can pass a firemode. If you pass {@code nil}
-                       the value for {@link Library_Weapon#func GetFiremode} is
-                       requested. The method will fail if the proplist is not a
-                       firemode.
- @return int The current amount of ammunition for an ID or firemode.
- @version 0.2.0
- */
-public func GetAmmo(type_or_firemode)
-{
-	if (GetType(type_or_firemode) == C4V_Def)
-	{
-		return _inherited(type_or_firemode, ...);
-	}
-	else if (GetType(type_or_firemode) == C4V_PropList)
-	{
-		return _inherited(type_or_firemode.ammo_id, ...);
-	}
-	else if (GetType(type_or_firemode) == C4V_Nil)
-	{
-		var fm = GetFiremode();
-		if (fm == nil)
-		{
-			FatalError("Cannot get firemode!");
-		}
-		else
-		{
-			return GetAmmo(fm);
-		}
-	}
-	else
-	{
-		FatalError(Format("You have to specify an id or proplist (firemode), but you specified %v", GetType(type_or_firemode)));
-	}
-}
-
-/**
- Overrides func {@link Library_AmmoManager#GetAmmoSource}, so that you can ask the
- ammo source for a specific firemode.
- 
- @par type_or_firemode You can pass an ID as in the original implementation,
-                       or you can pass a firemode. If you pass {@code nil}
-                       the value for {@link Library_Weapon#func GetFiremode} is
-                       requested. The method will fail if the proplist is not a
-                       firemode.
- @return int The current source of ammunition for an ID or firemode.
- @version 0.2.0
- */
-public func GetAmmoSource(type_or_firemode)
-{
-	if (GetType(type_or_firemode) == C4V_Def)
-	{
-		return _inherited(type_or_firemode, ...);
-	}
-	else if (GetType(type_or_firemode) == C4V_PropList)
-	{
-		return _inherited(type_or_firemode.ammo_id, ...);
-	}
-	else if (GetType(type_or_firemode) == C4V_Nil)
-	{
-		var fm = GetFiremode();
-		if (fm == nil)
-		{
-			FatalError("Cannot get firemode!");
-		}
-		else
-		{
-			return _inherited(fm, ...);
-		}
-	}
-	else
-	{
-		FatalError(Format("You have to specify an id or proplist (firemode), but you specified %v", GetType(type_or_firemode)));
-	}
+	return _inherited(firemode);
 }
 
 /**
@@ -1926,57 +1850,19 @@ public func OnNoAmmo(object user, proplist firemode)
 }
 
 /**
- Callback: The weapon ammo in the weapon changes.
-
- @par ammo_type The ammo that was affected.
+ Called after {@link Library_Firearm#FireProjectiles}. Should somehow reduce ammo.@br
+ Not implemented by default and will always return true (infinite ammo) as long as {@link Library_Firearm#Setting_WithAmmoLogic} is not implemented. Otherwise calls _inherited.@br
+ @par firemode The ammo type for this firemode is checked.
+ @return bool Returns {@code true} if the weapon has enough ammo for the firemode
  @version 0.2.0
  */
-public func OnAmmoChange(id ammo_type)
-{
-}
-
 func HandleAmmoUsage(proplist firemode)
 {
-	// default values
-	var rate = firemode.ammo_rate ?? 1;
-	var ammo_type = firemode.ammo_id;
-	var ammo_requested = firemode.ammo_usage ?? 1;
+	// No ammo handling set up, infinite ammo
+	if (!Setting_WithAmmoLogic())
+		return true;
 
-	// status
-	var ammo_changed = false;
-	var enough_ammo = true;
-
-	// only use actual ammo if there is no spare ammo per ammo rate
-	if (ammo_rate_counter[firemode.name] <= 0)
-	{
-		var ammo_available = GetAmmo(ammo_type);
-		
-		// cancel if not enough ammo
-		if (ammo_available < ammo_requested)
-		{
-			enough_ammo = false;
-		}
-		else
-		{
-			// undo if something went wrong
-			var ammo_received = Abs(DoAmmo(ammo_type, -ammo_requested));
-			if (ammo_received < ammo_requested)
-			{
-				DoAmmo(ammo_type, ammo_received);
-				enough_ammo = false;
-			}
-			else // everything ok: fill up the spare ammo per rate, signal that something has changed
-			{
-				ammo_changed = true;
-				ammo_rate_counter[firemode.name] += rate;
-			}
-		}
-	}
-
-	if (ammo_changed)
-	{
-		this->OnAmmoChange(ammo_type);
-	}
+	return _inherited(firemode);
 }
 
 /*-- Locking --*/
