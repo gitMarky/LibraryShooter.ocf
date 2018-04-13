@@ -6,6 +6,7 @@
 	@version 0.3.0
 */
 
+
 /*-- Getters --*/
 
 /**
@@ -65,7 +66,7 @@ public func GetAmmoID()
 */
 public func GetAmmoUsage()
 {
-	return this.ammo_usage;
+	return this.ammo_usage ?? 1;
 }
 
 /**
@@ -75,7 +76,7 @@ public func GetAmmoUsage()
 */
 public func GetAmmoRate()
 {
-	return this.ammo_rate;
+	return this.ammo_rate ?? 1;
 }
 
 /**
