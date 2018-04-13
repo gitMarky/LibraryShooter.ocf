@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
 	Shared functions between all firearms.
 
 	@note Basic workings
@@ -804,8 +804,8 @@ func FinishedAiming(object user, int angle)
 	if (!IsReadyToFire())
 		return;
 
-	var x = +Sin(angle, 20);
-	var y = -Cos(angle, 20);
+	var x = +Sin(angle, 1000);
+	var y = -Cos(angle, 1000);
 
 	Fire(user, x, y);
 }
