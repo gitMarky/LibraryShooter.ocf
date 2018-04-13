@@ -1060,7 +1060,7 @@ func FireRecovery(object user, int x, int y, proplist firemode)
  */
 public func NeedsRecovery(object user, proplist firemode)
 {
-	return true;
+	return false;
 }
 
 /**
