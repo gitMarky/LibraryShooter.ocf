@@ -32,8 +32,8 @@
 	projectile_distance: Integer. Distance the projectile is being created away from the shooting object (default: 10).@br
 	projectile_offset_y: Integer. Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center (default: -6).@br
 	projectile_number: Integer. How many projectiles are fired in a single shot (default: 1).@br
-	projectile_spread: Array with two integers. Deviation of a projectile from the firing angle and a precision parameter.@br
-	spread: Array of integers. Additional deviation added by certain effects (e.g. continuous firing) (default: [1, 100]).@br
+	projectile_spread: Proplist with two integers. Deviation of a projectile from the firing angle and a precision parameter.@br
+	spread: Proplist with two integers. Additional deviation added by certain effects (e.g. continuous firing) (default: { angle: 1, precision: 100 }).@br
 	burst: Integer. Number of shots being fired when using burst mode style (default: 0).@br
 	auto_reload: Boolean. If true, the weapon reloads even if the use button is not held (default: false).@br
 	anim_shoot_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general aim animation (default: nil).@br
@@ -76,8 +76,8 @@ local fire_mode_default =
 	projectile_distance = 10,
 	projectile_offset_y = -6,
 	projectile_number =   1,
-	projectile_spread =   [0, 100], // default inaccuracy of a single projectile
-	spread =              [1, 100], // inaccuracy from prolonged firing
+	projectile_spread =   { angle: 0, precision: 100 }, // default inaccuracy of a single projectile
+	spread =              { angle: 1, precision: 100 }, // inaccuracy from prolonged firing
 	burst =               0, // number of projectiles fired in a burst
 	auto_reload =         false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
 	anim_shoot_name =     nil, // for animation set: shoot animation
