@@ -113,26 +113,51 @@ public func GetFiremodeAmmoSource(type_or_firemode)
  */
 public func GetAmmo(type_or_firemode)
 {
-	var id = type_or_firemode;
-	if (GetType(id) == C4V_PropList)
-		id = id->GetAmmoID();
-	if (id == nil)
+	// Set the type to what makes sense
+	var type;
+	if (GetType(type_or_firemode) == C4V_PropList)
+	{
+		type = type_or_firemode->GetAmmoID();
+	}
+	else if (GetType(type_or_firemode) == C4V_Def)
+	{
+		type = type_or_firemode;
+	}
+	else if (GetType(type) != C4V_Nil)
+	{
+		FatalError("GetAmmo() accepts parameters of types C4V_PropList or C4V_Def only, received %v", GetType(type_or_firemode));
+	}
+	// Otherwise default to the current firemode
+	if (type == nil)
 	{
 		var firemode = this->GetFiremode();
 		if (firemode == nil)
-			return FatalError("Cannot get firemode!");
+		{
+			FatalError("Cannot get firemode!");
+		}
 		else
-			id = firemode->GetAmmoID();
+		{
+			type = firemode->GetAmmoID();
+		}
 	}
-	if (id == nil)
+	// Still nothing? Well...
+	if (type == nil)
+	{
 		FatalError("Cannot get ammunition ID!");
+	}
 
+	// Try handling it
 	if (this->~IsAmmoManager())
-		return _inherited(id);
+	{
+		return _inherited(type);
+	}
 
 	if (GetAmmoContainer())
-		return GetAmmoContainer()->GetAmmo(id);
+	{
+		return GetAmmoContainer()->GetAmmo(type);
+	}
 
+	// Nothing we can do
 	FatalError("Could not get a valid ammo source!");
 }
 
