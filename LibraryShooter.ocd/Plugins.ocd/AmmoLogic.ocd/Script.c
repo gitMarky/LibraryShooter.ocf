@@ -115,7 +115,10 @@ public func GetAmmo(type_or_firemode)
 {
 	// Set the type to what makes sense
 	var type;
-	if (GetType(type_or_firemode) == C4V_PropList)
+	// The parameter may be of the firemode prototype with type C4V_Def; in that case the whole
+	// thing would fail, so we regard this extra case here (this problem occurred in practice).
+	if (GetType(type_or_firemode) == C4V_PropList
+	|| (type_or_firemode != nil && GetPrototype(type_or_firemode) == Library_Firearm_Firemode))
 	{
 		type = type_or_firemode->GetAmmoID();
 	}
