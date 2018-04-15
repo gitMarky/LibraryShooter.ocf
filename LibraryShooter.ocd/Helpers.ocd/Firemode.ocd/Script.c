@@ -36,7 +36,7 @@ public func GetName()
 */
 public func GetIcon()
 {
-	return this.mode;
+	return this.icon;
 }
 
 /**
@@ -268,7 +268,8 @@ public func GetBackwardWalkingSpeed()
 */
 public func SetMode(int value)
 {
-	return this.mode = value;
+	this.mode = value;
+	return this;
 }
 
 /**
@@ -278,7 +279,8 @@ public func SetMode(int value)
 */
 public func SetName(string value)
 {
-	return this.name = value;
+	this.name = value;
+	return this;
 }
 
 /**
@@ -288,7 +290,8 @@ public func SetName(string value)
 */
 public func SetIcon(id value)
 {
-	return this.mode = value;
+	this.icon = value;
+	return this;
 }
 
 /**
@@ -298,7 +301,8 @@ public func SetIcon(id value)
 */
 public func SetCondition(string value)
 {
-	return this.condition = value;
+	this.condition = value;
+	return this;
 }
 
 /**
@@ -308,7 +312,8 @@ public func SetCondition(string value)
 */
 public func SetAmmoID(id value)
 {
-	return this.ammo_id = value;
+	this.ammo_id = value;
+	return this;
 }
 
 /**
@@ -318,7 +323,8 @@ public func SetAmmoID(id value)
 */
 public func SetAmmoUsage(int value)
 {
-	return this.ammo_usage = value;
+	this.ammo_usage = value;
+	return this;
 }
 
 /**
@@ -328,7 +334,8 @@ public func SetAmmoUsage(int value)
 */
 public func SetAmmoRate(int value)
 {
-	return this.ammo_rate = value;
+	this.ammo_rate = value;
+	return this;
 }
 
 /**
@@ -338,7 +345,8 @@ public func SetAmmoRate(int value)
 */
 public func SetChargeDelay(int value)
 {
-	return this.delay_charge = value;
+	this.delay_charge = value;
+	return this;
 }
 
 /**
@@ -348,7 +356,8 @@ public func SetChargeDelay(int value)
 */
 public func SetRecoveryDelay(int value)
 {
-	return this.delay_recover = value;
+	this.delay_recover = value;
+	return this;
 }
 
 /**
@@ -358,7 +367,8 @@ public func SetRecoveryDelay(int value)
 */
 public func SetCooldownDelay(int value)
 {
-	return this.delay_cooldown = value;
+	this.delay_cooldown = value;
+	return this;
 }
 
 /**
@@ -368,7 +378,8 @@ public func SetCooldownDelay(int value)
 */
 public func SetReloadDelay(int value)
 {
-	return this.delay_reload = value;
+	this.delay_reload = value;
+	return this;
 }
 
 /**
@@ -378,7 +389,8 @@ public func SetReloadDelay(int value)
 */
 public func SetDamage(int value) // yes, this shadows an engine function!
 {
-	return this.damage = value;
+	this.damage = value;
+	return this;
 }
 
 /**
@@ -388,7 +400,8 @@ public func SetDamage(int value) // yes, this shadows an engine function!
 */
 public func SetDamageType(int value)
 {
-	return this.damage_type = value;
+	this.damage_type = value;
+	return this;
 }
 
 /**
@@ -398,7 +411,8 @@ public func SetDamageType(int value)
 */
 public func SetProjectileID(id value)
 {
-	return this.projectile_id = value;
+	this.projectile_id = value;
+	return this;
 }
 
 /**
@@ -408,7 +422,8 @@ public func SetProjectileID(id value)
 */
 public func SetProjectileSpeed(int value)
 {
-	return this.projectile_speed = value;
+	this.projectile_speed = value;
+	return this;
 }
 
 /**
@@ -418,7 +433,8 @@ public func SetProjectileSpeed(int value)
 */
 public func SetProjectileRange(int value)
 {
-	return this.projectile_range = value;
+	this.projectile_range = value;
+	return this;
 }
 
 /**
@@ -428,7 +444,8 @@ public func SetProjectileRange(int value)
 */
 public func SetProjectileDistance(int value)
 {
-	return this.projectile_distance = value;
+	this.projectile_distance = value;
+	return this;
 }
 
 /**
@@ -438,7 +455,8 @@ public func SetProjectileDistance(int value)
 */
 public func SetYOffset(int value)
 {
-	return this.projectile_offset_y = value;
+	this.projectile_offset_y = value;
+	return this;
 }
 
 /**
@@ -448,7 +466,8 @@ public func SetYOffset(int value)
 */
 public func SetSpread(int value)
 {
-	return this.spread = value;
+	this.spread = value;
+	return this;
 }
 
 /**
@@ -458,7 +477,8 @@ public func SetSpread(int value)
 */
 public func SetBurstAmount(int value)
 {
-	return this.burst = value;
+	this.burst = value;
+	return this;
 }
 
 /**
@@ -468,7 +488,8 @@ public func SetBurstAmount(int value)
 */
 public func SetAutoReload(bool value)
 {
-	return this.auto_reload = value;
+	this.auto_reload = value;
+	return this;
 }
 
 /**
@@ -478,7 +499,8 @@ public func SetAutoReload(bool value)
 */
 public func SetShootingAnimation(string value)
 {
-	return this.anim_shoot_name = value;
+	this.anim_shoot_name = value;
+	return this;
 }
 
 /**
@@ -488,7 +510,8 @@ public func SetShootingAnimation(string value)
 */
 public func SetReloadAnimation(string value)
 {
-	return this.anim_load_name = value;
+	this.anim_load_name = value;
+	return this;
 }
 
 /**
@@ -498,7 +521,8 @@ public func SetReloadAnimation(string value)
 */
 public func SetForwardWalkingSpeed(int value)
 {
-	return this.walk_speed_front = value;
+	this.walk_speed_front = value;
+	return this;
 }
 
 /**
@@ -508,5 +532,6 @@ public func SetForwardWalkingSpeed(int value)
 */
 public func SetBackwardWalkingSpeed(int value)
 {
-	return this.walk_speed_back = value;
+	this.walk_speed_back = value;
+	return this;
 }
