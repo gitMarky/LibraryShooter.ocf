@@ -145,6 +145,15 @@ public func GetProjectileSpeed()
 }
 
 /**
+ Get the projectile spread of this fire mode.
+ @return An array of two integers, spread and precision.
+*/
+public func GetProjectileSpread()
+{
+	return this.projectile_spread;
+}
+
+/**
  Get the projectile range of this fire mode.
  @return An integer.
 */
@@ -239,7 +248,11 @@ public func GetBackwardWalkingSpeed()
 /**
  Set the mode (firing style) of this fire mode.
  
- @par value An integer (see {@link Library_Firearm} fire modes description).
+ @par value An integer (see {@link Library_Firearm} fire modes description). Can simply be one of the following constants:@br
+	- WEAPON_FM_Single: single shot style, only shot per click is fired (default).@br
+	- WEAPON_FM_Burst: burst style, firing a set number of shot in short succession.@br
+	- WEAPON_FM_Auto: auto style, firing as long as the use button is pressed.@br
+	
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -252,7 +265,9 @@ public func SetMode(int value)
 /**
  Set the name of this fire mode.
  
- @par value A string.
+ @par value The name of this fire mode.
+            Unnecessary if no GUI exists that displays the name.
+ 
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -265,7 +280,9 @@ public func SetName(string value)
 /**
  Set the icon of this fire mode.
  
- @par value An ID.
+ @par value The ID of a definition icon for the fire mode.
+            Unnecessary if no GUI exists that displays the icon.
+            
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -278,11 +295,14 @@ public func SetIcon(id value)
 /**
  Set the condition callback of this fire mode.
  
- @par value A string.
+ @par value A string corresponding to a function name, or a function pointer.
+            The fire mode will not be marked as 'available' unless the condition functions return true. 
+            Example: An upgraded weapon could offer more fire modes.
+
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
-public func SetCondition(string value)
+public func SetCondition(value)
 {
 	this.condition = value;
 	return this;
@@ -291,7 +311,7 @@ public func SetCondition(string value)
 /**
  Set the ammunition ID of this fire mode.
  
- @par value An ID.
+ @par value A definition that represents ammunition for the fire mode.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -304,7 +324,7 @@ public func SetAmmoID(id value)
 /**
  Set the ammunition usage of this fire mode.
  
- @par value An integer.
+ @par value How much ammunition is needed per {@link Library_Firearm_Firemode#GetAmmoRate} shots.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -330,7 +350,9 @@ public func SetAmmoRate(int value)
 /**
  Set the charging delay of this fire mode.
  
- @par value An integer.
+ @par value Charge duration in frames before the weapon can fire.
+            If 0 or nil, no charge is required.
+
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -343,7 +365,8 @@ public func SetChargeDelay(int value)
 /**
  Set the recovery delay of this fire mode.
  
- @par value An integer.
+ @par value Recovery duration between consecutive shots in frames.
+            If 0 or nil, no recovery is required
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -356,7 +379,10 @@ public func SetRecoveryDelay(int value)
 /**
  Set the cooldown delay of this fire mode.
  
- @par value An integer.
+ @par value Cooldown duration after firing the last shot in frames.
+            The last shot is the last shot in a series of consecutive
+            shots (as opposed to the last shot before ammo runs out).
+            If 0 or nil, no cooldown is required.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -369,7 +395,7 @@ public func SetCooldownDelay(int value)
 /**
  Set the reloading delay of this fire mode.
  
- @par value An integer.
+ @par value Reload duration in frames. If 0 or nil, reloading is instantaneous.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -382,7 +408,7 @@ public func SetReloadDelay(int value)
 /**
  Set the damage of this fire mode.
  
- @par value An integer.
+ @par value The amount of damage that a projectile does.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -395,7 +421,9 @@ public func SetDamage(int value) // yes, this shadows an engine function!
 /**
  Set the damage type of this fire mode.
  
- @par value An integer.
+ @par value Defining a damage type.
+            Damage type handling is not done by this library
+            and should be handled by any implementation.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -408,7 +436,8 @@ public func SetDamageType(int value)
 /**
  Set the projectile ID of this fire mode.
  
- @par value An ID.
+ @par value A definition of the actual projectile that is being fired.
+            These are created on the fly and must therefore not be created beforehand.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -421,7 +450,7 @@ public func SetProjectileID(id value)
 /**
  Set the projectile speed of this fire mode.
  
- @par value An integer.
+ @par value Firing speed of a projectile.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -432,9 +461,24 @@ public func SetProjectileSpeed(int value)
 }
 
 /**
+ Set the spread of the projectiles for this fire mode. Refers to 
+ the basic inaccuracy of the projectiles.
+ 
+ @par value A proplist with the properties "angle" and "precision",
+            see {@link Global#Projectile_Deviation}.
+ @return proplist Returns the fire mode,
+         so that further function calls can be issued.
+*/
+public func SetProjectileSpread(proplist value)
+{
+	this.projectile_spread = value;
+	return this;
+}
+
+/**
  Set the projectile range of this fire mode.
  
- @par value An integer.
+ @par value Maximum range a projectile flies.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -447,7 +491,7 @@ public func SetProjectileRange(int value)
 /**
  Set the projectile distance of this fire mode.
  
- @par value An integer.
+ @par value Distance the projectile is being created away from the shooting object.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -460,7 +504,9 @@ public func SetProjectileDistance(int value)
 /**
  Set the Y offset of this fire mode.
  
- @par value An integer.
+ @par value Y offset when creating a projectile in case
+            the barrel of the gun is not perfectly aligned
+            to the firing object's center.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -471,20 +517,22 @@ public func SetYOffset(int value)
 }
 
 /**
- Set the spread of this fire mode.
+ Set the spread of this fire mode. Refers to 
+ additional deviation added by certain effects (e.g. continuous firing).
  
- @par value An array of two integers, spread and precision.
+ @par value A proplist with the properties "angle" and "precision",
+            see {@link Global#Projectile_Deviation}.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
-public func SetSpread(int value)
+public func SetSpread(proplist value)
 {
 	this.spread = value;
 	return this;
 }
 
 /**
- Set the amount of projectiles firing in a burst of this fire mode.
+ Set the amount of shots being fired in a burst of this fire mode.
  
  @par value An integer.
  @return proplist Returns the fire mode,
@@ -499,7 +547,8 @@ public func SetBurstAmount(int value)
 /**
  Set the automatic reload setting of this fire mode.
  
- @par value A boolean.
+ @par value If true, the weapon reloads even if the use button
+            is not being held while reloading.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -512,7 +561,9 @@ public func SetAutoReload(bool value)
 /**
  Set the shooting animation name of this fire mode.
  
- @par value A string.
+ @par value The animation name that is returned for
+            the animation set (usually when being used by a Clonk)
+            as general aim animation.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -525,7 +576,9 @@ public func SetShootingAnimation(string value)
 /**
  Set the loading animation name of this fire mode.
  
- @par value A string.
+ @par value The animation name that is returned for
+      the animation set (usually when being used by a Clonk)
+      as general reload animation.
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -538,7 +591,8 @@ public func SetReloadAnimation(string value)
 /**
  Set the forward walking speed of this fire mode.
  
- @par value An integer.
+ @par value Forwards walking speed to be returned for
+      the animation set (usually when being used by a Clonk).
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
@@ -551,7 +605,8 @@ public func SetForwardWalkingSpeed(int value)
 /**
  Set the backward walking speed of this fire mode.
  
- @par value An integer.
+ @par value Backwards walking speed to be returned for
+      the animation set (usually when being used by a Clonk).
  @return proplist Returns the fire mode,
          so that further function calls can be issued.
 */
