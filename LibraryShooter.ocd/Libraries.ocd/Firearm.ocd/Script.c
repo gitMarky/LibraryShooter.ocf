@@ -42,7 +42,6 @@
 	walk_speed_back: Integer. Backwards walking speed to be returned for the animation set (usually when being used by a Clonk) (default: nil).@br
 	@author Marky
 	@credits Hazard Team, Zapper
-	@version 0.1.0
 */
 
 /*-- Important Library Properties --*/
@@ -119,7 +118,6 @@ local animation_set = {
  If set to false, the weapon itself will not make the user aim and it must be initiated elsewhere, e.g. a clonk can always aim when the weapon is selected.@br
  You can use the Mouse1Move key assignment to continuously forward cursor updates to the script.@br
  @return {@c true} by default.
- @version 0.3.0
 */
 public func Setting_AimOnUseStart()
 {
@@ -129,7 +127,6 @@ public func Setting_AimOnUseStart()
 /**
  Check if the weapon should fire on a call of {@link Library_Firearm#ControlUseHolding}.@br
  @return {@c true} if either {@link Library_Firearm#Setting_AimOnUseStart} is false or if the selected fire mode is an automatic one.
- @version 0.3.0
 */
 func FireOnHolding()
 {
@@ -139,7 +136,6 @@ func FireOnHolding()
 /**
  Check if the weapon should fire on a call of {@link Library_Firearm#ControlUseStop}.@br
  @return {@c true} if {@link Library_Firearm#Setting_AimOnUseStart} is true and if the selected fire mode is not an automatic one.
- @version 0.3.0
 */
 func FireOnStopping()
 {
@@ -150,7 +146,6 @@ func FireOnStopping()
  If returns true, it is assumed that all functions regarding ammunition handling are configured as desired.@br
  Ammunition handling can be done by for example by including {@link Library_AmmoManager}@br
  @return {@link Global#inherited} by default.
- @version 0.3.0
 */
 public func Setting_WithAmmoLogic()
 {
@@ -180,7 +175,6 @@ func Initialize()
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseStart(object user, int x, int y)
 {
@@ -202,7 +196,6 @@ public func ControlUseStart(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseAltStart(object user, int x, int y)
 {
@@ -225,7 +218,6 @@ public func ControlUseAltStart(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseHolding(object user, int x, int y)
 {
@@ -245,7 +237,6 @@ public func ControlUseHolding(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aiming at. Relative to the user.
- @version 0.2.0
  */
 public func ControlFireHolding(object user, int x, int y)
 {
@@ -276,7 +267,6 @@ public func ControlFireHolding(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseAltHolding(object user, int x, int y)
 {
@@ -299,7 +289,6 @@ public func ControlUseAltHolding(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseStop(object user, int x, int y)
 {
@@ -338,7 +327,6 @@ public func ControlUseStop(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseAltStop(object user, int x, int y)
 {
@@ -356,7 +344,6 @@ public func ControlUseAltStop(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseCancel(object user, int x, int y)
 {
@@ -374,7 +361,6 @@ public func ControlUseCancel(object user, int x, int y)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 public func ControlUseAltCancel(object user, int x, int y)
 {
@@ -385,7 +371,6 @@ public func ControlUseAltCancel(object user, int x, int y)
 
 /**
  Sets is_using to false.
- @version 0.2.0
 */
 public func CancelUsing()
 {
@@ -397,7 +382,6 @@ public func CancelUsing()
 
  Checks {@link Library_Firearm#IsWeaponReadyToUse} and {@link Library_Firearm#IsUserReadyToUse}. For custom behaviour, modify those functions.
  @par user The object that is trying to use this weapon.
- @version 0.2.0
 */
 func RejectUse(object user)
 {
@@ -426,7 +410,6 @@ func IsUserReadyToUse(object user)
 
 /**
  Must return true if the weapon wants to receive holding updates for controls.
- @version 0.1.0
 */
 public func HoldingEnabled() { return true; }
 
@@ -532,7 +515,6 @@ public func OnUseAltCancel(object user, int x, int y)
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @return {@c true} if any kind of charging process is happening or charging is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no charging is necessary at the moment.
- @version 0.2.0
 */
 func StartCharge(object user, int x, int y)
 {
@@ -595,7 +577,6 @@ func StartCharge(object user, int x, int y)
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @par callback Set to true to call {@link Library_Firearm#OnCancelCharge}.
- @version 0.2.0
 */
 func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
 {
@@ -618,7 +599,6 @@ func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @return {@c true} by default.
- @version 0.2.0
 */
 func DoCharge(object user, int x, int y, proplist firemode)
 {
@@ -629,7 +609,6 @@ func DoCharge(object user, int x, int y, proplist firemode)
 /**
  Checks if the weapon is currently charging.@br
  @return The charging effect.
- @version 0.2.0
 */
 func IsCharging()
 {
@@ -656,7 +635,6 @@ public func GetChargeProgress()
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
  @return {@c true} by default. Overload this function for a custom condition.
- @version 0.1.0
  */
 public func NeedsCharge(object user, proplist firemode)
 {
@@ -669,7 +647,6 @@ public func NeedsCharge(object user, proplist firemode)
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.1.0
  */
 public func OnStartCharge(object user, int x, int y, proplist firemode)
 {
@@ -681,7 +658,6 @@ public func OnStartCharge(object user, int x, int y, proplist firemode)
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.1.0
  */
 public func OnFinishCharge(object user, int x, int y, proplist firemode)
 {
@@ -695,7 +671,6 @@ public func OnFinishCharge(object user, int x, int y, proplist firemode)
  @par firemode A proplist containing the fire mode information.
  @par current_percent The progress of charging, in percent.
  @par change_percent The change of progress, since the last update.
- @version 0.2.0
  @note The function existed in version 0.1.0 too, passing {@code change_percent} in place of {@code current_percent}.
  */
 public func OnProgressCharge(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
@@ -708,7 +683,6 @@ public func OnProgressCharge(object user, int x, int y, proplist firemode, int c
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
  */
 public func OnCancelCharge(object user, int x, int y, proplist firemode)
 {
@@ -748,7 +722,6 @@ local IntChargeEffect = new Effect {
 
 /**
  The weapon is ready to fire a shot.
- @version 0.1.0
  */
 func IsReadyToFire()
 {
@@ -771,7 +744,6 @@ func IsReadyToFire()
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par is_pressing_trigger Should be true if the fire button is held to indicate the is_using state.
- @version 0.2.0
 */
 func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 {
@@ -793,7 +765,6 @@ func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
  Checks: {@link Library_Firearm#IsReadyToFire}.@br
  @par user The object that is using the weapon.
  @par angle The firing angle the user is aiming at.
- @version 0.3.0
 */
 func FinishedAiming(object user, int angle)
 {
@@ -815,7 +786,6 @@ func FinishedAiming(object user, int angle)
  @par x The x coordinate, local.
  @par y The y coordinate, local.
  @return int The angle in degrees, normalized to the range of -180° to 180°.
- @version 0.1.0
  */
 func GetAngle(int x, int y)
 {
@@ -831,7 +801,6 @@ func GetAngle(int x, int y)
  @par y The y coordinate, local.
  @par firemode A proplist containing the fire mode information.
  @return int The angle in degrees, normalized to the range of -180° to 180°.
- @version 0.2.0
 */
 func GetFireAngle(int x, int y, proplist firemode)
 {
@@ -854,7 +823,6 @@ func GetFireAngle(int x, int y, proplist firemode)
  @par user The object that is using the weapon.
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
- @version 0.1.0
  */
 func Fire(object user, int x, int y)
 {
@@ -890,7 +858,6 @@ func Fire(object user, int x, int y)
  @par user The object that is using the weapon.
  @par angle The firing angle.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
 */
 func FireProjectiles(object user, int angle, proplist firemode)
 {
@@ -934,7 +901,6 @@ func FireProjectiles(object user, int angle, proplist firemode)
  Gets the number of projectiles to be fired by a single shot.@br
  @par firemode A proplist containing the fire mode information.
  @return By default, the return value is simple the projectile_number of the firemode. Can be overloaded for custom behaviour.
- @version 0.2.0
 */
 func GetProjectileAmount(proplist firemode)
 {
@@ -1038,7 +1004,6 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
 */
 func FireRecovery(object user, int x, int y, proplist firemode)
 {
@@ -1056,7 +1021,6 @@ func FireRecovery(object user, int x, int y, proplist firemode)
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
  @return {@c true} by default. Overload this function for a custom condition.
- @version 0.2.0
  */
 public func NeedsRecovery(object user, proplist firemode)
 {
@@ -1065,7 +1029,6 @@ public func NeedsRecovery(object user, proplist firemode)
 
 /**
  Will cancel the recovering process currently running.@br
- @version 0.2.0
 */
 func CancelRecovery()
 {
@@ -1097,7 +1060,6 @@ func GetRecoveryProgress()
 /**
  Checks if the weapon is currently recovering.@br
  @return The recovering effect.
- @version 0.2.0
 */
 func IsRecovering()
 {
@@ -1113,7 +1075,6 @@ func IsRecovering()
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
 */
 func DoRecovery(object user, int x, int y, proplist firemode)
 {
@@ -1151,7 +1112,6 @@ func DoRecovery(object user, int x, int y, proplist firemode)
  Callback: the weapon finished one firing cycle. Does nothing by default.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @version 0.1.0
  */
 public func OnRecovery(object user, proplist firemode)
 {
@@ -1198,7 +1158,6 @@ func CheckCooldown(object user, proplist firemode)
  - if yes, create a cooldown effect if not already present, call {@link Library_Firearm#OnStartCooldown}.@br
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
 */
 func StartCooldown(object user, proplist firemode)
 {
@@ -1219,7 +1178,6 @@ func StartCooldown(object user, proplist firemode)
 
 /**
  Simply forwards a call to {@link Library_Firearm#OnFinishCooldown}.@br
- @version 0.2.0
 */
 func DoCooldown(object user, proplist firemode)
 {
@@ -1248,7 +1206,6 @@ func GetCooldownProgress()
 /**
  Checks if the weapon is currently cooling down.@br
  @return The cooldown effect.
- @version 0.2.0
 */
 func IsCoolingDown()
 {
@@ -1260,7 +1217,6 @@ func IsCoolingDown()
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
  @return {@c true} by default. Overload this function for a custom condition.
- @version 0.1.0
  */
 public func NeedsCooldown(object user, proplist firemode)
 {
@@ -1271,7 +1227,6 @@ public func NeedsCooldown(object user, proplist firemode)
  Callback: the weapon starts cooling down. Does nothing by default.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @version 0.1.0
  */
 public func OnStartCooldown(object user, proplist firemode)
 {
@@ -1281,7 +1236,6 @@ public func OnStartCooldown(object user, proplist firemode)
  Callback: the weapon has successfully cooled down. Does nothing by default.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @version 0.1.0
  */
 public func OnFinishCooldown(object user, proplist firemode)
 {
@@ -1291,7 +1245,6 @@ public func OnFinishCooldown(object user, proplist firemode)
  Callback: the weapon has skipped cooling down. Does nothing by default.
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
  */
 public func OnSkipCooldown(object user, proplist firemode)
 {
@@ -1326,7 +1279,6 @@ local IntCooldownEffect = new Effect {
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par forced If true, the weapon will reload even if it is currently not in use ({@link Library_Firearm#IsInUse}).@br
  @return {@c true} if any kind of reloading process is happening or reloading is for some reason hampered. In this case, nothing should happen otherwise. {@c false} if no reloading is necessary at the moment.
- @version 0.2.0
 */
 func StartReload(object user, int x, int y, bool forced)
 {
@@ -1381,7 +1333,6 @@ func StartReload(object user, int x, int y, bool forced)
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @par requested_by_user Set to true, if the stopping was a user's choice (usually when the fire button was released). If true, auto reloading weapon will also stop reloading.
- @version 0.2.0
 */
 func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
@@ -1416,7 +1367,6 @@ func DoReload(object user, int x, int y, proplist firemode)
 /**
  Checks if the weapon is currently reloading.@br
  @return The reloading effect.
- @version 0.2.0
 */
 func IsReloading()
 {
@@ -1443,7 +1393,6 @@ public func GetReloadProgress()
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
  @return {@c true} by default. Overload this function for a custom condition.
- @version 0.2.0
  */
 public func CanReload(object user, proplist firemode)
 {
@@ -1455,7 +1404,6 @@ public func CanReload(object user, proplist firemode)
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
  @return {@c false} by default. Overload this function for a custom condition. Otherwise no reloading needs ever to be done.
- @version 0.2.0
  */
 public func NeedsReload(object user, proplist firemode)
 {
@@ -1468,7 +1416,6 @@ public func NeedsReload(object user, proplist firemode)
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
  */
 public func OnStartReload(object user, int x, int y, proplist firemode)
 {
@@ -1480,7 +1427,6 @@ public func OnStartReload(object user, int x, int y, proplist firemode)
  @par x The x coordinate the user is aiming at. Relative to the user.
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
  */
 public func OnFinishReload(object user, int x, int y, proplist firemode)
 {
@@ -1494,7 +1440,6 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
  @par firemode A proplist containing the fire mode information.
  @par current_percent The progress of reloading, in percent.
  @par change_percent The change of progress, since the last update.
- @version 0.2.0
  */
 public func OnProgressReload(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
@@ -1507,7 +1452,6 @@ public func OnProgressReload(object user, int x, int y, proplist firemode, int c
  @par y The y coordinate the user is aimint at. Relative to the user.
  @par firemode A proplist containing the fire mode information.
  @par requested_by_user Is {@c true} if the user releases the use button while the weapon is reloading. Otherwise, for example if the user changes the firemode is {@c false}.
- @version 0.2.0
  */
 public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
@@ -1560,7 +1504,6 @@ local IntReloadEffect = new Effect {
  The newly created fire mode will inherit all information from fire_mode_default.@br
  @par add A boolean, if true the fire mode will be added to the weapon ({@link Library_Firearm#AddFiremode}).
  @return The proplist of the newly created firemode
- @version 0.3.0
 */
 public func CreateFiremode(bool add)
 {
@@ -1573,7 +1516,6 @@ public func CreateFiremode(bool add)
 /**
  Replace a fire mode with a writable copy of itself. With this, you can make fire modes writable during runtime if needed.@br
  @par number The index of the fire mode in the fire modes array.
- @version 0.3.0
 */
 public func MakeFiremodeWritable(int number)
 {
@@ -1591,7 +1533,6 @@ public func MakeFiremodeWritable(int number)
  @par number The number key in the fire modes array to select.
  @par force If true, the fire mode is changed without checking whether the fire mode can currently be changed or if the condition is met.
  @return {@c true} if the fire mode was changed, {@c false} if it failed.
- @version 0.3.0
 */
 public func SetFiremode(int number, bool force)
 {
@@ -1617,7 +1558,6 @@ public func SetFiremode(int number, bool force)
  @par number The fire mode index in the array {@link Library_Firearm#GetFiremodes}, 
              or if you pass {@c nil} the currently selected fire mode.
  @return A {@c proplist} containing the fire mode information.
- @version 0.1.0
  */
 public func GetFiremode(int number)
 {
@@ -1653,7 +1593,6 @@ public func GetFiremodeIndex(proplist firemode, bool available)
 /**
  Gets all configured fire modes for this weapon.@br
  @return An array of all fire modes.
- @version 0.2.0
 */
 public func GetFiremodes()
 {
@@ -1668,7 +1607,6 @@ public func GetFiremodes()
 /**
  Gets all available fire modes. Available fire modes are only those where the configured condition is met.@br
  @return An array of all available fire modes.
- @version 0.2.0
 */
 public func GetAvailableFiremodes()
 {
@@ -1703,7 +1641,6 @@ func IsFiremodeAvailable(proplist firemode) // TODO: Temporary function => firem
 
 /**
  Delete all configured fire modes.@br
- @version 0.2.0
 */
 public func ClearFiremodes()
 {
@@ -1713,7 +1650,6 @@ public func ClearFiremodes()
 /**
  Add a fire mode to the list of configured fire modes.@br
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
 */
 public func AddFiremode(proplist firemode)
 {
@@ -1723,7 +1659,6 @@ public func AddFiremode(proplist firemode)
 /**
  Checks whether the weapon is currently recovering, charging, reloading or locked.@br
  @return {@c true} if change if fire modes is possible.
- @version 0.2.0
 */
 public func CanChangeFiremode()
 {
@@ -1737,7 +1672,6 @@ public func CanChangeFiremode()
  Changes the firemode at the next possible time.
  
  @par number the desired fire mode index.
- @version 0.3.0
  */
 public func ScheduleSetFiremode(int number)
 {
@@ -1756,7 +1690,6 @@ public func ScheduleSetFiremode(int number)
  Gets the scheduled fire mode
  
  @return the fire mode index.
- @version 0.3.0
  */
 public func GetScheduledFiremode()
 {
@@ -1771,8 +1704,6 @@ public func GetScheduledFiremode()
 
 /**
  Cancels a scheduled fire mode change.
-
- @version 0.3.0
  */
 public func ResetScheduledFiremode()
 {
@@ -1811,7 +1742,6 @@ local IntChangeFiremodeEffect = new Effect
              changed will be returned.
  @return The actual change that happened.
  @author Marky
- @version 0.3.0
  @note This function should be implemented by the weapon. A quick implementation
        is available by including {@link Library_AmmoManager}.
  @related {@link Library_AmmoManager#DoAmmo}, {@link Library_AmmoManager#SetAmmo}
@@ -1826,7 +1756,6 @@ public func DoAmmo(id ammo, int amount)
  Not implemented by default and will always return true (infinite ammo) as long as {@link Library_Firearm#Setting_WithAmmoLogic} is not implemented. Otherwise calls _inherited.@br
  @par firemode The ammo type for this firemode is checked.
  @return bool Returns {@code true} if the weapon has enough ammo for the firemode
- @version 0.2.0
  */
 public func HasAmmo(proplist firemode)
 {
@@ -1843,7 +1772,6 @@ public func HasAmmo(proplist firemode)
 
  @par user The object that is using the weapon.
  @par firemode A proplist containing the fire mode information.
- @version 0.2.0
  */
 public func OnNoAmmo(object user, proplist firemode)
 {
@@ -1854,7 +1782,6 @@ public func OnNoAmmo(object user, proplist firemode)
  Not implemented by default and will always return true (infinite ammo) as long as {@link Library_Firearm#Setting_WithAmmoLogic} is not implemented. Otherwise calls _inherited.@br
  @par firemode The ammo type for this firemode is checked.
  @return bool Returns {@code true} if the weapon has enough ammo for the firemode
- @version 0.2.0
  */
 func HandleAmmoUsage(proplist firemode)
 {
@@ -1870,7 +1797,6 @@ func HandleAmmoUsage(proplist firemode)
 /**
  Locks the weapon so it cannot be used.@br
  @par lock_time The weapon will be locked for this many frames. On a lock time of {@code 0} the weapon stays locked until you call {@link Library_Weapon#UnlockWeapon}.
- @version 0.2.0
  */
 public func LockWeapon(int lock_time)
 {
@@ -1883,7 +1809,6 @@ public func LockWeapon(int lock_time)
 
 /**
  Unlocks the weapon, so that it can be used again.@br
- @version 0.2.0
  */
 public func UnlockWeapon()
 {
@@ -1894,7 +1819,6 @@ public func UnlockWeapon()
 /**
  Checks if the weapon is currently locked against usage.@br
  @return The weapon locking effect.
- @version 0.2.0
 */
 func IsWeaponLocked()
 {

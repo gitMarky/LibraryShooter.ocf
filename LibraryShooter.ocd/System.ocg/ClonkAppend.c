@@ -1,7 +1,6 @@
 /**
  Clonk append script from Caedes OC.
  @author Zapper (original), Marky (cut and modified where necessary)
- @version 0.1.0
  */
 /*
 #appendto Clonk

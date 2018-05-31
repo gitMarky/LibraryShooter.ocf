@@ -23,7 +23,6 @@ global func CreateImpactEffect(int size, int xoff, int yoff, string name, partic
  @par xdir Velocity for the effect.
  @par ydir Velocity for the effect. The created particles have a gravity factor of 5,
            which has to be considered when calculating the velocity.
- @version 0.1.0
  */
 global func CreateCartridgeEffect(string particle, int size, int x, int y, int xdir, int ydir, int amount)
 {

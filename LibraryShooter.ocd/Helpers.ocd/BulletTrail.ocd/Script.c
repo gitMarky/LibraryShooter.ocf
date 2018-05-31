@@ -11,7 +11,6 @@
 	is called in the projectile which can return the color modulation.
 	
 	@author Newton (original author), Marky (modified script)
-	@version 0.1.0
 */
 
 local do_fade, fade_speed, move_speed, projectile, w, l, r, x, y;
@@ -38,7 +37,6 @@ local fade_speed_add = 0;
             Otherwise this is the velocity of the projectile, if provided.
  @par x_end [optional] Overrides the end position of the trail if not projectile was provided.
  @par y_end [optional] Overrides the end position of the trail if not projectile was provided.
- @version 0.1.0
  */
 public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_dir, int y_dir, int x_end, int y_end)
 {
@@ -90,8 +88,7 @@ public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_
          for trails.@br
          If the trail is set to a projectile, then this function is also called
          in the projectile. The return value of the projectile function has a
-         higher priority than the local return value.  
-@version 0.1.0
+         higher priority than the local return value.
  */
 public func TrailColor(int time)
 {

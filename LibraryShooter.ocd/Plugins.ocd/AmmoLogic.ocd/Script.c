@@ -5,7 +5,6 @@
  Otherwise, it will forward calls to whatever object is defined via {@link Library_Firearm_AmmoLogic#GetAmmoContainer}.@br
 
  @author Clonkonaut
- @version 0.3.0
  */
 
 local ammo_rate_counter; // proplist
@@ -13,7 +12,6 @@ local ammo_rate_counter; // proplist
 /**
  Ammo logic is set up.@br
  @related {@link Library_Firearm#Setting_WithAmmoLogic}
- @version 0.3.0
 */
 public func Setting_WithAmmoLogic()
 {
@@ -32,7 +30,6 @@ func Initialize()
 
 /**
  @return An object that receives all ammunition calls.
- @version 0.3.0
  */
 public func GetAmmoContainer()
 {
@@ -47,7 +44,6 @@ public func GetAmmoContainer()
  - The ammo source is AMMO_Source_Infinite@br
  @par firemode The ammo type for this fire mode is checked.
  @return bool Returns {@code true} if the weapon has enough ammo for the fire mode
- @version 0.3.0
  */
 public func HasAmmo(proplist firemode)
 {
@@ -73,7 +69,6 @@ public func HasAmmo(proplist firemode)
                        The method will fail if the proplist is not a firemode.@br
                        The ammo ID is passed on to any calls of {@link Library_AmmoManager#GetAmmoSource}.
  @return int The current source of ammunition for an ID or firemode (see {@link Library_AmmoManager#GetAmmoSource}).
- @version 0.3.0
  */
 public func GetFiremodeAmmoSource(type_or_firemode)
 {
@@ -109,7 +104,6 @@ public func GetFiremodeAmmoSource(type_or_firemode)
                        The method will fail if the proplist is not a firemode.@br
                        The ammo ID is passed on to any calls of {@link Library_AmmoManager#GetAmmo}.
  @return int The current amount of ammunition for an ID or firemode.
- @version 0.3.0
  */
 public func GetAmmo(type_or_firemode)
 {
@@ -169,7 +163,6 @@ public func GetAmmo(type_or_firemode)
  Will call {@link Library_AmmoManager#DoAmmo} if shots equivalent to the the fire modes ammo rate have been fired. Either in this object if {@link Library_AmmoManager#IsAmmoManager} or {@link Library_Firearm_AmmoLogic#GetAmmoContainer}.@br
  Will call {@link Library_Firearm_AmmoLogic#OnAmmoChange}
  @par firemode The ammo type for this fire mode is checked.
- @version 0.3.0
 */
 func HandleAmmoUsage(proplist firemode)
 {
@@ -230,7 +223,6 @@ func HandleAmmoUsage(proplist firemode)
  Callback: The weapon ammo in the weapon changes.
 
  @par ammo_type ID. The ammo that was affected.
- @version 0.3.0
  */
 public func OnAmmoChange(id ammo_type)
 {

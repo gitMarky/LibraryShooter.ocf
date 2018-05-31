@@ -2,7 +2,6 @@
  Handles the deviation of projectiles.
 
  @author Marky
- @version 0.2.0
  */
 
 
@@ -12,7 +11,6 @@
 
  @par angle The angle, in degrees.
  @par precision The precision factor, default precision is 1.
- @version 0.2.0
  */
 global func Projectile_Deviation(angle, int precision)
 {
@@ -33,7 +31,6 @@ global func Projectile_Deviation(angle, int precision)
  
  @par deviations The deviation definitions.
  @par min_precision The minimal precision.
- @version 0.2.0
  */ 
 global func NormalizeDeviations(array deviations, int min_precision)
 {
@@ -70,7 +67,6 @@ global func NormalizeDeviations(array deviations, int min_precision)
  
  @par deviations The deviation definitions.
  @par target_precision The target precision;
- @version 0.2.0
  */ 
 global func ScaleDeviation(proplist deviation, int target_precision)
 {

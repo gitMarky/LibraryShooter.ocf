@@ -3,7 +3,6 @@
 	Keep in mind that for fire modes to be writable, they must be created using {@link Library_Firearm#AddFiremode}.
 
 	@author Clonkonaut
-	@version 0.3.0
 */
 
 

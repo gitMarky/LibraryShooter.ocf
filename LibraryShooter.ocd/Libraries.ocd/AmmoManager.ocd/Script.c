@@ -2,7 +2,6 @@
  This is an interface for saving ammunition in an object. It should be included in 
  objects that carry ammunition.
  @author Marky
- @version 0.1.0
  */
 
 
@@ -58,7 +57,6 @@ public func GetAmmoSource(id ammo)
  @par ammo The type of the ammunition.
  @return int The amount that the object currently has.
  @author Marky
- @version 0.1.0
  @note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
  @related {@link Library_AmmoManager#DoAmmo}, {@link Library_AmmoManager#SetAmmo}
  */
@@ -105,7 +103,6 @@ public func GetAmmo(id ammo)
              changed will be returned. 
  @return The actual change that happened.
  @author Marky
- @version 0.1.0
  @note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
  @related {@link Library_AmmoManager#GetAmmo}, {@link Library_AmmoManager#SetAmmo}
  */
@@ -136,7 +133,6 @@ public func DoAmmo(id ammo, int amount)
              beyond the capacity of the object.
  @return The current amount of ammunition.
  @author Marky
- @version 0.1.0
  @note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
  @related {@link Library_AmmoManager#GetAmmo}, {@link Library_AmmoManager#DoAmmo}
  */
@@ -176,7 +172,6 @@ public func SetAmmo(id ammo, int new_value)
  @return an ammunition manager object that handles the ammunition counting
          if {@link Library_AmmoManager#GetAmmoSource} is {@c AMMO_Source_Container}
  @author Marky
- @version 0.1.0
  */
 public func GetAmmoContainer()
 {
@@ -188,7 +183,6 @@ public func GetAmmoContainer()
  Identifies the object as an ammo manager.
  @return {@c true}
  @author Marky
- @version 0.2.0
  */
 public func IsAmmoManager()
 {

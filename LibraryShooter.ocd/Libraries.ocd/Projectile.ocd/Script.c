@@ -3,7 +3,6 @@
  
  @author Marky
  @credits Hazard Team, Code Modern Combat as inspiration
- @version 0.1.0
  */
 
 static const PROJECTILE_Default_Velocity_Precision = 10;
@@ -46,7 +45,6 @@ local rotation_by_rdir;
  can provide a correct value.
  
  @par precision The precision value, default is 10.
- @version 0.2.0
  */
 public func GetXDir(int precision)
 {
@@ -65,7 +63,6 @@ public func GetXDir(int precision)
  can provide a correct value.
 
  @par precision The precision value, default is 10.
- @version 0.2.0
  */
 public func GetYDir(int precision)
 {
@@ -85,14 +82,12 @@ public func GetYDir(int precision)
 
 /**
  Identifies the object as a projectile.
- @version 0.1.0
  */
 public func IsProjectile(){ return true;}
 
 
 /**
  Identifies the object as a hitscan projectile.
- @version 0.2.0
  */
 public func IsHitscan()
 {
@@ -104,7 +99,6 @@ public func IsHitscan()
  Configures the object that controls the weapon. 
  @par shooter An object. 
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.1.0
  */
 public func Shooter(object shooter)
 {
@@ -123,7 +117,6 @@ public func Shooter(object shooter)
 /**
  Gets the shooter that this projectile was configured with.
  @return object Returns the shooter, usually the object that fired the projectile.
- @version 0.2.0
  */
 public func GetShooter()
 {
@@ -135,7 +128,6 @@ public func GetShooter()
  Configures the weapon ID that shot the projectile.
  @par value The weapon that launches the projectile. This can be either an id, or an object. 
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.1.0
  */
 public func Weapon(value)
 {
@@ -161,7 +153,6 @@ public func Weapon(value)
 /**
  Gets a weapon ID that can be used for kill messages, for example.
  @return The weapon ID that this object was configured with.
- @version 0.2.0
  */
 public func GetWeaponID()
 {
@@ -173,7 +164,6 @@ public func GetWeaponID()
  Configures how far the projectile will travel. 
  @par value The approximate distance in pixels. The projectile calculates its lifetime in frames with {@c distance / velocity}. 
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.1.0
  */
 public func Range(int value)
 {
@@ -197,7 +187,6 @@ public func Range(int value)
 /**
  Gets the range of the projectile.
  @return int the range of the projectile, in pixels.
- @version 0.2.0
  */
 public func GetRange()
 {
@@ -209,7 +198,6 @@ public func GetRange()
  Configures how long the projectile will travel. 
  @par value The lifetime in frames.
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.2.0
  */
 public func Lifetime(int value)
 {
@@ -233,7 +221,6 @@ public func Lifetime(int value)
 /**
  Gets the lifetime of the projectile.
  @return int the lifetime of the projectile, in frames.
- @version 0.2.0
  */
 public func GetLifetime()
 {
@@ -245,7 +232,6 @@ public func GetLifetime()
  Configures how much damage the projectile will deal when it hits. 
  @par value The amount of damage that the projectile deals to the target. 
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.1.0
  */
 public func DamageAmount(int value)
 {
@@ -261,7 +247,6 @@ public func DamageAmount(int value)
 /**
  Gets the amount of damage that this projectile was configured with.
  @return int The amount of damage that this projectile should inflict.
- @version 0.2.0
  */
 public func GetDamageAmount()
 {
@@ -273,7 +258,6 @@ public func GetDamageAmount()
  Configures the damage type. 
  @par value A damage type code that exists in your project. This is a custom value. For existing damage types see {@link TODO}. 
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.1.0
  */
 public func DamageType(int value)
 {
@@ -287,7 +271,6 @@ public func DamageType(int value)
 /**
  Gets the damage type that this projectile was configured with.
  @return int The damage type for this projectile.
- @version 0.2.0
  */
 public func GetDamageType()
 {
@@ -318,7 +301,6 @@ public func Velocity(int value)
  Configures the projectile to do a hit check immediately when launched. This means that the projectile will not fly,
  it rather hits instantly. 
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.1.0
  */
 public func HitScan()
 {
@@ -334,7 +316,6 @@ public func HitScan()
  @par width The trail width, in pixels.
  @par length The trail length, in pixels.
  @return object Returns the projectile object, so that further function calls can be issued.
- @version 0.1.0
  */
 public func Trail(int width, int length, string gfx, int speed)
 {
@@ -564,7 +545,6 @@ private func LaunchHitscan(int angle, int precision)
 
 /**
  Callback that happens before the projectile is launched.
- @version 0.1.0
  */
 public func OnLaunch()
 {
@@ -577,7 +557,6 @@ public func OnLaunch()
  that case the call will not be executed at all.
  @note This call will not be executed in hitscan projectiles,
        see {@link Library_Projectile#HitScan}.
- @version 0.1.0
  */
 public func OnLaunched()
 {
@@ -596,8 +575,7 @@ public func OnLaunched()
  @par x_end   The final X coordinate of the projectile, in global
               coordinates. 
  @par y_end   The final Y coordinate of the projectile, in global
-              coordinates. 
- @version 0.1.0
+              coordinates.
  */
 public func OnHitScan(int x_start, int y_start, int x_end, int y_end)
 {
@@ -715,7 +693,6 @@ public func OnTravelling()
  @return {@c nil}, which means that the color is not adjusted.
          You can override this function if you want a custom color modulation
          for projectile.
-@version 0.1.0
  */
 public func ProjectileColor(int time)
 {
@@ -758,7 +735,6 @@ public func HitObject(object obj, bool remove, proplist effect)
 /**
  Callback when a target should be damaged.
  @par target The object that should be damaged.
- @version 0.2.0 
  */
 public func DoDamageObject(object target)
 {
@@ -770,7 +746,6 @@ public func DoDamageObject(object target)
  Callback if the projectile was removed because
  it did not hit anything before its lifetime
  expired.
- @version 0.2.0
  */
 public func OnHitNothing()
 {
@@ -781,7 +756,6 @@ public func OnHitNothing()
  Callback if the projectile hits another object.
  @par target This is the object that was hit.
  @par effect
- @version 0.1.0
  */
 public func OnHitObject(object target, proplist effect)
 {
@@ -790,7 +764,6 @@ public func OnHitObject(object target, proplist effect)
 
 /**
  Callback if the projectile collides with the landscape.
- @version 0.1.0
  */
 public func OnHitLandscape()
 {

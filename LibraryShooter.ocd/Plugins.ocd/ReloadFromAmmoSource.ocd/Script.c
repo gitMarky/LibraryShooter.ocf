@@ -12,7 +12,6 @@
  {@link Library_AmmoManager#AMMO_Source_Local}.
 
  @author Marky
- @version 0.2.0
  */
 
 

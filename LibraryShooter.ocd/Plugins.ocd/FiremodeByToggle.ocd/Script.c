@@ -86,7 +86,6 @@ public func ToggleFiremode()
  Delay until the toggled firemode is activated.
  
  @return int The delay, in frames.
- @version 0.2.0
  */
 public func ToggleFiremodeDelay(){ return 30;}
 
