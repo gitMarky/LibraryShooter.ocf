@@ -20,8 +20,10 @@ public func GetCarryTransform()
 public func Initialize()
 {
 	_inherited(...);
-	firemode_default = new firemode_default{};
-	SetFiremode(firemode_default);
+	ClearFiremodes();
+	firemode_default = new firemode_default {};
+	AddFiremode(firemode_default);
+	SetFiremode(firemode_default->GetIndex());
 }
 
 
@@ -33,6 +35,8 @@ local Collectible = 1;
 
 local firemode_default = 
 {
+	Prototype = Library_Firearm_Firemode,
+	
 	name = 				"Standard", // string - menu caption
 	icon = 				nil, // id - menu icon
 	condition = 		nil, // string - callback for a condition
@@ -57,9 +61,9 @@ local firemode_default =
 	projectile_distance = 10,
 	projectile_offset_y = -10,
 	projectile_number =    1,
-	projectile_spread = [0, 100], // default inaccuracy of a single projectile
+	projectile_spread = {angle = 0, precision = 100}, // default inaccuracy of a single projectile
 
-	spread = [0, 100],			  // inaccuracy from prolonged firing
+	spread = {angle = 0, precision = 100},			  // inaccuracy from prolonged firing
 
 	burst = 0, // number of projectiles fired in a burst
 };

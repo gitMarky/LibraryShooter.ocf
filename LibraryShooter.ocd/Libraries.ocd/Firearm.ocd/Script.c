@@ -175,7 +175,7 @@ public func Setting_WithAmmoLogic()
 */
 func Initialize()
 {
-	shot_counter = {};
+	shot_counter = [];
 	selected_firemode = 0;
 
 	_inherited();
@@ -587,7 +587,7 @@ func StartCharge(object user, int x, int y)
 		FatalError(Format("Fire mode '%s' not supported", firemode));
 	}
 
-	if (!is_using || firemode.delay_charge < 1 || !NeedsCharge(user, firemode)) return false;
+	if (!is_using || firemode->GetChargeDelay() < 1 || !NeedsCharge(user, firemode)) return false;
 
 	var effect = IsCharging();
 
@@ -788,12 +788,12 @@ local IntChargeEffect = new Effect {
 	Timer = func(int time)
 	{
 		// Increase progress percentage depending on the charging delay of the firemode
-		this.percentage = BoundBy(time * 100 / this.firemode.delay_charge, 0, 100);
+		this.percentage = BoundBy(time * 100 / this.firemode->GetChargeDelay(), 0, 100);
 		// Save the progress (i.e. the difference between the current percentage and during the last update)
 		this.progress = this.percentage - this.percent_old;
 
 		// Check if the charging process is finished based on the charging delay of the firemode
-		if (time > this.firemode.delay_charge && !this.is_charged)
+		if (time > this.firemode->GetChargeDelay() && !this.is_charged)
 		{
 			this.is_charged = true;
 			// Do not make subsequent calls of the timer function because every-frame-effects do hurt performance
@@ -900,7 +900,7 @@ func GetAngle(int x, int y)
 */
 func GetFireAngle(int x, int y, proplist firemode)
 {
-	var angle = Angle(0, firemode.projectile_offset_y, x, y);
+	var angle = Angle(0, firemode->GetYOffset(), x, y);
 		angle = Normalize(angle, -180);
 
 	return angle;
@@ -973,41 +973,28 @@ func FireProjectiles(object user, int angle, proplist firemode)
 	var user_x = user->~GetWeaponX(this); if (user_x) user_x -= GetX();
 	var user_y = user->~GetWeaponY(this); if (user_y) user_y -= GetY();
 
-	var x = +Sin(angle, firemode.projectile_distance) + user_x;
-	var y = -Cos(angle, firemode.projectile_distance) + user_y + firemode.projectile_offset_y;
+	var x = +Sin(angle, firemode->GetProjectileDistance()) + user_x;
+	var y = -Cos(angle, firemode->GetProjectileDistance()) + user_y + firemode->GetYOffset();
 
 	// launch the single projectiles
-	for (var i = 0; i < Max(1, GetProjectileAmount(firemode)); i++)
+	for (var i = 0; i < Max(1, firemode->GetProjectileAmount()); i++)
 	{
-		var projectile = CreateObject(firemode.projectile_id, x, y, user->GetController());
+		var projectile = CreateObject(firemode->GetProjectileID(), x, y, user->GetController());
 
 		projectile->Shooter(user)
 		          ->Weapon(this)
-		          ->DamageAmount(firemode.damage)
-		          ->DamageType(firemode.damage_type)
-		          ->Velocity(SampleValue(firemode.projectile_speed))
-		          ->Range(SampleValue(firemode.projectile_range));
+		          ->DamageAmount(firemode->GetDamage())
+		          ->DamageType(firemode->GetDamageType())
+		          ->Velocity(SampleValue(firemode->GetProjectileSpeed()))
+		          ->Range(SampleValue(firemode->GetProjectileRange()));
 
 		this->OnFireProjectile(user, projectile, firemode);
 		projectile->Launch(angle, GetSpread(firemode));
 	}
 
-	shot_counter[firemode.name]++;
+	shot_counter[firemode->GetIndex()]++;
 
 	HandleAmmoUsage(firemode);
-}
-
-
-/**
-	Gets the number of projectiles to be fired by a single shot.@br
-
-	@par firemode A proplist containing the fire mode information.
-
-	@return By default, the return value is simple the projectile_number of the firemode. Can be overloaded for custom behaviour.
-*/
-func GetProjectileAmount(proplist firemode)
-{
-	return firemode.projectile_number;
 }
 
 
@@ -1020,9 +1007,9 @@ func GetProjectileAmount(proplist firemode)
 */
 func GetSpread(proplist firemode)
 {
-	if (firemode.spread || firemode.projectile_spread)
+	if (firemode->GetSpread() || firemode->GetProjectileSpread())
 	{
-		return NormalizeDeviations([firemode.spread, firemode.projectile_spread]);
+		return NormalizeDeviations([firemode->GetSpread(), firemode->GetProjectileSpread()]);
 	}
 	else
 	{
@@ -1127,9 +1114,13 @@ func FireRecovery(object user, int x, int y, proplist firemode)
 {
 	var delay;
 	if (NeedsRecovery(user, firemode))
-		delay = firemode.delay_recover;
+	{
+		delay = firemode->GetRecoveryDelay();
+	}
 	else
+	{
 		delay = 1;
+	}
 
 	CreateEffect(IntRecoveryEffect, 1, delay, user, x, y, firemode);
 }
@@ -1211,16 +1202,16 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 
 	this->OnRecovery(user, firemode);
 
-	if (firemode.burst)
+	if (firemode->GetBurstAmount())
 	{
-		if (firemode.mode != WEAPON_FM_Burst)
+		if (firemode->GetMode() != WEAPON_FM_Burst)
 		{
-			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode.burst, firemode.mode));
+			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode->GetBurstAmount(), firemode->GetMode()));
 		}
 
-		if (shot_counter[firemode.name] >= firemode.burst)
+		if (shot_counter[firemode->GetIndex()] >= firemode->GetBurstAmount())
 		{
-			shot_counter[firemode.name] = 0;
+			shot_counter[firemode->GetIndex()] = 0;
 		}
 		else
 		{
@@ -1275,10 +1266,14 @@ local IntRecoveryEffect = new Effect {
 func CheckCooldown(object user, proplist firemode)
 {
 	if (!HasAmmo(firemode) || RejectUse(user))
+	{
 		CancelUsing();
+	}
 
-	if ((firemode.mode != WEAPON_FM_Auto) || (firemode.mode == WEAPON_FM_Auto && !is_using))
+	if ((firemode->GetMode() != WEAPON_FM_Auto) || (firemode->GetMode() == WEAPON_FM_Auto && !is_using))
+	{
 		StartCooldown(user, firemode);
+	}
 }
 
 
@@ -1295,7 +1290,7 @@ func CheckCooldown(object user, proplist firemode)
 */
 func StartCooldown(object user, proplist firemode)
 {
-	if (firemode.delay_cooldown < 1 || !NeedsCooldown(user, firemode))
+	if (firemode->GetCooldownDelay() < 1 || !NeedsCooldown(user, firemode))
 	{
 		this->OnSkipCooldown(user, firemode);
 		return;
@@ -1305,7 +1300,7 @@ func StartCooldown(object user, proplist firemode)
 
 	if (effect == nil)
 	{
-		CreateEffect(IntCooldownEffect, 1, firemode.delay_cooldown, user, firemode);
+		CreateEffect(IntCooldownEffect, 1, firemode->GetCooldownDelay(), user, firemode);
 		this->OnStartCooldown(user, firemode);
 	}
 }
@@ -1490,7 +1485,7 @@ func CancelReload(object user, int x, int y, proplist firemode, bool requested_b
 {
 	var effect = IsReloading();
 
-	var auto_reload = firemode.auto_reload && requested_by_user;
+	var auto_reload = firemode->GetAutoReload() && requested_by_user;
 
 	if (effect != nil)
 	{
@@ -1646,12 +1641,12 @@ local IntReloadEffect = new Effect {
 	Timer = func(int time)
 	{
 		// Increase progress percentage depending on the reloading delay of the firemode
-		this.percentage = BoundBy(time * 100 / this.firemode.delay_reload, 0, 100);
+		this.percentage = BoundBy(time * 100 / this.firemode->GetReloadDelay(), 0, 100);
 		// Save the progress (i.e. the difference between the current percentage and during the last update)
 		this.progress = this.percentage - this.percent_old;
 
 		// Check if the reloading process is finished based on the reloading delay of the firemode
-		if (time > this.firemode.delay_reload && !this.is_reloaded)
+		if (time > this.firemode->GetReloadDelay() && !this.is_reloaded)
 		{
 			this.is_reloaded = true;
 
@@ -1830,7 +1825,9 @@ public func ClearFiremodes()
 */
 public func AddFiremode(proplist firemode)
 {
+	var index = GetLength(fire_modes);
 	PushBack(fire_modes, firemode);
+	firemode->SetIndex(index);
 }
 
 
@@ -2040,12 +2037,12 @@ public func GetAnimationSet()
 
 	if (firemode)
 	{
-		anim_shoot_name = firemode.anim_shoot_name;
-		anim_shoot_time = firemode.delay_recover;
-		anim_load_name = firemode.anim_load_name;
-		anim_load_time = firemode.delay_reload;
-		anim_walk_speed_front = firemode.walk_speed_front;	
-		anim_walk_speed_back = firemode.walk_speed_back;
+		anim_shoot_name = firemode->GetShootingAnimation();
+		anim_shoot_time = firemode->GetRecoveryDelay();
+		anim_load_name = firemode->GetReloadAnimation();
+		anim_load_time = firemode->GetReloadDelay();
+		anim_walk_speed_front = firemode->GetForwardWalkingSpeed();	
+		anim_walk_speed_back = firemode->GetBackwardWalkingSpeed();
 	}
 
 	return {

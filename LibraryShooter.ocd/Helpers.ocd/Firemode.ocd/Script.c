@@ -42,6 +42,17 @@ public func GetIcon()
 
 
 /**
+	Get the index of this fire mode, for {@link Library_Firemode#GetFiremode()}.
+
+	@return int The fire mode index.
+*/
+public func GetIndex()
+{
+	return this.index;
+}
+
+
+/**
 	Get the condition callback of this fire mode.
 
 	@return A string.
@@ -148,6 +159,17 @@ public func GetDamage() // yes, this shadows an engine function!
 public func GetDamageType()
 {
 	return this.damage_type;
+}
+
+
+/**
+	Gets the number of projectiles to be fired by a single shot.
+
+	@return int The number of projectiles per shot.
+*/
+func GetProjectileAmount()
+{
+	return this.projectile_number;
 }
 
 
@@ -348,6 +370,23 @@ public func SetIcon(id value)
 
 
 /**
+	Set the index of this fire mode, for {@link Library_Firearm#GetFiremode}.
+	
+	@note This is automatically called by {@link Library_Firearm#AddFiremode}.
+
+	@par value The index of the firemode.
+
+	@return proplist Returns the fire mode, so that 
+	                 further function calls can be issued.
+*/
+public func SetIndex(int value)
+{
+	this.index = value;
+	return this;
+}
+
+
+/**
 	Set the condition callback of this fire mode.
 
 	@par value A string corresponding to a function name, or a function pointer.
@@ -502,6 +541,21 @@ public func SetDamage(int value) // yes, this shadows an engine function!
 public func SetDamageType(int value)
 {
 	this.damage_type = value;
+	return this;
+}
+
+
+/**
+	Sets the number of projectiles to be fired by a single shot.
+
+	@par value The number of projectiles per shot.
+	
+	@return proplist Returns the fire mode, so that 
+	                 further function calls can be issued.
+*/
+func SetProjectileAmount(int value)
+{
+	this.projectile_number = value;
 	return this;
 }
 
