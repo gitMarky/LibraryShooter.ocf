@@ -8,7 +8,7 @@
 
 /* --- Properties --- */
 
-local plugin_firearm_spread;
+local plugin_firearm_spread = 0;
 
 /* --- Callbacks from the firearm library --- */
 
@@ -24,15 +24,7 @@ func GetFirearmSpread(object weapon, proplist firemode)
 
 /* --- Internals --- */
 
-func DoFirearmSpread(proplist spread)
+func DoFirearmSpread(int spread)
 {
-	if (!plugin_firearm_spread)
-	{
-		plugin_firearm_spread = Projectile_Deviation(0, 100);
-		plugin_firearm_spread->SetDynamic(true);
-	}
-	// Too lazy for making the detailed change, this is enough at the moment
-	var scaled = spread->ScalePrecision(plugin_firearm_spread->GetPrecision());
-	plugin_firearm_spread->DoValue(scaled->GetValue());
-	return [plugin_firearm_spread, scaled];
+	plugin_firearm_spread = Max(0, plugin_firearm_spread + spread);
 }

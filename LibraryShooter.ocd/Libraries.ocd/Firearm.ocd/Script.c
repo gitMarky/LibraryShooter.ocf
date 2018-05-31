@@ -47,8 +47,8 @@ local fire_mode_default =
 	projectile_distance = 10,
 	projectile_offset_y = -6,
 	projectile_number =   1,
-	projectile_spread =   { Prototype = Deviation, Value: 0, Precision: 100 }, // default inaccuracy of a single projectile
-	spread =              { Prototype = Deviation, Value: 1, Precision: 100 }, // inaccuracy from prolonged firing
+	projectile_spread =   0, // default inaccuracy of a single projectile
+	spread =              1, // inaccuracy from prolonged firing
 	burst =               0, // number of projectiles fired in a burst
 	auto_reload =         false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
 	anim_shoot_name =     nil, // for animation set: shoot animation
@@ -975,17 +975,17 @@ func FireProjectiles(object user, int angle, proplist firemode)
 
 
 /**
-	Gets bullet deviations for a shot.
+	Gets the individual deviations for a shot.
 
 	@par firemode A proplist containing the fire mode information.
 
-	@return By default, will compose the spread values:
+	@return array By default, will compose the spread values:
 			<ul>
 			<li>{@link Library_Firemode#GetSpread}</li>
 			<li>{@link Library_Firemode#GetProjectileSpread}</li>
 			<li>{@code user->GetFirearmSpread(weapon, firemode}</li>
 	        </ul>
-            fire mode and weapon user into an array and pass over to {@link NormalizeDeviations},
+            fire mode and weapon user into an array,
             or returns nil.
 */
 func ComposeSpread(object user, proplist firemode)
@@ -1002,14 +1002,9 @@ func ComposeSpread(object user, proplist firemode)
 	}
 
 	// Compose everything
-	if (weapon_spread || projectile_spread || user_spread)
-	{
-		return NormalizeDeviations([weapon_spread, projectile_spread, user_spread]);
-	}
-	else
-	{
-		return nil;
-	}
+	var deviations = [weapon_spread, projectile_spread, user_spread];
+	RemoveHoles(deviations);
+	return deviations;
 }
 
 

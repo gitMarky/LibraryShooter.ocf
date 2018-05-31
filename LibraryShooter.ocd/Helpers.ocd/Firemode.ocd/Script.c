@@ -26,9 +26,9 @@
 	projectile_distance: Integer. Distance the projectile is being created away from the shooting object (default: 10).@br
 	projectile_offset_y: Integer. Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center (default: -6).@br
 	projectile_number: Integer. How many projectiles are fired in a single shot (default: 1).@br
-	projectile_spread: Proplist with two integers. Deviation of a projectile from the firing angle and a precision parameter.@br
-	spread: Proplist with two integers. Additional deviation added by certain effects (e.g. continuous firing) (default: { angle: 1, precision: 100 }).@br
-	spread_per_shot: Proplist {@link Global#Deviation}.
+	projectile_spread: Integer. Deviation of the projectiles. Default: 0@br
+	spread: Integer. Deviation of the fire mode. Default: 0@br
+	spread_per_shot: Integer. Deviation that is added to the user with each shot.@br
 	burst: Integer. Number of shots being fired when using burst mode style (default: 0).@br
 	auto_reload: Boolean. If true, the weapon reloads even if the use button is not held (default: false).@br
 	anim_shoot_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general aim animation (default: nil).@br
@@ -234,7 +234,8 @@ public func GetProjectileSpeed()
 	This spread value is static and defines how inaccurate
 	the projectiles are by themselves.
 
-	@return proplist A {@link Global#Deviation} proplist.
+	@return int The spread {@code x} in millidegrees, will be added to the
+	            as a cone {@code +/- x} to the aiming angle.
 */
 public func GetProjectileSpread()
 {
@@ -281,7 +282,8 @@ public func GetYOffset()
 	This spread value is static and defines how inaccurate
 	the weapon or firemode is by itself in this fire mode.
 
-	@return proplist A {@link Global#Deviation} proplist.
+	@return int The spread {@code x} in millidegrees, will be added to the
+	            as a cone {@code +/- x} to the aiming angle.
 */
 public func GetSpread()
 {
@@ -301,7 +303,8 @@ public func GetSpread()
 	      including {@link Plugin_Firearm_DynamicSpread}
 	      in the user.
 
-	@return proplist A {@link Global#Deviation} proplist.
+	@return int The spread {@code x} in millidegrees, will be added to the
+	            as a cone {@code +/- x} to the aiming angle.
 */
 public func GetSpreadPerShot()
 {
@@ -654,13 +657,13 @@ public func SetProjectileSpeed(int value)
 	Set the spread of the projectiles for this fire mode. Refers to 
     the basic inaccuracy of the projectiles.
 
-	@par value A proplist, see {@link Global#Projectile_Deviation}
-	           and {@link Global#Deviation}.
+	@par value The spread {@code x} in millidegrees, will be added to the
+	           as a cone {@code +/- x} to the aiming angle.
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
 */
-public func SetProjectileSpread(proplist value)
+public func SetProjectileSpread(int value)
 {
 	this.projectile_spread = value;
 	return this;
@@ -718,13 +721,13 @@ public func SetYOffset(int value)
 	Set the spread of this fire mode. Refers to 
     additional deviation added by certain effects (e.g. continuous firing).
 
-	@par value A proplist, see {@link Global#Projectile_Deviation}
-	           and {@link Global#Deviation}.
+	@par value The spread {@code x} in millidegrees, will be added to the
+	           as a cone {@code +/- x} to the aiming angle.
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
 */
-public func SetSpread(proplist value)
+public func SetSpread(int value)
 {
 	this.spread = value;
 	return this;
@@ -740,9 +743,13 @@ public func SetSpread(proplist value)
 	      including {@link Plugin_Firearm_DynamicSpread}
 	      in the user.
 
-	@return proplist A {@link Global#Deviation} proplist.
+	@par value The spread {@code x} in millidegrees, will be added to the
+	           as a cone {@code +/- x} to the aiming angle.
+
+	@return proplist Returns the fire mode, so that 
+	                 further function calls can be issued.
 */
-public func SetSpreadPerShot(proplist value)
+public func SetSpreadPerShot(int value)
 {
 	this.spread_per_shot = value;
 	return this;

@@ -11,8 +11,6 @@
 static const PROJECTILE_Default_Velocity_Precision = 10;
 static const PROJECTILE_Range_Infinite = 0;
 
-static const PROJECTILE_Deviation_Value = 0;
-static const PROJECTILE_Deviation_Precision = 1;
 
 /* --- Properties --- */
 
@@ -464,7 +462,7 @@ func ShouldRemoveOnHit()
 	return this.remove_on_hit;
 }
 
-public func Launch(int angle, proplist deviation)
+public func Launch(int angle, deviation)
 {
 	lifetime = lifetime ?? (PROJECTILE_Default_Velocity_Precision * GetRange() / Max(velocity, 1));
 
@@ -473,21 +471,7 @@ public func Launch(int angle, proplist deviation)
 
 	SetController(user->GetController());
 	
-	var precision = 100;
-	
-	// Get correct precision
-	if (deviation == nil)
-	{
-		// everything ok
-	}
-	else if (deviation->GetPrecision() > precision)
-	{
-		precision = deviation->GetPrecision();
-	}
-	else
-	{
-		deviation = deviation->ScalePrecision(precision);
-	}
+	var precision = 1000;
 	
 	// get angle and velocity
 	angle = GetLaunchAngle(angle, precision, deviation);
@@ -526,6 +510,7 @@ func LaunchAsProjectile(int angle, int precision)
 
 func LaunchHitscan(int angle, int precision)
 {
+
 	//-- initialize position
 
 	var self = this;
@@ -1304,28 +1289,28 @@ func ProhibitedWhileLaunched()
 func GetLaunchAngle(int angle, int precision, deviation)
 {
 	var launch_angle = angle * precision;
-	// handle correct deviation
-	if (GetType(deviation) == C4V_PropList)
+	var deviations;
+	if (GetType(deviation) == C4V_Int)
 	{
-		var deviations;
-		if (GetType(deviation->GetValue()) == C4V_Int)
-		{
-			deviations = [deviation->GetValue()];
-		}
-		else
-		{
-			deviations = deviation->GetValue();
-		}
-
-		for (var i = 0; i < GetLength(deviations); ++i)
-		{
-			var rnd = deviations[i];
-			launch_angle += RandomX(-rnd, +rnd);
-		}
+		deviations = [deviation];
 	}
-	else if (GetType(deviation) != C4V_Nil)
+	else if (GetType(deviation) == C4V_Array)
+	{
+		deviations = deviation;
+	}
+	else if (GetType(deviation) == C4V_Nil)
+	{
+		deviations = [];
+	}
+	else
 	{
 		FatalError(Format("Unexpected parameter %v for deviation. Expected proplist, or nil.", deviation));
+	}
+
+	for (var i = 0; i < GetLength(deviations); ++i)
+	{
+		var rnd = deviations[i];
+		launch_angle += RandomX(-rnd, +rnd);
 	}
 	return launch_angle;
 }

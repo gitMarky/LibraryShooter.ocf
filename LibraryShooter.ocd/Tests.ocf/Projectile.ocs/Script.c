@@ -132,12 +132,12 @@ global func Test3_Execute()
 {
 	var projectile = CreateProjectile();
 
-	for (var precision in [100, 1000, 10000])
+	for (var precision in [10, 100, 1000])
 	{
 		for (var angle in [0, 50])
 		{
 			Log("Testing precision %d, angle %d", precision, angle);
-			var deviation = Projectile_Deviation(5, precision);
+			var deviation = 5;
 
 			
 			var max_launch_angle = angle * precision;
