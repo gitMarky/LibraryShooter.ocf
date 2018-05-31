@@ -1,4 +1,5 @@
 [DefCore]
-id=Plugin_Weapon_ReloadFromAmmoSource
+id=Plugin_Firearm_ReloadFromAmmoSource
 Version=8,0
 Category=C4D_StaticBack
+HideInCreator=true

@@ -2,7 +2,6 @@
  Allows fire mode selection by cycling through the modes.
  */
 
-#include Plugin_Weapon_FiremodeBySelection
 
 local next_firemode_index = 0;
 local current_firemode_index = 0;
@@ -20,7 +19,7 @@ local IntToggleFiremode = new Effect
 		{
 			if (current_index != next_index)
 			{
-				Target->ScheduleChangeFiremode(modes[next_index].name);
+				Target->ScheduleSetFiremode(next_index);
 			}
 			
 			return FX_Execute_Kill;
@@ -72,7 +71,7 @@ public func ToggleFiremode()
 	{
 		toggle_effect = CreateEffect(IntToggleFiremode, 1, 1);
 		toggle_effect->SetFiremodes(modes);
-		toggle_effect->SetIndex(GetIndexOf(modes, GetFiremode()));
+		toggle_effect->SetIndex(this->~GetFiremode());
 		toggle_effect->SetDelay(ToggleFiremodeDelay());
 	}
 	else

@@ -1,7 +1,23 @@
 ﻿Version 0.2.0
 ------------------------------------------------------------------------------------------------
-! fixed callbacks for cooldown when user dies or drops weapon (#13402)
-* made weapon callbacks runtime-replaceable
-* moved assertion to OC repository
-* updated version of all definitions to 8,0
-+ added change log file
++ Added change log file
++ Added getters and setters for fire modes
+
+! Made the library more generic in many aspected, you should check and test your code extensively:
+  x Weapons are not automatically aiming anymore, this can be defined by the user
+  x Ammo logic is not part of the weapon anymore, can be included via plugin
+! Renamed Library_Weapon to Library_Firearm
+
+* Made weapon callbacks runtime-replaceable
+* Moved assertion to OC repository
+* Updated version of all definitions to 8,0
+
+# Fixed callbacks for cooldown when user dies or drops weapon (#13402)
+
+Legend
+------------------------------------------------------------------------------------------------
++ = Addition
+- = Removal
+! = Changed behaviour, your code may need adjustments
+* = Change, should not affect your code
+# = Bugfix, patch

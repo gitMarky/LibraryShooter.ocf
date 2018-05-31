@@ -4,36 +4,34 @@
  @author Marky
  @version 0.1.0
  */
- 
- #include Library_DefinitionBag
- 
-/*
- TODO: Planned stuff
- - two modes for distributing/saving ammo: abstract (variables) or with objects
-*/
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// global functions
 
-// these are numbers and should not be used as bits
+/* --- Global functions and constants --- */
+
+// These are numbers and should not be used as bits
 static const AMMO_Source_Local = 1;	// ammo is saved as numbers
-static const AMMO_Source_Items = 2;		// ammo is saved from collected items, such as arrow packs
+static const AMMO_Source_Items = 2; // ammo is saved from collected items, such as arrow packs
 
 static const AMMO_Source_Container = 3;	// ammo is saved in the carrier of the weapon (as in arcade games)
 static const AMMO_Source_Infinite = 4;	// ammo is unlimited - yay for cheats
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// definitions
+/* --- Properties --- */
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// finished functions
+local library_ammo_manager;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// non-functional and temporary stuff
+/* --- Engine callbacks --- */
+
+/**
+ Objects that include this library must call {@link Global#inherited}
+ for this function.
+ */
+public func Construction()
+{
+	library_ammo_manager = library_ammo_manager ?? {};
+	return _inherited(...);
+}
+
+/* --- Library code --- */
 
 /**
  Tells the object where to get its ammunition from.@br
@@ -75,7 +73,7 @@ public func GetAmmo(id ammo)
 
 	if (ammo_source == AMMO_Source_Local)
 	{
-		return GetItems(ammo);
+		return Max(0, library_ammo_manager[Format("%i", ammo)]);
 	}
 	else if (ammo_source == AMMO_Source_Items)
 	{
@@ -94,7 +92,7 @@ public func GetAmmo(id ammo)
 	}
 	else if (ammo_source == AMMO_Source_Infinite)
 	{
-		return Max(1, GetItems(ammo));
+		return Max(1, ammo->~MaxAmmo());
 	}
 }
 
@@ -148,7 +146,10 @@ public func SetAmmo(id ammo, int new_value)
 
 	if (ammo_source == AMMO_Source_Local)
 	{
-		return SetItems(ammo, new_value);
+		var max = ammo->~MaxAmmo() ?? new_value;
+		var value = BoundBy(new_value, 0, max);
+		library_ammo_manager[Format("%i", ammo)] = value;
+		return value;
 	}
 	else if (ammo_source == AMMO_Source_Items)
 	{
@@ -167,14 +168,7 @@ public func SetAmmo(id ammo, int new_value)
 	}
 	else if (ammo_source == AMMO_Source_Infinite)
 	{
-		if (GetItems(ammo))
-		{
-			return new_value;
-		}
-		else
-		{
-			return 0;
-		}
+		return Max(1, new_value);
 	}
 }
 

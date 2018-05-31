@@ -1,2 +1,0 @@
-Name=Weapon
-Description=A weapon that launches projectiles or is suitable for melee

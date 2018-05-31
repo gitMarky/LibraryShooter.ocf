@@ -1,0 +1,4 @@
+﻿Name=Waffe
+Description=Eine Waffe.
+
+DefaultFireMode=Standard

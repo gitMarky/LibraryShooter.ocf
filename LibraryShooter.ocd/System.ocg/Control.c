@@ -1,4 +1,30 @@
+/*
 
+Use the following PlayerControls.txt
+
+[ControlDefs]
+
+	[ControlDef]
+	Identifier=CaedesAimingCursor
+	DefaultDisabled=1
+
+[ControlSets]
+
+	[ControlSet]
+	Name=WASD_Hotkeys_IntQueue_MouseCon_
+	GUIName=Keyboard and Mouse
+	Keyboard=1
+	Mouse=1
+	Gamepad=0
+
+		[Assignment]
+		Key=Mouse1Move
+		Control=CaedesAimingCursor
+		Priority=30
+
+*/
+
+/*
 global func Control2Player(int plr, int ctrl, int x, int y, int strength, bool repeat, bool release)
 {
 	// cursor pos info - store in player values
@@ -21,3 +47,4 @@ global func Control2Player(int plr, int ctrl, int x, int y, int strength, bool r
 	
 	return inherited(plr, ctrl, x, y, strength, repeat, release);
 }
+*/

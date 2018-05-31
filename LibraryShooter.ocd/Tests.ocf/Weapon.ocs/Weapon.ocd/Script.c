@@ -1,5 +1,5 @@
-#include Library_Weapon
-#include Plugin_Weapon_FiremodeBySelection
+#include Library_Firearm
+#include Plugin_Firearm_FiremodeBySelection
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -9,8 +9,8 @@ local Name = "$Name$";
 local Description = "$Description$";
 
 
-public func GetCarryMode(object user) {    if (is_selected) return CARRY_Hand; }
-public func GetCarrySpecial(object user) { if (is_selected) return "pos_hand2"; }
+public func GetCarryMode(object user) {    return CARRY_Hand; }
+public func GetCarrySpecial(object user) { return "pos_hand2"; }
 public func GetCarryBone() { return "main"; }
 public func GetCarryTransform()
 {
