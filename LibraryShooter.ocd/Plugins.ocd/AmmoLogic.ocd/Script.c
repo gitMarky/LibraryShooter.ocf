@@ -128,7 +128,7 @@ public func GetAmmo(type_or_firemode)
 	}
 	else if (GetType(type) != C4V_Nil)
 	{
-		FatalError("GetAmmo() accepts parameters of types C4V_PropList or C4V_Def only, received %v", GetType(type_or_firemode));
+		FatalError(Format("GetAmmo() accepts parameters of types C4V_PropList or C4V_Def only, received %v", GetType(type_or_firemode)));
 	}
 	// Otherwise default to the current firemode
 	if (type == nil)
