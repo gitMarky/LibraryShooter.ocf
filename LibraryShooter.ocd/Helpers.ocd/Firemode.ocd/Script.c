@@ -294,7 +294,7 @@ public func GetBackwardWalkingSpeed()
 }
 
 
-/*-- Setters --*/
+/* --- Setters --- */
 
 /**
 	Set the mode (firing style) of this fire mode.
@@ -711,4 +711,19 @@ public func SetBackwardWalkingSpeed(int value)
 {
 	this.walk_speed_back = value;
 	return this;
+}
+
+/* --- Misc --- */
+
+
+/**
+	Find out whether the firemode is available.
+	
+	@return {@code true} if the firemode has no condition,
+	        or the return value of the function defined in
+	        {@link Library_Firearm_Firemode#GetCondition}.
+ */
+public func IsAvailable()
+{
+	return this.condition == nil || this->Call(this->GetCondition());
 }

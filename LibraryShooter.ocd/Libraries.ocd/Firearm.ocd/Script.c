@@ -1722,7 +1722,7 @@ public func SetFiremode(int number, bool force)
 		return;
 	}
 
-	if (force || CanChangeFiremode() || IsFiremodeAvailable(GetFiremode(number)))
+	if (force || CanChangeFiremode() || GetFiremode(number)->IsAvailable())
 	{
 		selected_firemode = number;
 		return true;
@@ -1804,28 +1804,13 @@ public func GetAvailableFiremodes()
 	for (var i = 0; i < GetLength(GetFiremodes()); ++i) // firemode in GetFiremodes())
 	{
 		var firemode = GetFiremode(i);
-
-		var is_available = IsFiremodeAvailable(firemode);
-
-		if (is_available)
+		if (firemode->IsAvailable())
 		{
 			PushBack(available, firemode);
 		}
 	}
 
 	return available;
-}
-
-func IsFiremodeAvailable(proplist firemode) // TODO: Temporary function => firemode should be base on a proplist prototype that has a function IsAvailable()
-{
-	if (firemode)
-	{
-		return firemode.condition == nil || this->Call(firemode.condition);
-	}
-	else
-	{
-		return false;
-	}
 }
 
 
