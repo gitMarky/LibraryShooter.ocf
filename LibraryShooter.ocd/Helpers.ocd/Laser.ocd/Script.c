@@ -139,7 +139,7 @@ public func LaserEnd(int x, int y)
 	return [x, y];
 }
 
-private func Activate()
+func Activate()
 {
 	if(GetAction() != "Laser")
 	{
@@ -149,12 +149,12 @@ private func Activate()
 	DrawTransform();
 }
 
-private func Update()
+func Update()
 {
 	DrawTransform();
 }
 
-protected func Laser()
+func Laser()
 {
 	DrawTransform();
 
@@ -175,7 +175,7 @@ protected func Laser()
 	if(timer >= lifetime) RemoveObject();
 }
 
-private func DrawTransform()
+func DrawTransform()
 {
 	// draw line
 

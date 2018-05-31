@@ -13,12 +13,12 @@ local trail;
 
 local instant;
 
-protected func Initialize()
+func Initialize()
 {
 	speed = 4000;
 }
 
-protected func Hit()
+func Hit()
 {
 	var self = this;
 	
@@ -186,7 +186,7 @@ public func OnHitObject(object obj)
 
 
 
-private func SquishVertices(bool squish)
+func SquishVertices(bool squish)
 {
 	if(squish==true)
 	{

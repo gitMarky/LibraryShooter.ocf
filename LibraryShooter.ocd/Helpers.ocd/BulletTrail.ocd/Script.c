@@ -138,12 +138,12 @@ public func ProjectileUpdate()
 	}
 }
 
-private func Hit()
+func Hit()
 {
 	Remove();
 }
 
-private func Remove()
+func Remove()
 {
 	l = Min(l, GetRelativeLength());
 	
@@ -152,14 +152,14 @@ private func Remove()
 	move_speed = 0;
 }
 
-private func GetRelativeLength()
+func GetRelativeLength()
 {
 	var distance = Distance(x, y, GetX(), GetY());
 	var relative_length = precision * distance / ActMap.Travel.Hgt;
 	return relative_length;
 }
 
-private func DrawColorModulation()
+func DrawColorModulation()
 {
 	var trail_color;
 	
@@ -172,7 +172,7 @@ private func DrawColorModulation()
 	}
 }
 
-private func DrawTransform()
+func DrawTransform()
 {
 	var relative_length = GetRelativeLength();
 	
@@ -205,7 +205,7 @@ private func DrawTransform()
 	SetObjDrawTransform(width, xskew, xadjust, yskew, height, yadjust);
 }
 
-private func SaveScenarioObject()
+func SaveScenarioObject()
 {
 	return false;
 }
@@ -248,7 +248,7 @@ local ActMap =
 	}
 };
 
-private func FxIntProjectileTimer(object target, proplist effect, int time)
+func FxIntProjectileTimer(object target, proplist effect, int time)
 {
 	if (target != this)
 	{

@@ -1,11 +1,11 @@
 #include Library_Projectile
 
-protected func Initialize()
+func Initialize()
 {
 	SetObjectBlitMode(GFX_BLIT_Additive);
 }
 
-private func OnLaunch()
+func OnLaunch()
 {
 	SetAction("Travel");
 }

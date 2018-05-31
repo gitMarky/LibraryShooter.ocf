@@ -514,7 +514,7 @@ public func Launch(int angle, proplist deviation)
 }
 
 
-private func LaunchAsProjectile(int angle, int precision)
+func LaunchAsProjectile(int angle, int precision)
 {
 	//Log("Launching projectile at angle %d (%d with precision %d), v_x = %d, v_y = %d", angle / precision, angle, precision, velocity_x, velocity_y);
 
@@ -524,7 +524,7 @@ private func LaunchAsProjectile(int angle, int precision)
 }
 
 
-private func LaunchHitscan(int angle, int precision)
+func LaunchHitscan(int angle, int precision)
 {
 	//-- initialize position
 
@@ -709,7 +709,7 @@ public func Travelling()
 	if (self && GetLifetime() > 0 && GetActTime() >= GetLifetime()) Remove();
 }
 
-protected func ControlSpeed()
+func ControlSpeed()
 {
 	if (GetAction() == "Travel")
 	{
@@ -720,7 +720,7 @@ protected func ControlSpeed()
 	if (!rotation_by_rdir) SetR(Angle(0, 0, GetXDir(), GetYDir()));
 }
 
-private func DrawColorModulation()
+func DrawColorModulation()
 {
 	var color = ProjectileColor(GetActTime());
 	
@@ -828,7 +828,7 @@ public func OnHitLandscape()
 }
 
 
-private func SquishVertices(bool squish)
+func SquishVertices(bool squish)
 {
 	if(squish)
 	{
@@ -967,7 +967,7 @@ public func LaunchInstant(int iAngle, int iSpeed, int iDist, int iSize, int iTra
 
 
 // Extern für Überladung
-private func CreateTrail(int iSize, int iTrail) {
+func CreateTrail(int iSize, int iTrail) {
 	pTrail = CreateObject(TrailID(),0,0,-1);
 	if(pTrail) {
 		pTrail->Set(iSize-2,iTrail,this());
@@ -978,7 +978,7 @@ private func CreateTrail(int iSize, int iTrail) {
 
 // Timer 
 
-private func Traveling()
+func Traveling()
 {
 	if(pTrail) HandleTrail();
 
@@ -999,7 +999,7 @@ private func Traveling()
 
 // Treffer
 
-private func Hit()
+func Hit()
 {
 	// Reflektion an Wänden (Eintrittswinkel = Austrittwinkel)
 	if(iRefl)
@@ -1072,7 +1072,7 @@ private func Hit()
 	HitObject();
 }
 
-private func Color(int iATime) {
+func Color(int iATime) {
 	var iPrg = 100*iATime/iTime;
 	return(RGBa(255,255-iPrg*2,255-iPrg*2,iPrg*2));
 }
@@ -1136,7 +1136,7 @@ public func FxHitCheckStart(object target, int effect, int temp, object byObj, b
 //
 // neue Treffer-Routine
 
-private func HitCheck(int x1, int y1, int x2, int y2, object pExclude )
+func HitCheck(int x1, int y1, int x2, int y2, object pExclude )
 {
 
 	// Endposition bestimmen
@@ -1212,7 +1212,7 @@ private func HitCheck(int x1, int y1, int x2, int y2, object pExclude )
 //
 // Geändertes
 
-private func HitObject(object pObject)
+func HitObject(object pObject)
 {
 	var ret = BulletStrike(pObject);
 
@@ -1292,7 +1292,7 @@ TravelBallistic = {
 
 */
 
-private func ProhibitedWhileLaunched()
+func ProhibitedWhileLaunched()
 {
 	if (is_launched)
 	{
@@ -1301,7 +1301,7 @@ private func ProhibitedWhileLaunched()
 }
 
 
-private func GetLaunchAngle(int angle, int precision, deviation)
+func GetLaunchAngle(int angle, int precision, deviation)
 {
 	var launch_angle = angle * precision;
 	// handle correct deviation
