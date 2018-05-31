@@ -475,18 +475,18 @@ public func Launch(int angle, proplist deviation)
 	
 	var precision = 100;
 	
-	// get correct precision
+	// Get correct precision
 	if (deviation == nil)
 	{
 		// everything ok
 	}
-	else if (deviation.precision > precision)
+	else if (deviation->GetPrecision() > precision)
 	{
-		precision = deviation.precision;
+		precision = deviation->GetPrecision();
 	}
 	else
 	{
-		deviation = ScaleDeviation(deviation, precision);
+		deviation = deviation->ScalePrecision(precision);
 	}
 	
 	// get angle and velocity
@@ -1307,20 +1307,25 @@ func GetLaunchAngle(int angle, int precision, deviation)
 	// handle correct deviation
 	if (GetType(deviation) == C4V_PropList)
 	{
-		if (GetType(deviation.angle) == C4V_Int)
+		var deviations;
+		if (GetType(deviation->GetValue()) == C4V_Int)
 		{
-			deviation.angle = [deviation.angle];
+			deviations = [deviation->GetValue()];
+		}
+		else
+		{
+			deviations = deviation->GetValue();
 		}
 
-		for (var i = 0; i < GetLength(deviation.angle); ++i)
+		for (var i = 0; i < GetLength(deviations); ++i)
 		{
-			var rnd = deviation.angle[i];
+			var rnd = deviations[i];
 			launch_angle += RandomX(-rnd, +rnd);
 		}
 	}
 	else if (GetType(deviation) != C4V_Nil)
 	{
-		FatalError(Format("Unexpected parameter %v for deviation. Expected array, proplist, or nil.", deviation));
+		FatalError(Format("Unexpected parameter %v for deviation. Expected proplist, or nil.", deviation));
 	}
 	return launch_angle;
 }

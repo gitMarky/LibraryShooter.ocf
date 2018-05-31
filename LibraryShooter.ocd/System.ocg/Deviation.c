@@ -37,10 +37,39 @@ static const Deviation = new Global
 		}
 	},
 	
+	
+	/**
+		Sets the precision, without changing the value.
+	 */
 	SetPrecision = func(int value)
 	{
 		this.Precision = Max(1, value ?? 1);
 		return this;
+	},
+	
+	
+	/**
+		Returns a new deviation with the current value
+		scaled to a specific precision
+	 */
+	ScalePrecision = func (int value)
+	{
+		var factor = value ?? 1;
+		var angles;
+		if (GetType(this.Value) == C4V_Array)
+		{
+			angles = [];
+			for (var i = 0; i < GetLength(this->GetValue()); ++i)
+			{
+				angles[i] = factor * this.Value[i] / this.Precision;
+			}
+		}
+		else
+		{
+			angles = factor * this.Value / this.Precision;
+		}
+	
+		return Projectile_Deviation(angles, factor);
 	},
 };
 
@@ -100,31 +129,4 @@ global func NormalizeDeviations(array deviations, int min_precision)
 	}
 	
 	return Projectile_Deviation(angles, precision_max);
-}
-
-
-/**
-	Takes a projectile deviation and scales it to fit the target precision.
-
-	@par deviations The deviation definitions.
-	@par target_precision The target precision;
- */ 
-global func ScaleDeviation(proplist deviation, int target_precision)
-{
-	var factor = target_precision ?? 1;
-	var angles;
-	if (GetType(deviation.angle) == C4V_Array)
-	{
-		angles = [];
-		for (var i = 0; i < GetLength(deviation.angle); ++i)
-		{
-			angles[i] = factor * deviation.angle[i] / deviation.precision;
-		}
-	}
-	else
-	{
-		angles = factor * deviation.angle / deviation.precision;
-	}
-
-	return Projectile_Deviation(angles, target_precision);
 }
