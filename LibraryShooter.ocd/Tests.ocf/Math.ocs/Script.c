@@ -12,6 +12,7 @@ func InitializePlayer(int plr)
 	return;
 }
 
+
 /* --- The actual tests --- */
 
 
@@ -39,6 +40,7 @@ global func Test1_Execute()
 	
 	return Evaluate();
 }
+
 
 // --------------------------------------------------------------------------------------------------------
 

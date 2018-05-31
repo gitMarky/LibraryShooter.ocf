@@ -87,6 +87,7 @@ public func GetXDir(int precision)
 	}
 }
 
+
 /**
 	Override of the default function for getting y dir, so that hitscan projectiles
 	can provide a correct value.
@@ -104,6 +105,7 @@ public func GetYDir(int precision)
 		return _inherited(precision, ...);
 	}
 }
+
 
 /* --- Interface --- */
 
@@ -381,6 +383,7 @@ public func Trail(int width, int length, string gfx, int speed)
 	return this;
 }
 
+
 /* --- Engine callbacks --- */
 
 func Initialize()
@@ -434,6 +437,7 @@ func Hit()
 		if (self && self->ShouldRemoveOnHit()) RemoveObject();
 	}
 }
+
 
 /* --- Internals --- */
 
@@ -629,6 +633,7 @@ public func OnLaunched()
 public func OnHitScan(int x_start, int y_start, int x_end, int y_end)
 {
 }
+
 
 /*
 public func Launch(int iAngle, int iSpeed, int iDist, int iSize, int iTrail, int iDmg, int iDmgType, int iGlowSize, int iAPrec, int iReflections)
@@ -970,6 +975,7 @@ private func CreateTrail(int iSize, int iTrail) {
 	}
 }
 
+
 // Timer 
 
 private func Traveling()
@@ -989,6 +995,7 @@ private func Traveling()
 	// außerhalb der Landschaft: löschen
 	if(GetY()<0) return(Remove());
 }
+
 
 // Treffer
 
@@ -1081,6 +1088,7 @@ public func GlowColor(int iATime) {
 	return(RGBa(255,190,0,50));
 }
 
+
 // Dummy-func
 func HitExclude()
 {
@@ -1095,6 +1103,7 @@ public func Remove() {
 
 	RemoveObject();
 }
+
 
 // Effekt für Trefferüberprüfung
 
@@ -1198,6 +1207,7 @@ private func HitCheck(int x1, int y1, int x2, int y2, object pExclude )
 	}
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Geändertes
@@ -1242,6 +1252,7 @@ public func SetBallistic()
 {
 	SetAction("TravelBallistic");
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

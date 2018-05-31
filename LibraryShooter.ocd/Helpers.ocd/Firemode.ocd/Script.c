@@ -18,6 +18,7 @@ public func GetMode()
 	return this.mode;
 }
 
+
 /**
 	Get the name of this fire mode.
 
@@ -27,6 +28,7 @@ public func GetName()
 {
 	return this.name;
 }
+
 
 /**
 	Get the icon of this fire mode.
@@ -38,6 +40,7 @@ public func GetIcon()
 	return this.icon;
 }
 
+
 /**
 	Get the condition callback of this fire mode.
 
@@ -47,6 +50,7 @@ public func GetCondition()
 {
 	return this.condition;
 }
+
 
 /**
 	Get the ammunition ID of this fire mode.
@@ -58,6 +62,7 @@ public func GetAmmoID()
 	return this.ammo_id;
 }
 
+
 /**
 	Get the ammunition usage of this fire mode.
 
@@ -67,6 +72,7 @@ public func GetAmmoUsage()
 {
 	return this.ammo_usage ?? 1;
 }
+
 
 /**
 	Get the ammunition rate of this fire mode.
@@ -78,6 +84,7 @@ public func GetAmmoRate()
 	return this.ammo_rate ?? 1;
 }
 
+
 /**
 	Get the charging delay of this fire mode.
 
@@ -87,6 +94,7 @@ public func GetChargeDelay()
 {
 	return this.delay_charge;
 }
+
 
 /**
 	Get the recovery delay of this fire mode.
@@ -98,6 +106,7 @@ public func GetRecoveryDelay()
 	return this.delay_recover;
 }
 
+
 /**
 	Get the cooldown delay of this fire mode.
 
@@ -107,6 +116,7 @@ public func GetCooldownDelay()
 {
 	return this.delay_cooldown;
 }
+
 
 /**
 	Get the reloading delay of this fire mode.
@@ -118,6 +128,7 @@ public func GetReloadDelay()
 	return this.delay_reload;
 }
 
+
 /**
 	Get the damage of this fire mode.
 
@@ -127,6 +138,7 @@ public func GetDamage() // yes, this shadows an engine function!
 {
 	return this.damage;
 }
+
 
 /**
 	Get the damage type of this fire mode.
@@ -138,6 +150,7 @@ public func GetDamageType()
 	return this.damage_type;
 }
 
+
 /**
 	Get the projectile ID of this fire mode.
 
@@ -147,6 +160,7 @@ public func GetProjectileID()
 {
 	return this.projectile_id;
 }
+
 
 /**
 	Get the projectile speed of this fire mode.
@@ -158,6 +172,7 @@ public func GetProjectileSpeed()
 	return this.projectile_speed;
 }
 
+
 /**
 	Get the projectile spread of this fire mode.
 
@@ -167,6 +182,7 @@ public func GetProjectileSpread()
 {
 	return this.projectile_spread;
 }
+
 
 /**
 	Get the projectile range of this fire mode.
@@ -178,6 +194,7 @@ public func GetProjectileRange()
 	return this.projectile_range;
 }
 
+
 /**
 	Get the projectile distance of this fire mode.
 
@@ -187,6 +204,7 @@ public func GetProjectileDistance()
 {
 	return this.projectile_distance;
 }
+
 
 /**
 	Get the Y offset of this fire mode.
@@ -198,6 +216,7 @@ public func GetYOffset()
 	return this.projectile_offset_y;
 }
 
+
 /**
 	Get the spread of this fire mode.
 
@@ -207,6 +226,7 @@ public func GetSpread()
 {
 	return this.spread;
 }
+
 
 /**
 	Get the amount of projectiles firing in a burst of this fire mode.
@@ -218,6 +238,7 @@ public func GetBurstAmount()
 	return this.burst;
 }
 
+
 /**
 	Get the automatic reload setting of this fire mode.
 
@@ -227,6 +248,7 @@ public func GetAutoReload()
 {
 	return this.auto_reload;
 }
+
 
 /**
 	Get the shooting animation name of this fire mode.
@@ -238,6 +260,7 @@ public func GetShootingAnimation()
 	return this.anim_shoot_name;
 }
 
+
 /**
 	Get the loading animation name of this fire mode.
 
@@ -247,6 +270,7 @@ public func GetReloadAnimation()
 {
 	return this.anim_load_name;
 }
+
 
 /**
 	Get the forward walking speed of this fire mode.
@@ -258,6 +282,7 @@ public func GetForwardWalkingSpeed()
 	return this.walk_speed_front;
 }
 
+
 /**
 	Get the backward walking speed of this fire mode.
 
@@ -267,6 +292,7 @@ public func GetBackwardWalkingSpeed()
 {
 	return this.walk_speed_back;
 }
+
 
 /*-- Setters --*/
 
@@ -288,6 +314,7 @@ public func SetMode(int value)
 	return this;
 }
 
+
 /**
 	Set the name of this fire mode.
 
@@ -303,6 +330,7 @@ public func SetName(string value)
 	return this;
 }
 
+
 /**
 	Set the icon of this fire mode.
 
@@ -317,6 +345,7 @@ public func SetIcon(id value)
 	this.icon = value;
 	return this;
 }
+
 
 /**
 	Set the condition callback of this fire mode.
@@ -334,6 +363,7 @@ public func SetCondition(value)
 	return this;
 }
 
+
 /**
 	Set the ammunition ID of this fire mode.
 
@@ -347,6 +377,7 @@ public func SetAmmoID(id value)
 	this.ammo_id = value;
 	return this;
 }
+
 
 /**
 	Set the ammunition usage of this fire mode.
@@ -362,6 +393,7 @@ public func SetAmmoUsage(int value)
 	return this;
 }
 
+
 /**
 	Set the ammunition rate of this fire mode.
 
@@ -375,6 +407,7 @@ public func SetAmmoRate(int value)
 	this.ammo_rate = value;
 	return this;
 }
+
 
 /**
 	Set the charging delay of this fire mode.
@@ -391,6 +424,7 @@ public func SetChargeDelay(int value)
 	return this;
 }
 
+
 /**
 	Set the recovery delay of this fire mode.
 
@@ -405,6 +439,7 @@ public func SetRecoveryDelay(int value)
 	this.delay_recover = value;
 	return this;
 }
+
 
 /**
 	Set the cooldown delay of this fire mode.
@@ -423,6 +458,7 @@ public func SetCooldownDelay(int value)
 	return this;
 }
 
+
 /**
 	Set the reloading delay of this fire mode.
 
@@ -437,6 +473,7 @@ public func SetReloadDelay(int value)
 	return this;
 }
 
+
 /**
 	Set the damage of this fire mode.
 
@@ -450,6 +487,7 @@ public func SetDamage(int value) // yes, this shadows an engine function!
 	this.damage = value;
 	return this;
 }
+
 
 /**
 	Set the damage type of this fire mode.
@@ -467,6 +505,7 @@ public func SetDamageType(int value)
 	return this;
 }
 
+
 /**
 	Set the projectile ID of this fire mode.
 
@@ -482,6 +521,7 @@ public func SetProjectileID(id value)
 	return this;
 }
 
+
 /**
 	Set the projectile speed of this fire mode.
 
@@ -495,6 +535,7 @@ public func SetProjectileSpeed(int value)
 	this.projectile_speed = value;
 	return this;
 }
+
 
 /**
 	Set the spread of the projectiles for this fire mode. Refers to 
@@ -512,6 +553,7 @@ public func SetProjectileSpread(proplist value)
 	return this;
 }
 
+
 /**
 	Set the projectile range of this fire mode.
 
@@ -526,6 +568,7 @@ public func SetProjectileRange(int value)
 	return this;
 }
 
+
 /**
 	Set the projectile distance of this fire mode.
 
@@ -539,6 +582,7 @@ public func SetProjectileDistance(int value)
 	this.projectile_distance = value;
 	return this;
 }
+
 
 /**
 	Set the Y offset of this fire mode.
@@ -556,6 +600,7 @@ public func SetYOffset(int value)
 	return this;
 }
 
+
 /**
 	Set the spread of this fire mode. Refers to 
     additional deviation added by certain effects (e.g. continuous firing).
@@ -572,6 +617,7 @@ public func SetSpread(proplist value)
 	return this;
 }
 
+
 /**
 	Set the amount of shots being fired in a burst of this fire mode.
 
@@ -585,6 +631,7 @@ public func SetBurstAmount(int value)
 	this.burst = value;
 	return this;
 }
+
 
 /**
 	Set the automatic reload setting of this fire mode.
@@ -600,6 +647,7 @@ public func SetAutoReload(bool value)
 	this.auto_reload = value;
 	return this;
 }
+
 
 /**
 	Set the shooting animation name of this fire mode.
@@ -617,6 +665,7 @@ public func SetShootingAnimation(string value)
 	return this;
 }
 
+
 /**
 	Set the loading animation name of this fire mode.
 
@@ -633,6 +682,7 @@ public func SetReloadAnimation(string value)
 	return this;
 }
 
+
 /**
 	Set the forward walking speed of this fire mode.
 
@@ -646,6 +696,7 @@ public func SetForwardWalkingSpeed(int value)
 {
 	this.walk_speed_front = value;
 }
+
 
 /**
 	Set the backward walking speed of this fire mode.

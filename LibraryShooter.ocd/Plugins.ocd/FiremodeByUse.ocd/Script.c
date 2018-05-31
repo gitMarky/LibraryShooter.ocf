@@ -17,6 +17,7 @@ public func OnPressUse(object user, int x, int y)
 	_inherited(user, x, y, ...);
 }
 
+
 /**
 	Callback: Pressed the alternate use button (fire secondary).
 
@@ -34,6 +35,7 @@ public func OnPressUseAlt(object user, int x, int y)
 	_inherited(...);
 }
 
+
 /**
 	Callback: The alternative use button is held. Called in regular intervals by {@link Library_Firearm#ControlUseAltHolding}.@br
 
@@ -46,6 +48,7 @@ public func OnHoldingUseAlt(object user, int x, int y)
 	this->ControlUseHolding(user, x, y);
 }
 
+
 /**
 	Callback: Released the alternative use button. Called by {@link Library_Firearm#ControlUseAltStop}.@br
 
@@ -57,6 +60,7 @@ public func OnUseAltStop(object user, int x, int y)
 {
 	this->ControlUseStop(user, x, y);
 }
+
 
 /**
 	This is executed when the user cancels the alternative use (usually by pressing a dedicated cancel button; must be defined, not standard in OpenClonk).@br@br

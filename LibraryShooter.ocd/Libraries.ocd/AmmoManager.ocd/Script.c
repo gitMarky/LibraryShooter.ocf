@@ -31,6 +31,7 @@ public func Construction()
 	return _inherited(...);
 }
 
+
 /* --- Library code --- */
 
 /**
@@ -53,6 +54,7 @@ public func GetAmmoSource(id ammo)
 {
 	return AMMO_Source_Infinite;
 }
+
 
 /**
 	Gets the current amount of ammunition of a certain type.
@@ -99,6 +101,7 @@ public func GetAmmo(id ammo)
 	}
 }
 
+
 /**
 	Changes the amount of ammunition that the object currently has.
 
@@ -134,6 +137,7 @@ public func DoAmmo(id ammo, int amount)
 		return after - before;
 	}
 }
+
 
 /**
 	Defines the amount of ammunition that the object currently has.
@@ -180,6 +184,7 @@ public func SetAmmo(id ammo, int new_value)
 		return Max(1, new_value);
 	}
 }
+
 
 /**
 

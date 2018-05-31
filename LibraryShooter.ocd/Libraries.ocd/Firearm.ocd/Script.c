@@ -133,6 +133,7 @@ public func Setting_AimOnUseStart()
 	return true;
 }
 
+
 /**
 	Check if the weapon should fire on a call of {@link Library_Firearm#ControlUseHolding}.@br
 
@@ -142,6 +143,7 @@ func FireOnHolding()
 {
 	return !Setting_AimOnUseStart() || GetFiremode().mode == WEAPON_FM_Auto;
 }
+
 
 /**
 	Check if the weapon should fire on a call of {@link Library_Firearm#ControlUseStop}.@br
@@ -153,6 +155,7 @@ func FireOnStopping()
 	return Setting_AimOnUseStart() && GetFiremode().mode != WEAPON_FM_Auto;
 }
 
+
 /**
 	If returns true, it is assumed that all functions regarding ammunition handling are configured as desired.@br
 	Ammunition handling can be done by for example by including {@link Library_AmmoManager}@br
@@ -163,6 +166,7 @@ public func Setting_WithAmmoLogic()
 {
 	return _inherited();
 }
+
 
 /*-- Engine Callbacks --*/
 
@@ -176,6 +180,7 @@ func Initialize()
 
 	_inherited();
 }
+
 
 /*-- Controls --*/
 
@@ -201,6 +206,7 @@ public func ControlUseStart(object user, int x, int y)
 	return true;
 }
 
+
 /**
 	This is executed each time the user presses the alternative use button (must be defined, not standard in OpenClonk).@br@br
 
@@ -223,6 +229,7 @@ public func ControlUseAltStart(object user, int x, int y)
 	return true;
 }
 
+
 /**
 	This is executed regularly while the user is holding the primary use button.@br@br
 
@@ -241,6 +248,7 @@ public func ControlUseHolding(object user, int x, int y)
 
 	return ControlFireHolding(user, x, y);
 }
+
 
 /**
 	This should be executed while the user is holding the fire button.@br@br
@@ -275,6 +283,7 @@ public func ControlFireHolding(object user, int x, int y)
 	return true;
 }
 
+
 /**
 	This is executed regularly while the user is holding the alternative use button (must be defined, not standard in OpenClonk).@br@br
 
@@ -291,6 +300,7 @@ public func ControlUseAltHolding(object user, int x, int y)
 
 	return true;
 }
+
 
 /**
 	This is executed when the user stops holding the fire button.@br@br
@@ -337,6 +347,7 @@ public func ControlUseStop(object user, int x, int y)
 	return true;
 }
 
+
 /**
 	This is executed when the user stops holding the alternative use button (must be defined, not standard in OpenClonk).@br@br
 
@@ -353,6 +364,7 @@ public func ControlUseAltStop(object user, int x, int y)
 
 	return true;
 }
+
 
 /**
 	This is executed when the user cancels the fire procedure (usually by pressing a dedicated cancel button).@br@br
@@ -373,6 +385,7 @@ public func ControlUseCancel(object user, int x, int y)
 	return ControlUseStop(user, x, y);
 }
 
+
 /**
 	This is executed when the user cancels the alternative use (usually by pressing a dedicated cancel button; must be defined, not standard in OpenClonk).@br@br
 
@@ -390,6 +403,7 @@ public func ControlUseAltCancel(object user, int x, int y)
 	return true;
 }
 
+
 /**
 	Sets is_using to false.
 */
@@ -397,6 +411,7 @@ public func CancelUsing()
 {
 	is_using = false;
 }
+
 
 /**
 	Check if the weapon should not be used right now.@br@br
@@ -410,6 +425,7 @@ func RejectUse(object user)
 	return !IsWeaponReadyToUse(user) || !IsUserReadyToUse(user);
 }
 
+
 /**
 	Interface for signaling that the weapon is ready to use (attack).
 
@@ -422,6 +438,7 @@ func IsWeaponReadyToUse(object user)
 	return Contained() == user;
 }
 
+
 /**
 	Interface for signaling that the user is ready to use (attack).
 
@@ -433,6 +450,7 @@ func IsUserReadyToUse(object user)
 {
 	return true;
 }
+
 
 /**
 	Must return true if the weapon wants to receive holding updates for controls.
@@ -452,6 +470,7 @@ public func OnPressUse(object user, int x, int y)
 {
 }
 
+
 /**
 	Callback: The regular use button (fire) is held. Called in regular intervals by {@link Library_Firearm#ControlUseHolding}.@br@br
 
@@ -464,6 +483,7 @@ public func OnPressUse(object user, int x, int y)
 public func OnHoldingUse(object user, int x, int y)
 {
 }
+
 
 /**
 	Callback: Released the regular use button (fire). Called by {@link Library_Firearm#ControlUseStop}.@br@br
@@ -478,6 +498,7 @@ public func OnUseStop(object user, int x, int y)
 {
 }
 
+
 /**
 	Callback: Use (fire) was cancelled. Called by {@link Library_Firearm#ControlUseCancel}.@br@br
 
@@ -491,6 +512,7 @@ public func OnUseCancel(object user, int x, int y)
 {
 }
 
+
 /**
 	Callback: Pressed the alternative use button. Called by {@link Library_Firearm#ControlUseAltStart}.@br
 
@@ -501,6 +523,7 @@ public func OnUseCancel(object user, int x, int y)
 public func OnPressUseAlt(object user, int x, int y)
 {
 }
+
 
 /**
 	Callback: The alternative use button is held. Called in regular intervals by {@link Library_Firearm#ControlUseAltHolding}.@br
@@ -513,6 +536,7 @@ public func OnHoldingUseAlt(object user, int x, int y)
 {
 }
 
+
 /**
 	Callback: Released the alternative use button. Called by {@link Library_Firearm#ControlUseAltStop}.@br
 
@@ -524,6 +548,7 @@ public func OnUseAltStop(object user, int x, int y)
 {
 }
 
+
 /**
 	Callback: Alternative use was cancelled. Called by {@link Library_Firearm#ControlUseAltCancel}.@br
 
@@ -534,6 +559,7 @@ public func OnUseAltStop(object user, int x, int y)
 public func OnUseAltCancel(object user, int x, int y)
 {
 }
+
 
 /* --- Charging --- */
 
@@ -606,6 +632,7 @@ func StartCharge(object user, int x, int y)
 	return true; // keep charging
 }
 
+
 /**
 	Will cancel the charging process currently running. Is automatically called by {@link Library_Firearm#StartCharge} if the user or firemode changed during a charging process.@br
 
@@ -627,6 +654,7 @@ func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
 	}
 }
 
+
 /**
 	Called by {@link Library_Firearm#StartCharge} if charging should be finished. If it returns false, the firing process holds and assumes that something else needs to be done.@br@br
 
@@ -645,6 +673,7 @@ func DoCharge(object user, int x, int y, proplist firemode)
 	return true;
 }
 
+
 /**
 	Checks if the weapon is currently charging.@br
 
@@ -654,6 +683,7 @@ func IsCharging()
 {
 	return GetEffect("IntChargeEffect", this);
 }
+
 
 /**
 	Gets the current status of the charging process.
@@ -671,6 +701,7 @@ public func GetChargeProgress()
 		return effect.percent;
 }
 
+
 /**
 	Condition if the weapon needs to be charged.@br
 
@@ -684,6 +715,7 @@ public func NeedsCharge(object user, proplist firemode)
 	return true;
 }
 
+
 /**
 	Callback: the weapon starts charging. Does nothing by default.@br
 
@@ -695,6 +727,7 @@ public func NeedsCharge(object user, proplist firemode)
 public func OnStartCharge(object user, int x, int y, proplist firemode)
 {
 }
+
 
 /**
 	Callback: the weapon has successfully charged. Does nothing by default.@br
@@ -708,6 +741,7 @@ public func OnStartCharge(object user, int x, int y, proplist firemode)
 public func OnFinishCharge(object user, int x, int y, proplist firemode)
 {
 }
+
 
 /**
 	Callback: called each time during the charging process if the percentage of the charge progress changed. Does nothing by default.@br
@@ -724,6 +758,7 @@ public func OnFinishCharge(object user, int x, int y, proplist firemode)
 public func OnProgressCharge(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
 }
+
 
 /**
 	Callback: the weapon user cancelled charging. Does nothing by default.@br
@@ -781,6 +816,7 @@ func IsReadyToFire()
 	    && !IsWeaponLocked();
 }
 
+
 /**
 	This function will go through the fire cycle: reloading, charging, firing and recovering, checking for cooldown.@br@br
 
@@ -812,6 +848,7 @@ func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 					Fire(user, x, y);
 }
 
+
 /**
 	Called by the clonk (Aim Manager) when aiming is stopped. Fires a shot if ready.@br
 	Checks: {@link Library_Firearm#IsReadyToFire}.@br
@@ -834,6 +871,7 @@ func FinishedAiming(object user, int angle)
 	Fire(user, x, y);
 }
 
+
 /**
 	Converts coordinates to an aiming angle for the weapon.
 
@@ -849,6 +887,7 @@ func GetAngle(int x, int y)
 
 	return angle;
 }
+
 
 /**
 	Converts coordinates to a firing angle for the weapon, respecting the projectile_offset_y from the fire mode.@br
@@ -866,6 +905,7 @@ func GetFireAngle(int x, int y, proplist firemode)
 
 	return angle;
 }
+
 
 /**
 	Fires the weapon.@br@br
@@ -906,6 +946,7 @@ func Fire(object user, int x, int y)
 		this->OnNoAmmo(user, firemode);
 	}
 }
+
 
 /**
 	The actual firing function.@br@br
@@ -956,6 +997,7 @@ func FireProjectiles(object user, int angle, proplist firemode)
 	HandleAmmoUsage(firemode);
 }
 
+
 /**
 	Gets the number of projectiles to be fired by a single shot.@br
 
@@ -967,6 +1009,7 @@ func GetProjectileAmount(proplist firemode)
 {
 	return firemode.projectile_number;
 }
+
 
 /**
 	Gets bullet deviations for a shot.@br
@@ -987,6 +1030,7 @@ func GetSpread(proplist firemode)
 	}
 }
 
+
 /**
 	Callback that happens each time an individual projectile is fired.
 
@@ -998,6 +1042,7 @@ func GetSpread(proplist firemode)
 public func FireSound(object user, proplist firemode)
 {
 }
+
 
 /**
 	Callback that happens each time an individual projectile is fired.
@@ -1013,6 +1058,7 @@ public func FireSound(object user, proplist firemode)
 public func FireEffect(object user, int angle, proplist firemode)
 {
 }
+
 
 /**
 	Callback that happens after a projectile is created and before it is launched.
@@ -1062,6 +1108,7 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
 	}
 }
 
+
 /*-- Recovering --*/
 
 /**
@@ -1087,6 +1134,7 @@ func FireRecovery(object user, int x, int y, proplist firemode)
 	CreateEffect(IntRecoveryEffect, 1, delay, user, x, y, firemode);
 }
 
+
 /**
 	Condition when the weapon needs to recover (pause between two consecutive shots) after firing.
 
@@ -1100,6 +1148,7 @@ public func NeedsRecovery(object user, proplist firemode)
 	return true;
 }
 
+
 /**
 	Will cancel the recovering process currently running.@br
 */
@@ -1110,6 +1159,7 @@ func CancelRecovery()
 	if (effect != nil)
 		RemoveEffect(nil, nil, effect);
 }
+
 
 /**
 	Gets the current status of the recovering process.
@@ -1131,6 +1181,7 @@ func GetRecoveryProgress()
 	}
 }
 
+
 /**
 	Checks if the weapon is currently recovering.@br
 
@@ -1140,6 +1191,7 @@ func IsRecovering()
 {
 	return GetEffect("IntRecoveryEffect", this);
 }
+
 
 /**
 	This function is called after the recovery process is done.@br
@@ -1185,6 +1237,7 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 	CheckCooldown(user, firemode);
 }
 
+
 /**
 	Callback: the weapon finished one firing cycle. Does nothing by default.@br
 
@@ -1228,6 +1281,7 @@ func CheckCooldown(object user, proplist firemode)
 		StartCooldown(user, firemode);
 }
 
+
 /**
 	Will start the cooldown process if the weapon or fire mode need cooling down. Can be called multiple times even if the cooldown is already in progress.@br@br
 
@@ -1256,6 +1310,7 @@ func StartCooldown(object user, proplist firemode)
 	}
 }
 
+
 /**
 	Simply forwards a call to {@link Library_Firearm#OnFinishCooldown}.@br
 */
@@ -1263,6 +1318,7 @@ func DoCooldown(object user, proplist firemode)
 {
 	this->OnFinishCooldown(user, firemode);
 }
+
 
 /**
 	Gets the current status of the cooldown process.
@@ -1284,6 +1340,7 @@ func GetCooldownProgress()
 	}
 }
 
+
 /**
 	Checks if the weapon is currently cooling down.@br
 
@@ -1293,6 +1350,7 @@ func IsCoolingDown()
 {
 	return GetEffect("IntCooldownEffect", this);
 }
+
 
 /**
 	Condition when the weapon needs a cooldown.
@@ -1307,6 +1365,7 @@ public func NeedsCooldown(object user, proplist firemode)
 	return true;
 }
 
+
 /**
 	Callback: the weapon starts cooling down. Does nothing by default.
 
@@ -1317,6 +1376,7 @@ public func OnStartCooldown(object user, proplist firemode)
 {
 }
 
+
 /**
 	Callback: the weapon has successfully cooled down. Does nothing by default.
 
@@ -1326,6 +1386,7 @@ public func OnStartCooldown(object user, proplist firemode)
 public func OnFinishCooldown(object user, proplist firemode)
 {
 }
+
 
 /**
 	Callback: the weapon has skipped cooling down. Does nothing by default.
@@ -1413,6 +1474,7 @@ func StartReload(object user, int x, int y, bool forced)
 	return true; // keep reloading
 }
 
+
 /**
 	Will cancel the reloading process currently running. Is automatically called by {@link Library_Firearm#StartReload} if the user or firemode changed during a reloading process.@br@br
 
@@ -1438,6 +1500,7 @@ func CancelReload(object user, int x, int y, proplist firemode, bool requested_b
 	}
 }
 
+
 /**
 	Called by the reloading effect if reloading should be finished. If it returns false, the reloading effect will linger and assumes that something else needs to be done. If it returns true, the reloading effect will end.@br@br
 
@@ -1456,6 +1519,7 @@ func DoReload(object user, int x, int y, proplist firemode)
 	return true;
 }
 
+
 /**
 	Checks if the weapon is currently reloading.@br
 
@@ -1465,6 +1529,7 @@ func IsReloading()
 {
 	return GetEffect("IntReloadEffect", this);
 }
+
 
 /**
 	Gets the current status of the reloading process.@br
@@ -1482,6 +1547,7 @@ public func GetReloadProgress()
 		return effect.percentage;
 }
 
+
 /**
 	Condition if the weapon can be reloaded.@br
 
@@ -1494,6 +1560,7 @@ public func CanReload(object user, proplist firemode)
 {
 	return true;
 }
+
 
 /**
 	Condition if the weapon needs to be reloaded.@br
@@ -1508,6 +1575,7 @@ public func NeedsReload(object user, proplist firemode)
 	return false;
 }
 
+
 /**
 	Callback: the weapon starts reloading. Does nothing by default.@br
 
@@ -1520,6 +1588,7 @@ public func OnStartReload(object user, int x, int y, proplist firemode)
 {
 }
 
+
 /**
 	Callback: the weapon has successfully reloaded. Does nothing by default.@br
 
@@ -1531,6 +1600,7 @@ public func OnStartReload(object user, int x, int y, proplist firemode)
 public func OnFinishReload(object user, int x, int y, proplist firemode)
 {
 }
+
 
 /**
 	Callback: called each time during the reloading process if the percentage of the reload progress changed. Does nothing by default.@br
@@ -1545,6 +1615,7 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 public func OnProgressReload(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
 }
+
 
 /**
 	Callback: the weapon user cancelled reloading. Does nothing by default.@br
@@ -1617,6 +1688,7 @@ public func CreateFiremode(bool add)
 	return add;
 }
 
+
 /**
 	Replace a fire mode with a writable copy of itself. With this, you can make fire modes writable during runtime if needed.@br
 
@@ -1632,6 +1704,7 @@ public func MakeFiremodeWritable(int number)
 
 	fire_modes[number] = { Prototype = fire_modes[number] };
 }
+
 
 /**
 	Sets a new fire mode.@br
@@ -1660,6 +1733,7 @@ public func SetFiremode(int number, bool force)
 	}
 }
 
+
 /**
 	Gets the currently selected fire mode, or an indexed fire mode.@br
 
@@ -1678,6 +1752,7 @@ public func GetFiremode(int number)
 	}
 	return fire_modes[number];
 }
+
 
 /**
 	Gets the index of a fire mode.
@@ -1700,6 +1775,7 @@ public func GetFiremodeIndex(proplist firemode, bool available)
 	}
 }
 
+
 /**
 	Gets all configured fire modes for this weapon.@br
 
@@ -1714,6 +1790,7 @@ public func GetFiremodes()
 
 	return fire_modes;
 }
+
 
 /**
 	Gets all available fire modes. Available fire modes are only those where the configured condition is met.@br
@@ -1751,6 +1828,7 @@ func IsFiremodeAvailable(proplist firemode) // TODO: Temporary function => firem
 	}
 }
 
+
 /**
 	Delete all configured fire modes.@br
 */
@@ -1758,6 +1836,7 @@ public func ClearFiremodes()
 {
 	fire_modes = [];
 }
+
 
 /**
 	Add a fire mode to the list of configured fire modes.@br
@@ -1768,6 +1847,7 @@ public func AddFiremode(proplist firemode)
 {
 	PushBack(fire_modes, firemode);
 }
+
 
 /**
 	Checks whether the weapon is currently recovering, charging, reloading or locked.@br
@@ -1781,6 +1861,7 @@ public func CanChangeFiremode()
 	    && !IsReloading()
 	    && !IsWeaponLocked();
 }
+
 
 /**
 	Changes the firemode at the next possible time.
@@ -1800,6 +1881,7 @@ public func ScheduleSetFiremode(int number)
 	}
 }
 
+
 /**
 	Gets the scheduled fire mode
 
@@ -1815,6 +1897,7 @@ public func GetScheduledFiremode()
 	}
 	return nil;
 }
+
 
 /**
 	Cancels a scheduled fire mode change.
@@ -1870,6 +1953,7 @@ public func DoAmmo(id ammo, int amount)
 	return _inherited(ammo, amount, ...);
 }
 
+
 /**
 	Checks whether the weapon has ammo.@br
 	Not implemented by default and will always return true (infinite ammo) as long as {@link Library_Firearm#Setting_WithAmmoLogic} is not implemented. Otherwise calls _inherited.@br
@@ -1887,6 +1971,7 @@ public func HasAmmo(proplist firemode)
 	return _inherited(firemode);
 }
 
+
 /**
 	Callback: The weapon has no ammo during {@link Library_Weapon#DoFireCycle},
               see {@link Library_Weapon#HasAmmo}.
@@ -1897,6 +1982,7 @@ public func HasAmmo(proplist firemode)
 public func OnNoAmmo(object user, proplist firemode)
 {
 }
+
 
 /**
 	Called after {@link Library_Firearm#FireProjectiles}. Should somehow reduce ammo.@br
@@ -1915,6 +2001,7 @@ func HandleAmmoUsage(proplist firemode)
 	return _inherited(firemode);
 }
 
+
 /* --- Locking --- */
 
 /**
@@ -1931,6 +2018,7 @@ public func LockWeapon(int lock_time)
 		effect.Interval = lock_time;
 }
 
+
 /**
 	Unlocks the weapon, so that it can be used again.@br
  */
@@ -1939,6 +2027,7 @@ public func UnlockWeapon()
 	var effect = IsWeaponLocked();
 	if (effect) RemoveEffect(nil, this, effect);
 }
+
 
 /**
 	Checks if the weapon is currently locked against usage.@br
@@ -1949,6 +2038,7 @@ func IsWeaponLocked()
 {
 	return GetEffect("IntWeaponLocked", this);
 }
+
 
 /* --- Misc --- */
 
@@ -1984,6 +2074,7 @@ public func GetAnimationSet()
 		WalkBack       = anim_walk_speed_back,
 	};
 }
+
 
 /**
 	Gets a sample of a random value.

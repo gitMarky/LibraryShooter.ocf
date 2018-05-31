@@ -14,6 +14,7 @@ global func CreateImpactEffect(int size, int xoff, int yoff, string name, partic
 	CreateParticle(name, PV_Random(xoff - 2, xoff + 2), PV_Random(yoff - 2, yoff + 2), PV_Random(-size, size), PV_Random(-size, size), PV_Random(20, 40), particles, size * 2);
 }
 
+
 /**
 	Creates the effect for a projectile casing.
 

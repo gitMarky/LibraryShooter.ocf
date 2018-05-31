@@ -58,6 +58,7 @@ func Initialize()
 	timer = 0;
 }
 
+
 /* --- Interface --- */
 
 public func SetPosi(int iPos)

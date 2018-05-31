@@ -28,6 +28,7 @@ global func LaunchTest(int nr)
 	test.launched = false;
 }
 
+
 // Calling this function skips the current test, does not work if last test has been ran already.
 global func SkipTest()
 {

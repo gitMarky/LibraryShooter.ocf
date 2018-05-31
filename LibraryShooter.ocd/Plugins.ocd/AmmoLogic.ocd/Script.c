@@ -19,6 +19,7 @@ public func Setting_WithAmmoLogic()
 	return true;
 }
 
+
 /**
 	Make sure to call this via _inherited();
 */
@@ -29,6 +30,7 @@ func Initialize()
 	_inherited();
 }
 
+
 /**
 
 	@return An object that receives all ammunition calls.
@@ -37,6 +39,7 @@ public func GetAmmoContainer()
 {
 	return nil;
 }
+
 
 /**
 	Checks whether the weapon has ammo.@br
@@ -63,6 +66,7 @@ public func HasAmmo(proplist firemode)
 	    || ammo_rate_counter[firemode.name] > 0                   // 2. There can still be shots fired before another ammunition piece is needed (when ammo rate is > 1)
 	    || this->GetAmmoSource(firemode) == AMMO_Source_Infinite; // 3. This mode has infinite ammo
 }
+
 
 /**
 	Get the specific ammo source for a fire mode.@br
@@ -100,6 +104,7 @@ public func GetFiremodeAmmoSource(type_or_firemode)
 
 	FatalError("Could not get a valid ammo source!");
 }
+
 
 /**
 	Get the specific ammo amount for a fire mode.@br
@@ -166,6 +171,7 @@ public func GetAmmo(type_or_firemode)
 	FatalError("Could not get a valid ammo source!");
 }
 
+
 /**
 	Called after a shot has been fired. Handles the depletion of ammo.@br
 	Will call {@link Library_AmmoManager#DoAmmo} if shots equivalent to the the fire modes ammo rate have been fired. Either in this object if {@link Library_AmmoManager#IsAmmoManager} or {@link Library_Firearm_AmmoLogic#GetAmmoContainer}.@br
@@ -227,6 +233,7 @@ func HandleAmmoUsage(proplist firemode)
 		this->OnAmmoChange(ammo_type);
 	}
 }
+
 
 /**
 	Callback: The weapon ammo in the weapon changes.

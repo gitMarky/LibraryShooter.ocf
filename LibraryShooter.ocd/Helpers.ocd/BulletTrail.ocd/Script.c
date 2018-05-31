@@ -107,6 +107,7 @@ public func TrailColor(int time)
 	return nil;
 }
 
+
 /* --- Timer --- */
 
 public func Travelling()

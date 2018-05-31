@@ -62,6 +62,7 @@ global func NormalizeDeviations(array deviations, int min_precision)
 	return Projectile_Deviation(angles, precision_max);
 }
 
+
 /**
 	Takes a projectile deviation and scales it to fit the target precision.
 

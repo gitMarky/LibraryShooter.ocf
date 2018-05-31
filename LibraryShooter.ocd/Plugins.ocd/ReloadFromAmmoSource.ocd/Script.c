@@ -88,6 +88,7 @@ public func CanReload(object user, proplist firemode)
 	}
 }
 
+
 /**
 	Gets the ammunition manager that provides the weapon with new ammo.
 
