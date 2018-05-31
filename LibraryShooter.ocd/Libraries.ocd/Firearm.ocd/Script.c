@@ -985,8 +985,8 @@ func FireProjectiles(object user, int angle, proplist firemode)
 		          ->Weapon(this)
 		          ->DamageAmount(firemode->GetDamage())
 		          ->DamageType(firemode->GetDamageType())
-		          ->Velocity(SampleValue(firemode->GetProjectileSpeed()))
-		          ->Range(SampleValue(firemode->GetProjectileRange()));
+		          ->Velocity(Library_Random->SampleValue(firemode->GetProjectileSpeed()))
+		          ->Range(Library_Random->SampleValue(firemode->GetProjectileRange()));
 
 		this->OnFireProjectile(user, projectile, firemode);
 		projectile->Launch(angle, GetSpread(firemode));
@@ -2055,35 +2055,4 @@ public func GetAnimationSet()
 		WalkSpeed      = anim_walk_speed_front,
 		WalkBack       = anim_walk_speed_back,
 	};
-}
-
-
-/**
-	Gets a sample of a random value.
-
-	@par value The value. This can be a {@code C4V_Int}, or {@code C4V_Array}. 
-
-	@return int The sampled value. This is either the {@code value}, if {@code C4V_Int}
-         was passed, or if an array was passed: a random value between
-         {@code value[0]} and {@code value[1]}, where the possible increments are
-         {@code value[2]}.  
- */
-func SampleValue(value)
-{
-	if (GetType(value) == C4V_Array)
-	{
-		var min = value[0];
-		var range = value[1] - min;
-		var step = Max(value[2], 1);
-		
-		return min + step * Random(range / step);
-	}
-	else if (GetType(value) == C4V_Int)
-	{
-		return value;
-	}
-	else
-	{
-		FatalError(Format("Expected int or array, got %v", value));
-	}
 }
