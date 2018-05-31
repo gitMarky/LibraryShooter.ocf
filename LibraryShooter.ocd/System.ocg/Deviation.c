@@ -4,6 +4,46 @@
 	@author Marky
  */
 
+static const Deviation = new Global
+{
+	// Properties
+	
+	Value = 0,
+	Precision = 1,
+	
+	// Functions
+
+	GetValue = func ()
+	{
+		return this.Value;
+	},
+	
+	GetPrecision = func ()
+	{
+		return this.Precision;
+	},
+
+	SetValue = func (value)
+	{
+		if (GetType(value) == C4V_Int
+		 || GetType(value) == C4V_Array)
+		{
+			this.Value = value;
+			return this;
+		}
+		else
+		{
+			FatalError(Format("This function accepts arguments of type C4V_Int or C4V_Array for the parameter 'angle'. You passed %v: %v", GetType(value), value));
+		}
+	},
+	
+	SetPrecision = func(int value)
+	{
+		this.Precision = Max(1, value ?? 1);
+		return this;
+	},
+};
+
 
 /**
 	Creates a proplist that contains the information for
@@ -14,13 +54,8 @@
  */
 global func Projectile_Deviation(angle, int precision)
 {
-	if (GetType(angle) != C4V_Int
-	 && GetType(angle) != C4V_Array)
-	{
-		FatalError(Format("This function accepts arguments of type C4V_Int or C4V_Array for the parameter 'angle'. You passed %v", GetType(angle)));
-	}
-
-	return {angle = angle, precision = precision ?? 1};
+	var deviation = new Deviation {};
+	return deviation->SetValue(angle)->SetPrecision(precision);
 }
  
 
@@ -34,28 +69,33 @@ global func Projectile_Deviation(angle, int precision)
  */ 
 global func NormalizeDeviations(array deviations, int min_precision)
 {
-	var precision_max = min_precision ?? 1;
-	var precisions = [];
 	RemoveHoles(deviations);
+
+	var precision_max = min_precision ?? 1;
 	for (var deviation in deviations)
 	{
-		PushBack(precisions, deviation.precision);
-		if (deviation.precision > precision_max) precision_max = deviation.precision;
+		if (deviation->GetPrecision() > precision_max)
+		{
+			precision_max = deviation->GetPrecision();
+		}
 	}
 	
 	var angles = [];
 	for (var deviation in deviations)
 	{
-		if (GetType(deviation.angle) == C4V_Array)
+		var precision = deviation->GetPrecision();
+		var value = deviation->GetValue();
+		if (GetType(value) == C4V_Array)
 		{
-			for (var angle in deviation.angle)
+			var angles = [];
+			for (var angle in value)
 			{
-				PushBack(angles, angle * precision_max / deviation.precision);
+				PushBack(angles, angle * precision_max / precision);
 			}
 		}
 		else
 		{
-			PushBack(angles, deviation.angle * precision_max / deviation.precision);
+			PushBack(angles, value * precision_max / precision);
 		}
 	}
 	

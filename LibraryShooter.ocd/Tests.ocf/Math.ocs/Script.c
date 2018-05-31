@@ -52,9 +52,9 @@ global func Test2_OnStart()
 
 global func Test2_Execute()
 {	
-	doTest("Projectile_Deviation has the correct angle. Got %d, expected %d.", Projectile_Deviation(4, 100).angle, 4);
-	doTest("Projectile_Deviation has the correct precision. Got %d, expected %d.", Projectile_Deviation(4, 100).precision, 100);
-	doTest("Projectile_Deviation keeps arrays as angle. Got %v, expected %v.", Projectile_Deviation([1, 2, 3], 10).angle, [1, 2, 3]);
+	doTest("Projectile_Deviation has the correct angle. Got %d, expected %d.", Projectile_Deviation(4, 100)->GetValue(), 4);
+	doTest("Projectile_Deviation has the correct precision. Got %d, expected %d.", Projectile_Deviation(4, 100)->GetPrecision(), 100);
+	doTest("Projectile_Deviation keeps arrays as angle. Got %v, expected %v.", Projectile_Deviation([1, 2, 3], 10)->GetValue(), [1, 2, 3]);
 
 	return Evaluate();
 }
@@ -78,8 +78,8 @@ global func Test3_Execute()
 	
 	var deviation_normalized = NormalizeDeviations([deviation1, deviation2, deviation3, deviation4]);
 	
-	doTest("Normalizing deviations uses the maximum precision. Got %d, expected %d.", deviation_normalized.precision, 1000);
-	doTest("Normalizing deviations scales the angles correctly. Got %v, expected %v.", deviation_normalized.angle, [1000, 200, 30, 4]);
+	doTest("Normalizing deviations uses the maximum precision. Got %d, expected %d.", deviation_normalized->GetPrecision(), 1000);
+	doTest("Normalizing deviations scales the angles correctly. Got %v, expected %v.", deviation_normalized->GetValue(), [1000, 200, 30, 4]);
 
 	return Evaluate();
 }
