@@ -28,6 +28,7 @@
 	projectile_number: Integer. How many projectiles are fired in a single shot (default: 1).@br
 	projectile_spread: Proplist with two integers. Deviation of a projectile from the firing angle and a precision parameter.@br
 	spread: Proplist with two integers. Additional deviation added by certain effects (e.g. continuous firing) (default: { angle: 1, precision: 100 }).@br
+	spread_per_shot: Proplist {@link Global#Deviation}.
 	burst: Integer. Number of shots being fired when using burst mode style (default: 0).@br
 	auto_reload: Boolean. If true, the weapon reloads even if the use button is not held (default: false).@br
 	anim_shoot_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general aim animation (default: nil).@br
@@ -230,8 +231,10 @@ public func GetProjectileSpeed()
 
 /**
 	Get the projectile spread of this fire mode.
+	This spread value is static and defines how inaccurate
+	the projectiles are by themselves.
 
-	@return An array of two integers, spread and precision.
+	@return proplist A {@link Global#Deviation} proplist.
 */
 public func GetProjectileSpread()
 {
@@ -274,12 +277,35 @@ public func GetYOffset()
 
 /**
 	Get the spread of this fire mode.
+	
+	This spread value is static and defines how inaccurate
+	the weapon or firemode is by itself in this fire mode.
 
-	@return An array of two integers, spread and precision.
+	@return proplist A {@link Global#Deviation} proplist.
 */
 public func GetSpread()
 {
 	return this.spread;
+}
+
+
+/**
+	Get the spread that is passed to the user after
+	each shot.
+	
+	This spread value is static and defines how inaccurate
+	the weapon or firemode is by itself in this fire mode.
+	
+	@note This depends entirely on how the user handles
+	      spread. Can be handley for example by
+	      including {@link Plugin_Firearm_DynamicSpread}
+	      in the user.
+
+	@return proplist A {@link Global#Deviation} proplist.
+*/
+public func GetSpreadPerShot()
+{
+	return this.spread_per_shot;
 }
 
 
@@ -628,8 +654,8 @@ public func SetProjectileSpeed(int value)
 	Set the spread of the projectiles for this fire mode. Refers to 
     the basic inaccuracy of the projectiles.
 
-	@par value A proplist with the properties "angle" and "precision",
-            see {@link Global#Projectile_Deviation}.
+	@par value A proplist, see {@link Global#Projectile_Deviation}
+	           and {@link Global#Deviation}.
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
@@ -692,8 +718,8 @@ public func SetYOffset(int value)
 	Set the spread of this fire mode. Refers to 
     additional deviation added by certain effects (e.g. continuous firing).
 
-	@par value A proplist with the properties "angle" and "precision",
-               see {@link Global#Projectile_Deviation}.
+	@par value A proplist, see {@link Global#Projectile_Deviation}
+	           and {@link Global#Deviation}.
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
@@ -701,6 +727,24 @@ public func SetYOffset(int value)
 public func SetSpread(proplist value)
 {
 	this.spread = value;
+	return this;
+}
+
+
+/**
+	Set the spread that is passed to the user after
+	each shot.
+	
+	@note This depends entirely on how the user handles
+	      spread. Can be handley for example by
+	      including {@link Plugin_Firearm_DynamicSpread}
+	      in the user.
+
+	@return proplist A {@link Global#Deviation} proplist.
+*/
+public func SetSpreadPerShot(proplist value)
+{
+	this.spread_per_shot = value;
 	return this;
 }
 

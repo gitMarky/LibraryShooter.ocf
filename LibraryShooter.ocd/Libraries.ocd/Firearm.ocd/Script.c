@@ -886,6 +886,9 @@ func GetFireAngle(int x, int y, proplist firemode)
 	- call {@link Library_Firearm#FireEffect}.@br
 	- call {@link Library_Firearm#FireProjectiles}.@br
 	- call {@link Library_Firearm#FireRecovery}.@br
+	
+	@note Issues a callback "OnFirearmFire(object weapon, proplist firemode)"
+	      to the user after the projectile was fired.
 
 	@par user The object that is using the weapon.
 	@par x The x coordinate the user is aiming at. Relative to the user.
@@ -894,12 +897,15 @@ func GetFireAngle(int x, int y, proplist firemode)
 func Fire(object user, int x, int y)
 {
 	if (user == nil)
+	{
 		FatalError("The function expects a user that is not nil");
+	}
 
 	var firemode = GetFiremode();
-
 	if (firemode == nil)
-		FatalError(Format("Fire mode '%s' not supported", firemode));
+	{
+		FatalError("No firemode selected");
+	}
 
 	if (HasAmmo(firemode))
 	{
@@ -909,6 +915,7 @@ func Fire(object user, int x, int y)
 		FireEffect(user, angle, firemode);
 		FireProjectiles(user, angle, firemode);
 		FireRecovery(user, x, y, firemode);
+		user->~OnFirearmFire(this, firemode);
 	}
 	else
 	{
@@ -958,7 +965,7 @@ func FireProjectiles(object user, int angle, proplist firemode)
 		          ->Range(Library_Random->SampleValue(firemode->GetProjectileRange()));
 
 		this->OnFireProjectile(user, projectile, firemode);
-		projectile->Launch(angle, GetSpread(firemode));
+		projectile->Launch(angle, ComposeSpread(user, firemode));
 	}
 
 	shot_counter[firemode->GetIndex()]++;
@@ -968,17 +975,36 @@ func FireProjectiles(object user, int angle, proplist firemode)
 
 
 /**
-	Gets bullet deviations for a shot.@br
+	Gets bullet deviations for a shot.
 
 	@par firemode A proplist containing the fire mode information.
 
-	@return By default, will compose the spread and projectile_spread values from the fire mode into an array and pass over to {@link NormalizeDeviations} or returns nil.
+	@return By default, will compose the spread values:
+			<ul>
+			<li>{@link Library_Firemode#GetSpread}</li>
+			<li>{@link Library_Firemode#GetProjectileSpread}</li>
+			<li>{@code user->GetFirearmSpread(weapon, firemode}</li>
+	        </ul>
+            fire mode and weapon user into an array and pass over to {@link NormalizeDeviations},
+            or returns nil.
 */
-func GetSpread(proplist firemode)
+func ComposeSpread(object user, proplist firemode)
 {
-	if (firemode->GetSpread() || firemode->GetProjectileSpread())
+	// Get static values from the weapon
+	var weapon_spread = firemode->GetSpread();
+	var projectile_spread = firemode->GetProjectileSpread();
+	
+	// Get dynamic values from the user
+	var user_spread;
+	if (user)
 	{
-		return NormalizeDeviations([firemode->GetSpread(), firemode->GetProjectileSpread()]);
+		user_spread = user->~GetFirearmSpread(this, firemode);
+	}
+
+	// Compose everything
+	if (weapon_spread || projectile_spread || user_spread)
+	{
+		return NormalizeDeviations([weapon_spread, projectile_spread, user_spread]);
 	}
 	else
 	{
