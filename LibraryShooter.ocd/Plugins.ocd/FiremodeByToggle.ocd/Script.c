@@ -1,5 +1,5 @@
 /**
- Allows fire mode selection by cycling through the modes.
+	Allows fire mode selection by cycling through the modes.
  */
 
 
@@ -83,9 +83,9 @@ public func ToggleFiremode()
 
 
 /**
- Delay until the toggled firemode is activated.
- 
- @return int The delay, in frames.
+	Delay until the toggled firemode is activated.
+
+	@return int The delay, in frames.
  */
 public func ToggleFiremodeDelay(){ return 30;}
 

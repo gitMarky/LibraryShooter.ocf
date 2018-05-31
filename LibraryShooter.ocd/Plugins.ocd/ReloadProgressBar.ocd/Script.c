@@ -1,7 +1,7 @@
 /**
- Plugin for weapons: The weapon displays a progress bar when reloading.
+	Plugin for weapons: The weapon displays a progress bar when reloading.
 
- @author Marky
+	@author Marky
  */
 
 local reload_progress_bar;

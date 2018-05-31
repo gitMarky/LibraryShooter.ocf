@@ -85,9 +85,12 @@ global func Test3_Execute()
 
 /**
  Gets the exponent of a value.
- @par value The value.
- @par base The base.
- @return int The exponent, so that {@code value = base ** exponent}.
+
+	@par value The value.
+
+	@par base The base.
+
+	@return int The exponent, so that {@code value = base ** exponent}.
  */
 global func GetExponent(int value, int base)
 {

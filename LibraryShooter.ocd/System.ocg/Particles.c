@@ -15,14 +15,17 @@ global func CreateImpactEffect(int size, int xoff, int yoff, string name, partic
 }
 
 /**
- Creates the effect for a projectile casing.
- @par particle The particle name.
- @par size The size, in pixels.
- @par x Position for the effect, local coordinates.
- @par y Position for the effect, local coordinates.
- @par xdir Velocity for the effect.
- @par ydir Velocity for the effect. The created particles have a gravity factor of 5,
-           which has to be considered when calculating the velocity.
+	Creates the effect for a projectile casing.
+
+	@par particle The particle name.
+	@par size The size, in pixels.
+
+	@par x Position for the effect, local coordinates.
+	@par y Position for the effect, local coordinates.
+
+	@par xdir Velocity for the effect.
+	@par ydir Velocity for the effect. The created particles have a gravity factor of 5,
+              which has to be considered when calculating the velocity.
  */
 global func CreateCartridgeEffect(string particle, int size, int x, int y, int xdir, int ydir, int amount)
 {
@@ -60,6 +63,3 @@ global func Particles_Blood(int size, int rotation)
 		Phase = PV_Random(0, 4)
 	};
 }
-
-
-

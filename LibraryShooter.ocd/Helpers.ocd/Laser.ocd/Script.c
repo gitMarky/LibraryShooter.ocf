@@ -1,8 +1,4 @@
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// definitions
+/* --- Properties --- */
 
 local phase;	// int - phase of the animation
 local width;	// int - the laser beam is this wide, in pixels
@@ -11,24 +7,47 @@ local angle;	// int - the rotation of the laser, in degrees
 local lifetime;	// int - the time until the laser is removed, in frames
 local timer;	// int - the time that has already passed, in frames
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// global functions
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// finished functions
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// temporary stuff
-
-
 local pAttach;
 local dx;
 local dy;
 
-protected func Initialize()
+local BorderBound = 7;
+
+
+local ActMap = {
+Laser = {
+	Prototype = Action,
+	Name = "Laser",
+	Procedure = DFA_FLOAT,
+	Length = 4,
+	Delay = 1,
+	X = 0,
+	Y = 0,
+	Wdt = 32,
+	Hgt = 96,
+	NextAction = "Laser",
+	PhaseCall = "Laser",
+},
+
+LaserEnd = {
+	Prototype = Action,
+	Name = "LaserEnd",
+	Procedure = DFA_FLOAT,
+	Length = 4,
+	Delay = 1,
+	X = 0,
+	Y = 0,
+	Wdt = 32,
+	Hgt = 128,
+	NextAction = "LaserEnd",
+	PhaseCall = "Laser",
+},
+};
+
+
+/* --- Engine callbacks --- */
+
+func Initialize()
 {
 	SetObjectBlitMode(GFX_BLIT_Additive);
 
@@ -39,7 +58,7 @@ protected func Initialize()
 	timer = 0;
 }
 
-/* Interface (public functions) */
+/* --- Interface --- */
 
 public func SetPosi(int iPos)
 {
@@ -179,44 +198,3 @@ private func DrawTransform()
 	// set matrix values
 	SetObjDrawTransform(width2, xskew, xadjust, yskew, height, yadjust);
 }
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// properties
-
-local BorderBound = 7;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// actions
-
-local ActMap = {
-Laser = {
-	Prototype = Action,
-	Name = "Laser",
-	Procedure = DFA_FLOAT,
-	Length = 4,
-	Delay = 1,
-	X = 0,
-	Y = 0,
-	Wdt = 32,
-	Hgt = 96,
-	NextAction = "Laser",
-	PhaseCall = "Laser",
-},
-
-LaserEnd = {
-	Prototype = Action,
-	Name = "LaserEnd",
-	Procedure = DFA_FLOAT,
-	Length = 4,
-	Delay = 1,
-	X = 0,
-	Y = 0,
-	Wdt = 32,
-	Hgt = 128,
-	NextAction = "LaserEnd",
-	PhaseCall = "Laser",
-},
-};

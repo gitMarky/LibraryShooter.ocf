@@ -1,13 +1,10 @@
 /**
- Allows fire mode selection via the object interaction menu.
+	Allows fire mode selection via the object interaction menu.
  
- {@c public func HasInteractionMenu()} must be implemented in order for this to work.
+	{@c public func HasInteractionMenu()} must be implemented in order for this to work.
  */
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// GUI
+/* --- GUI --- */
 
 static const GUI_PRIORITY_FIREMODE = 10;
 

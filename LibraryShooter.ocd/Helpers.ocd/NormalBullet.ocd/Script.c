@@ -1,4 +1,3 @@
-/*-- Bullet --*/
 
 #include Library_Projectile
 
@@ -41,7 +40,7 @@ protected func Hit()
 				{
 					SetPosition(lastX + nextX, lastY + nextY);
 					if (trail)
-						trail->Travelling();
+						trail->~Travelling();
 					break;
 				}
 			}

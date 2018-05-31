@@ -9,7 +9,7 @@
 	projectile itself. The trail will be removed when the projectile is gone.
 	The color is always a light-grey. However each frame, ~TrailColor(int time)
 	is called in the projectile which can return the color modulation.
-	
+
 	@author Newton (original author), Marky (modified script)
 */
 
@@ -21,22 +21,31 @@ local fade_speed_factor = 100;
 local fade_speed_add = 0;
 
 /**
- Sets the trail to follow the projectile.
- @par shot [optional] This is the projectile. May be {@c nil} and in this
-           case the trail will fade out immediately.
- @par width The trail will be this wide, in pixels.
- @par length The trail will be this long, in pixels.
-             Note that it stretches to this length from its original position.
- @par x_pos [optional] If provided, this specifies a starting position for the trail.
-            Otherwise this is the position of the projectile, if provided.
- @par y_pos [optional] If provided, this specifies a starting position for the trail.
-            Otherwise this is the position of the projectile, if provided.
- @par x_dir [optional] If provided, this specifies a velocity for the trail.
-            Otherwise this is the velocity of the projectile, if provided.
- @par y_dir [optional] If provided, this specifies a velocity for the trail.
-            Otherwise this is the velocity of the projectile, if provided.
- @par x_end [optional] Overrides the end position of the trail if not projectile was provided.
- @par y_end [optional] Overrides the end position of the trail if not projectile was provided.
+	Sets the trail to follow the projectile.
+
+	@par shot [optional] This is the projectile. May be {@c nil} and in this
+						 case the trail will fade out immediately.
+
+	@par width The trail will be this wide, in pixels.
+
+	@par length The trail will be this long, in pixels.
+				Note that it stretches to this length from its original position.
+
+	@par x_pos [optional] If provided, this specifies a starting position for the trail.
+			    Otherwise this is the position of the projectile, if provided.
+
+	@par y_pos [optional] If provided, this specifies a starting position for the trail.
+			    Otherwise this is the position of the projectile, if provided.
+
+	@par x_dir [optional] If provided, this specifies a velocity for the trail.
+				Otherwise this is the velocity of the projectile, if provided.
+
+	@par y_dir [optional] If provided, this specifies a velocity for the trail.
+				Otherwise this is the velocity of the projectile, if provided.
+
+	@par x_end [optional] Overrides the end position of the trail if not projectile was provided.
+
+	@par y_end [optional] Overrides the end position of the trail if not projectile was provided.
  */
 public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_dir, int y_dir, int x_end, int y_end)
 {
@@ -80,10 +89,13 @@ public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_
 	SetAction("Travel");
 }
 
+
 /**
- Specifies a color modulation for the trail, based on the time it exists.
- @par time The time that the trail exists, in frames.
- @return {@c nil}, which means that the color is not adjusted.
+	Specifies a color modulation for the trail, based on the time it exists.
+
+	@par time The time that the trail exists, in frames.
+
+	@return {@c nil}, which means that the color is not adjusted.
          You can override this function if you want a custom color modulation
          for trails.@br
          If the trail is set to a projectile, then this function is also called
@@ -95,7 +107,7 @@ public func TrailColor(int time)
 	return nil;
 }
 
-/* Timer */
+/* --- Timer --- */
 
 public func Travelling()
 {

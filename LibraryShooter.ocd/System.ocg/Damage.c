@@ -1,5 +1,5 @@
 
-/*
+/**
 	Deals damage to an object, draining either energy for living things or dealing damage otherwise.
 	CatchBlow is called on the target if it's alive.
 */

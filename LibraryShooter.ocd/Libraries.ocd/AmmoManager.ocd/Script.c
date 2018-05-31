@@ -1,7 +1,8 @@
 /**
- This is an interface for saving ammunition in an object. It should be included in 
- objects that carry ammunition.
- @author Marky
+	This is an interface for saving ammunition in an object. It should be included in 
+	objects that carry ammunition.
+
+	@author Marky
  */
 
 
@@ -21,8 +22,8 @@ local library_ammo_manager;
 /* --- Engine callbacks --- */
 
 /**
- Objects that include this library must call {@link Global#inherited}
- for this function.
+	Objects that include this library must call {@link Global#inherited}
+	for this function.
  */
 public func Construction()
 {
@@ -33,19 +34,20 @@ public func Construction()
 /* --- Library code --- */
 
 /**
- Tells the object where to get its ammunition from.@br
- The following options exist:@br
- {@table
-   {@tr {@th Constant} {@th Value} {@th Description}}
-   {@tr {@td AMMO_Source_Local} {@td 1} {@td The ammunition is saved as a local variable in this object.}}
-   {@tr {@td AMMO_Source_Items} {@td 2} {@td The ammunition is requested from a certain object.}}
-   {@tr {@td AMMO_Source_Container} {@td 3} {@td The ammunition is requested from a certain object.}}
-   {@tr {@td AMMO_Source_Infinite} {@td 4} {@td The object has unlimited ammunition.}}
- }
- 
-  @par ammo The type of the ammunition.
-  @return int One of the options in the table above. The default return value is
-  {@c AMMO_Source_Infinite}. Override this function if you want a different source.
+	Tells the object where to get its ammunition from.@br
+	The following options exist:@br
+	{@table
+		{@tr {@th Constant} {@th Value} {@th Description}}
+		{@tr {@td AMMO_Source_Local} {@td 1} {@td The ammunition is saved as a local variable in this object.}}
+		{@tr {@td AMMO_Source_Items} {@td 2} {@td The ammunition is requested from a certain object.}}
+		{@tr {@td AMMO_Source_Container} {@td 3} {@td The ammunition is requested from a certain object.}}
+		{@tr {@td AMMO_Source_Infinite} {@td 4} {@td The object has unlimited ammunition.}}
+	}
+
+	@par ammo The type of the ammunition.
+
+	@return int One of the options in the table above. The default return value is
+                {@c AMMO_Source_Infinite}. Override this function if you want a different source.
  */
 public func GetAmmoSource(id ammo)
 {
@@ -53,12 +55,15 @@ public func GetAmmoSource(id ammo)
 }
 
 /**
- Gets the current amount of ammunition of a certain type.
- @par ammo The type of the ammunition.
- @return int The amount that the object currently has.
- @author Marky
- @note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
- @related {@link Library_AmmoManager#DoAmmo}, {@link Library_AmmoManager#SetAmmo}
+	Gets the current amount of ammunition of a certain type.
+
+	@par ammo The type of the ammunition.
+
+	@return int The amount that the object currently has.
+
+	@note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
+
+	@related {@link Library_AmmoManager#DoAmmo}, {@link Library_AmmoManager#SetAmmo}
  */
 public func GetAmmo(id ammo)
 {
@@ -95,16 +100,20 @@ public func GetAmmo(id ammo)
 }
 
 /**
- Changes the amount of ammunition that the object currently has.
- @par ammo The type of the ammunition.
- @par amount The change, can be positive or negative.
-             The amount of ammunition cannot be changed beyond the capacity
-             of the object, so the actual amount by which the ammunition was
-             changed will be returned. 
- @return The actual change that happened.
- @author Marky
- @note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
- @related {@link Library_AmmoManager#GetAmmo}, {@link Library_AmmoManager#SetAmmo}
+	Changes the amount of ammunition that the object currently has.
+
+	@par ammo The type of the ammunition.
+
+	@par amount The change, can be positive or negative.
+                The amount of ammunition cannot be changed beyond the capacity
+                of the object, so the actual amount by which the ammunition was
+                changed will be returned. 
+
+	@return The actual change that happened.
+
+	@note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
+
+	@related {@link Library_AmmoManager#GetAmmo}, {@link Library_AmmoManager#SetAmmo}
  */
 public func DoAmmo(id ammo, int amount)
 {
@@ -127,14 +136,18 @@ public func DoAmmo(id ammo, int amount)
 }
 
 /**
- Defines the amount of ammunition that the object currently has.
- @par ammo The type of the ammunition.
- @par amount The new value. The amount of ammunition cannot be changed
-             beyond the capacity of the object.
- @return The current amount of ammunition.
- @author Marky
- @note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
- @related {@link Library_AmmoManager#GetAmmo}, {@link Library_AmmoManager#DoAmmo}
+	Defines the amount of ammunition that the object currently has.
+
+	@par ammo The type of the ammunition.
+
+	@par amount The new value. The amount of ammunition cannot be changed
+                beyond the capacity of the object.
+
+	@return The current amount of ammunition.
+
+	@note The function considers the ammunition source {@link Library_AmmoManager#GetAmmoSource}.
+
+	@related {@link Library_AmmoManager#GetAmmo}, {@link Library_AmmoManager#DoAmmo}
  */
 public func SetAmmo(id ammo, int new_value)
 {
@@ -169,9 +182,9 @@ public func SetAmmo(id ammo, int new_value)
 }
 
 /**
- @return an ammunition manager object that handles the ammunition counting
+
+	@return an ammunition manager object that handles the ammunition counting
          if {@link Library_AmmoManager#GetAmmoSource} is {@c AMMO_Source_Container}
- @author Marky
  */
 public func GetAmmoContainer()
 {
@@ -180,9 +193,9 @@ public func GetAmmoContainer()
 
 
 /**
- Identifies the object as an ammo manager.
- @return {@c true}
- @author Marky
+	Identifies the object as an ammo manager.
+
+	@return {@c true}
  */
 public func IsAmmoManager()
 {

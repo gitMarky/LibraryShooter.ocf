@@ -1,16 +1,16 @@
 /**
- Handles the deviation of projectiles.
+	Handles the deviation of projectiles.
 
- @author Marky
+	@author Marky
  */
 
 
 /**
- Creates a proplist that contains the information for
- projectile deviation.
+	Creates a proplist that contains the information for
+	projectile deviation.
 
- @par angle The angle, in degrees.
- @par precision The precision factor, default precision is 1.
+	@par angle The angle, in degrees.
+	@par precision The precision factor, default precision is 1.
  */
 global func Projectile_Deviation(angle, int precision)
 {
@@ -25,12 +25,12 @@ global func Projectile_Deviation(angle, int precision)
  
 
 /**
- Takes an array of projectile deviations, and
- normalizes it so that all deviations use the same
- precision.
- 
- @par deviations The deviation definitions.
- @par min_precision The minimal precision.
+	Takes an array of projectile deviations, and
+	normalizes it so that all deviations use the same
+	precision.
+
+	@par deviations The deviation definitions.
+	@par min_precision The minimal precision.
  */ 
 global func NormalizeDeviations(array deviations, int min_precision)
 {
@@ -63,10 +63,10 @@ global func NormalizeDeviations(array deviations, int min_precision)
 }
 
 /**
- Takes a projectile deviation and scales it to fit the target precision.
- 
- @par deviations The deviation definitions.
- @par target_precision The target precision;
+	Takes a projectile deviation and scales it to fit the target precision.
+
+	@par deviations The deviation definitions.
+	@par target_precision The target precision;
  */ 
 global func ScaleDeviation(proplist deviation, int target_precision)
 {
