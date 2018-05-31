@@ -61,11 +61,11 @@ global func Test2_Execute()
 
 
 // --------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------
+
 
 global func Test3_OnStart()
 {
-	Log("Test for math function, projectile deviations: NormalizeDeviations");
+	Log("Test for math function, projectile deviations: NormalizeDeviations, with comfortable values");
 	return true;
 }
 
@@ -83,6 +83,33 @@ global func Test3_Execute()
 
 	return Evaluate();
 }
+
+
+// --------------------------------------------------------------------------------------------------------
+
+
+global func Test4_OnStart()
+{
+	Log("Test for math function, projectile deviations: NormalizeDeviations, with uncomfortable values");
+	return true;
+}
+
+global func Test4_Execute()
+{
+	var deviation1 = Projectile_Deviation(1, 3);
+	var deviation2 = Projectile_Deviation(2, 17);
+	var deviation3 = Projectile_Deviation(3, 31);
+	var deviation4 = Projectile_Deviation(4, 5);
+	
+	var deviation_normalized = NormalizeDeviations([deviation1, deviation2, deviation3, deviation4]);
+	
+	doTest("Normalizing deviations uses the maximum precision. Got %d, expected %d.", deviation_normalized->GetPrecision(), 31);
+	doTest("Normalizing deviations scales the angles correctly. Got %v, expected %v.", deviation_normalized->GetValue(), [10, 3, 3, 24]);
+
+	return Evaluate();
+}
+
+// --------------------------------------------------------------------------------------------------------
 
 
 /**
