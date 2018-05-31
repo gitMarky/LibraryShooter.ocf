@@ -1,6 +1,39 @@
 ﻿/**
 	A dummy definition, used to provide various getters and setters for fire modes.
 	Keep in mind that for fire modes to be writable, they must be created using {@link Library_Firearm#AddFiremode}.
+	
+	@note
+	A fire mode is a proplist that can define the following properties:@br
+	mode: Integer. Must be set. This defines the basic firing mode. Can simply be one of the following constants:@br
+	- WEAPON_FM_Single: single shot style, only shot per click is fired (default).@br
+	- WEAPON_FM_Burst: burst style, firing a set number of shot in short succession.@br
+	- WEAPON_FM_Auto: auto style, firing as long as the use button is pressed.@br
+	name: A string containing the name of this fire mode. Unnecessary if no GUI exists that displays the name (default: Standard).@br
+	icon: ID of a definition icon for the fire mode. Unnecessary if no GUI exists that displays the icon (default: nil).@br
+	condition: A string corresponding to a function name. The fire mode will not be marked as 'available' unless the condition functions return true. Example: An upgraded weapon could offer more fire modes (default: nil).@br
+	ammo_id: A definition that represents ammunition for the fire mode (default: nil).@br
+	ammo_usage: Integer. How much ammunition is needed per ammo_rate shots (default: 1).@br
+	ammo_rate: Integer. See ammo_usage (default: 1). As ammo handling is not part the library, this has to be implemented (or include {@link Library_Firearm_AmmoLogic}).@br
+	delay_charge: Integer. Charge duration in frames. If 0 or nil, no charge is required (default: 0).@br
+	delay_recover: Integer. Recovery duration in frames. If 0 or nil, no recovery is required (default: 1).@br
+	delay_cooldown: Integer. Cooldown duration in frames. If 0 or nil, no cooldown is required (default: 0).@br
+	delay_reload: Integer. Reload duration in frames. If 0 or nil, reloading is instantaneous (default: 0).@br
+	damage: Integer. Amount of damage a projectile does (default: 10).@br
+	damage_type: Integer. Defining a damage type. Damage type handling is not done by this library and should be handled by any implementation (default: nil).@br
+	projectile_id: A definition of the actual projectile that is being fired. These are created on the fly and must therefore not be created beforehand (default: NormalBullet).@br
+	projectile_speed: Integer. Firing speed of a projectile (default: 100).@br
+	projectile_range: Integer. Maximum range a projectile flies (default: 600).@br
+	projectile_distance: Integer. Distance the projectile is being created away from the shooting object (default: 10).@br
+	projectile_offset_y: Integer. Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center (default: -6).@br
+	projectile_number: Integer. How many projectiles are fired in a single shot (default: 1).@br
+	projectile_spread: Proplist with two integers. Deviation of a projectile from the firing angle and a precision parameter.@br
+	spread: Proplist with two integers. Additional deviation added by certain effects (e.g. continuous firing) (default: { angle: 1, precision: 100 }).@br
+	burst: Integer. Number of shots being fired when using burst mode style (default: 0).@br
+	auto_reload: Boolean. If true, the weapon reloads even if the use button is not held (default: false).@br
+	anim_shoot_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general aim animation (default: nil).@br
+	anim_load_name: A string containing the animation name that is returned for the animation set (usually when being used by a Clonk) as general reload animation (default: nil).@br
+	walk_speed_front: Integer. Forwards walking speed to be returned for the animation set (usually when being used by a Clonk) (default: nil).@br
+	walk_speed_back: Integer. Backwards walking speed to be returned for the animation set (usually when being used by a Clonk) (default: nil).@br
 
 	@author Clonkonaut
 */
