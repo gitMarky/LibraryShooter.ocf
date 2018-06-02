@@ -2,6 +2,9 @@
 	Plugin for the user of a firemode.
 	
 	Enables accumulation of spread for the user.
+	
+	Must call inherited function in:
+	- Construction
 
 	@author Marky
  */
@@ -9,6 +12,14 @@
 /* --- Properties --- */
 
 local plugin_firearm_spread = 0;
+
+/* --- Engine callbacks --- */
+
+func Construction(object creator)
+{
+	AddTimer(this.UpdateFirearmSpread, this->~UpdateFirearmSpreadInterval() ?? 1);
+	_inherited(creator,...);
+}
 
 /* --- Callbacks from the firearm library --- */
 
@@ -27,4 +38,18 @@ func GetFirearmSpread(object weapon, proplist firemode)
 func DoFirearmSpread(int spread)
 {
 	plugin_firearm_spread = Max(0, plugin_firearm_spread + spread);
+}
+
+func RaiseFirearmSpread(int spread)
+{
+	var change = spread - GetFirearmSpread();
+	if (change > 0)
+	{
+		DoFirearmSpread(change);
+	}
+}
+
+func UpdateFirearmSpread()
+{
+	DoFirearmSpread(-10);
 }
