@@ -641,15 +641,25 @@ public func SetProjectileID(id value)
 /**
 	Set the projectile speed of this fire mode.
 
-	@par value Firing speed of a projectile.
+	@par value Firing speed of a projectile. May
+	           be an integer, or an array for use with
+	           {@link Library_Random#SampleValue}.
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
 */
-public func SetProjectileSpeed(int value)
+public func SetProjectileSpeed(value)
 {
-	this.projectile_speed = value;
-	return this;
+	if (GetType(value) == C4V_Int
+	 || GetType(value) == C4V_Array)
+	{
+		this.projectile_speed = value;
+		return this;
+	}
+	else
+	{
+		FatalError(Format("You have to pass an array or int, got %v", GetType(value)));
+	}
 }
 
 
@@ -673,15 +683,26 @@ public func SetProjectileSpread(int value)
 /**
 	Set the projectile range of this fire mode.
 
-	@par value Maximum range a projectile flies.
+	@par value Maximum range a projectile flies. May
+	           be an integer, or an array for use with
+	           {@link Library_Random#SampleValue}.
+	
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
 */
-public func SetProjectileRange(int value)
+public func SetProjectileRange(value)
 {
-	this.projectile_range = value;
-	return this;
+	if (GetType(value) == C4V_Int
+	 || GetType(value) == C4V_Array)
+	{
+		this.projectile_range = value;
+		return this;
+	}
+	else
+	{
+		FatalError(Format("You have to pass an array or int, got %v", GetType(value)));
+	}
 }
 
 
