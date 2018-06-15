@@ -12,6 +12,7 @@
 /* --- Properties --- */
 
 local plugin_firearm_spread = 0;
+local plugin_firearm_spread_max = 0;
 
 /* --- Engine callbacks --- */
 
@@ -38,6 +39,10 @@ func GetFirearmSpread(object weapon, proplist firemode)
 func DoFirearmSpread(int spread)
 {
 	plugin_firearm_spread = Max(0, plugin_firearm_spread + spread);
+	if (plugin_firearm_spread_max > 0)
+	{
+		plugin_firearm_spread = Min(plugin_firearm_spread, plugin_firearm_spread_max);
+	}
 }
 
 func RaiseFirearmSpread(int spread)
@@ -47,6 +52,11 @@ func RaiseFirearmSpread(int spread)
 	{
 		DoFirearmSpread(change);
 	}
+}
+
+func SetFirearmSpreadLimit(int limit)
+{
+	plugin_firearm_spread_max = limit;
 }
 
 func UpdateFirearmSpread()
