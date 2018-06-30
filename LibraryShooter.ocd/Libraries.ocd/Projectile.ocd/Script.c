@@ -392,16 +392,18 @@ func Initialize()
 	instant = false;
 }
 
-func Hit()
+func Hit(int xdir, int ydir)
 {
 	var self = this;
 	
-	if(!instant)
+	_inherited(xdir, ydir, ...);
+	
+	if (self && !instant)
 	{
 		SetXDir(0);
 		SetYDir(0);
 	
-		if(nextX)
+		if (nextX)
 		{
 			var x = GetX(), y = GetY();
 			var a = Angle(lastX, lastY, nextX, nextY);
@@ -755,8 +757,8 @@ public func HitObject(object obj, bool remove, proplist effect)
 	var self = this;
 
 	obj->~OnProjectileHit(this);
-	this->DoDamageObject(obj);
-	this->OnHitObject(obj);
+	if (self) this->DoDamageObject(obj);
+	if (self) this->OnHitObject(obj);
 
 	if (!self) return;
 
