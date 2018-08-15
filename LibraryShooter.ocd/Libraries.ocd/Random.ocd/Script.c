@@ -63,6 +63,10 @@ func SampleValue(value)
 	{
 		return value;
 	}
+	else if (GetType(value) == C4V_Nil)
+	{
+		return nil;
+	}
 	else
 	{
 		FatalError(Format("Expected int or array, got %v", value));
