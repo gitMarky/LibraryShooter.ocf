@@ -675,7 +675,7 @@ public func GetChargeProgress()
 	if (charge_process == nil)
 		return -1;
 	else
-		return charge_process.percent;
+		return charge_process->GetProgress();
 }
 
 
@@ -780,7 +780,12 @@ local IntChargeEffect = new Effect
 			this.Interval = 0;
 			// However, keep the effect, to track that this weapon is now charged
 		}
-	}
+	},
+	
+	GetProgress = func ()
+	{
+		return this.percent;
+	},
 };
 
 
@@ -1164,8 +1169,7 @@ func GetRecoveryProgress()
 	var recovery_process = IsRecovering();
 	if (recovery_process)
 	{
-		var progress = BoundBy(recovery_process.Time, 0, recovery_process.Interval);
-		return progress * 100 / recovery_process.Interval;
+		return recovery_process->GetProgress();
 	}
 	else
 	{
@@ -1255,7 +1259,13 @@ local IntRecoveryEffect = new Effect
 	{
 		this.Target->DoRecovery(this.user, this.x, this.y, this.firemode);
 		return FX_Execute_Kill;
-	}
+	},
+	
+	GetProgress = func ()
+	{
+		var progress = BoundBy(this.Time, 0, this.Interval);
+		return progress * 100 / this.Interval;
+	},
 };
 
 /* --- Cooldown --- */
@@ -1330,8 +1340,7 @@ func GetCooldownProgress()
 	var cooldown = IsCoolingDown();
 	if (cooldown)
 	{
-		var progress = BoundBy(cooldown.Time, 0, cooldown.Interval);
-		return progress * 100 / cooldown.Interval;
+		return cooldown->GetProgress();
 	}
 	else
 	{
@@ -1410,7 +1419,13 @@ local IntCooldownEffect = new Effect
 	{
 		this.Target->DoCooldown(this.user, this.firemode);
 		return FX_Execute_Kill;
-	}
+	},
+	
+	GetProgress = func ()
+	{
+		var progress = BoundBy(this.Time, 0, this.Interval);
+		return progress * 100 / this.Interval;
+	},
 };
 
 /* --- Reloading --- */
@@ -1535,7 +1550,7 @@ public func GetReloadProgress()
 	if (process == nil)
 		return -1;
 	else
-		return process.percentage;
+		return process->GetProgress();
 }
 
 
@@ -1543,7 +1558,6 @@ public func GetReloadProgress()
 	Condition if the weapon can be reloaded.@br
 
 	@par user The object that is using the weapon.
-	@par firemode A proplist containing the fire mode information.
 
 	@return {@c true} by default. Overload this function for a custom condition.
  */
@@ -1865,7 +1879,7 @@ local IntChangeFiremodeEffect = new Effect
 		}
 
 		return FX_OK;
-	}
+	},
 };
 
 /*-- Ammo --*/

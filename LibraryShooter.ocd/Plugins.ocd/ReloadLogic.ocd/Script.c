@@ -68,5 +68,10 @@ local IntReloadEffect = new Effect
 			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
 			this.percent_old = this.progress;
 		}
-	}
+	},
+	
+	GetProgress = func ()
+	{
+		return this.percentage;
+	},
 };
