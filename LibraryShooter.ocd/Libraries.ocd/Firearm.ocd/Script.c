@@ -553,7 +553,7 @@ func StartCharge(object user, int x, int y)
 
 	if (firemode == nil)
 	{
-		FatalError(Format("Fire mode '%s' not supported", firemode));
+		FatalError("Fire mode 'nil' not supported");
 	}
 
 	if (!is_using || firemode->GetChargeDelay() < 1 || !NeedsCharge(user, firemode)) return false;
@@ -1421,7 +1421,7 @@ func StartReload(object user, int x, int y, bool forced)
 
 	if (firemode == nil)
 	{
-		FatalError(Format("Fire mode '%s' not supported", firemode));
+		FatalError("Fire mode 'nil' not supported");
 	}
 
 	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
