@@ -10,6 +10,14 @@
 
 	@note Fire modes
 	Each weapon must define at least one fire mode. fire_mode_default provides an example of how these could look and should also be used as a Prototype, to provide default values.@br
+	
+	@note Reloading
+	Reloading can be implemented via {@link Plugin_Firearm_ReloadLogic}, or a custom plugin that
+	implements the functions
+	<ul>
+	<li>func IsReloading() with an effect return value</li>
+	<li>
+	</ul>
 
 	@author Marky
 
@@ -1435,7 +1443,7 @@ func StartReload(object user, int x, int y, bool forced)
 
 	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
 
-	var process = IsReloading();
+	var process = this->~IsReloading();
 
 	if (process != nil)
 	{
@@ -1461,7 +1469,7 @@ func StartReload(object user, int x, int y, bool forced)
 
 	if (CanReload(user, firemode))
 	{
-		CreateEffect(IntReloadEffect, 1, 1, user, x, y, firemode);
+		this->~StartReloadProcess(user, x, y, firemode);
 		this->OnStartReload(user, x, y, firemode);
 	}
 
@@ -1482,7 +1490,7 @@ func StartReload(object user, int x, int y, bool forced)
 */
 func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
-	var process = IsReloading();
+	var process = this->~IsReloading();
 
 	var auto_reload = firemode->GetAutoReload() && requested_by_user;
 
@@ -1515,17 +1523,6 @@ func DoReload(object user, int x, int y, proplist firemode)
 
 
 /**
-	Checks if the weapon is currently reloading.@br
-
-	@return The reloading effect.
-*/
-func IsReloading()
-{
-	return GetEffect("IntReloadEffect", this);
-}
-
-
-/**
 	Gets the current status of the reloading process.@br
 
 	@return A value of 0 to 100, if the weapon is reloading.@br
@@ -1533,7 +1530,7 @@ func IsReloading()
  */
 public func GetReloadProgress()
 {
-	var process = IsReloading();
+	var process = this->~IsReloading();
 
 	if (process == nil)
 		return -1;
@@ -1623,47 +1620,6 @@ public func OnProgressReload(object user, int x, int y, proplist firemode, int c
 public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
 }
-
-local IntReloadEffect = new Effect
-{
-	Construction = func (object user, int x, int y, proplist firemode)
-	{
-		this.user = user;
-		this.x = x; // x and y will be updated by StartReload
-		this.y = y;
-		this.firemode = firemode;
-
-		this.percent_old = 0;
-		this.percentage = 0;
-		this.progress = 0;
-		this.is_reloaded = false;
-	},
-
-	Timer = func (int time)
-	{
-		// Increase progress percentage depending on the reloading delay of the firemode
-		this.percentage = BoundBy(time * 100 / this.firemode->GetReloadDelay(), 0, 100);
-		// Save the progress (i.e. the difference between the current percentage and during the last update)
-		this.progress = this.percentage - this.percent_old;
-
-		// Check if the reloading process is finished based on the reloading delay of the firemode
-		if (time > this.firemode->GetReloadDelay() && !this.is_reloaded)
-		{
-			this.is_reloaded = true;
-
-			// Do the reload if anything is necessary and end the effect if successful
-			if (this.Target->DoReload(this.user, this.x, this.y, this.firemode))
-				return FX_Execute_Kill;
-		}
-
-		// Do a progress update if necessary
-		if (this.progress > 0)
-		{
-			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
-			this.percent_old = this.progress;
-		}
-	}
-};
 
 /* --- Firemodes --- */
 
@@ -1841,7 +1797,7 @@ public func CanChangeFiremode()
 {
 	return !IsRecovering()
 	    && !IsCharging()
-	    && !IsReloading()
+	    && !this->~IsReloading()
 	    && !IsWeaponLocked();
 }
 
