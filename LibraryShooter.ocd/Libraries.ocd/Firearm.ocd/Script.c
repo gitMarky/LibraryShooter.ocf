@@ -558,19 +558,19 @@ func StartCharge(object user, int x, int y)
 
 	if (!is_using || firemode->GetChargeDelay() < 1 || !NeedsCharge(user, firemode)) return false;
 
-	var effect = IsCharging();
+	var charge_process = IsCharging();
 
-	if (effect != nil)
+	if (charge_process != nil)
 	{
-		if (effect.user == user && effect.firemode == firemode)
+		if (charge_process.user == user && charge_process.firemode == firemode)
 		{
-			if (effect.has_charged)
+			if (charge_process.has_charged)
 			{
 				return false; // fire away
 			}
-			else if (effect.is_charged)
+			else if (charge_process.is_charged)
 			{
-				effect.has_charged = true;
+				charge_process.has_charged = true;
 				if (DoCharge(user, x, y, firemode))
 				{
 					return false; // fire away
@@ -582,10 +582,10 @@ func StartCharge(object user, int x, int y)
 			}
 			else
 			{
-				if (effect.progress > 0)
+				if (charge_process.progress > 0)
 				{
-					this->OnProgressCharge(user, x, y, firemode, effect.percentage, effect.progress);
-					effect.percent_old = effect.percentage;
+					this->OnProgressCharge(user, x, y, firemode, charge_process.percentage, charge_process.progress);
+					charge_process.percent_old = charge_process.percentage;
 				}
 				return true; // keep charging
 			}
@@ -613,13 +613,13 @@ func StartCharge(object user, int x, int y)
 */
 func CancelCharge(object user, int x, int y, proplist firemode, bool callback)
 {
-	var effect = IsCharging();
+	var charge_process = IsCharging();
 
-	if (effect != nil)
+	if (charge_process != nil)
 	{
-		if (callback) this->OnCancelCharge(effect.user, x, y, effect.firemode);
+		if (callback) this->OnCancelCharge(charge_process.user, x, y, charge_process.firemode);
 
-		RemoveEffect(nil, nil, effect);
+		RemoveEffect(nil, nil, charge_process);
 	}
 }
 
@@ -662,12 +662,12 @@ func IsCharging()
  */
 public func GetChargeProgress()
 {
-	var effect = IsCharging();
+	var charge_process = IsCharging();
 
-	if (effect == nil)
+	if (charge_process == nil)
 		return -1;
 	else
-		return effect.percent;
+		return charge_process.percent;
 }
 
 
@@ -742,8 +742,10 @@ public func OnCancelCharge(object user, int x, int y, proplist firemode)
 {
 }
 
-local IntChargeEffect = new Effect {
-	Construction = func(object user, proplist firemode)
+
+local IntChargeEffect = new Effect
+{
+	Construction = func (object user, proplist firemode)
 	{
 		this.user = user;
 		this.firemode = firemode;
@@ -754,7 +756,8 @@ local IntChargeEffect = new Effect {
 		this.is_charged = false;
 		this.has_charged = false;
 	},
-	Timer = func(int time)
+	
+	Timer = func (int time)
 	{
 		// Increase progress percentage depending on the charging delay of the firemode
 		this.percentage = BoundBy(time * 100 / this.firemode->GetChargeDelay(), 0, 100);
@@ -1135,10 +1138,10 @@ public func NeedsRecovery(object user, proplist firemode)
 */
 func CancelRecovery()
 {
-	var effect = IsRecovering();
+	var recovery_process = IsRecovering();
 	
-	if (effect != nil)
-		RemoveEffect(nil, nil, effect);
+	if (recovery_process != nil)
+		RemoveEffect(nil, nil, recovery_process);
 }
 
 
@@ -1150,11 +1153,11 @@ func CancelRecovery()
  */
 func GetRecoveryProgress()
 {
-	var recovery = IsRecovering();
-	if (recovery)
+	var recovery_process = IsRecovering();
+	if (recovery_process)
 	{
-		var progress = BoundBy(recovery.Time, 0, recovery.Interval);
-		return progress * 100 / recovery.Interval;
+		var progress = BoundBy(recovery_process.Time, 0, recovery_process.Interval);
+		return progress * 100 / recovery_process.Interval;
 	}
 	else
 	{
@@ -1229,15 +1232,18 @@ public func OnRecovery(object user, proplist firemode)
 {
 }
 
-local IntRecoveryEffect = new Effect {
-	Construction = func(object user, int x, int y, proplist firemode)
+
+local IntRecoveryEffect = new Effect
+{
+	Construction = func (object user, int x, int y, proplist firemode)
 	{
 		this.user = user;
 		this.x = x;
 		this.y = y;
 		this.firemode = firemode;
 	},
-	Timer = func()
+	
+	Timer = func ()
 	{
 		this.Target->DoRecovery(this.user, this.x, this.y, this.firemode);
 		return FX_Execute_Kill;
@@ -1286,9 +1292,9 @@ func StartCooldown(object user, proplist firemode)
 		return;
 	}
 
-	var effect = IsCoolingDown();
+	var cooldown_process = IsCoolingDown();
 
-	if (effect == nil)
+	if (cooldown_process == nil)
 	{
 		CreateEffect(IntCooldownEffect, 1, firemode->GetCooldownDelay(), user, firemode);
 		this->OnStartCooldown(user, firemode);
@@ -1383,13 +1389,16 @@ public func OnSkipCooldown(object user, proplist firemode)
 {
 }
 
-local IntCooldownEffect = new Effect {
-	Construction = func(object user, proplist firemode)
+
+local IntCooldownEffect = new Effect
+{
+	Construction = func (object user, proplist firemode)
 	{
 		this.user = user;
 		this.firemode = firemode;
 	},
-	Timer = func()
+	
+	Timer = func ()
 	{
 		this.Target->DoCooldown(this.user, this.firemode);
 		return FX_Execute_Kill;
@@ -1426,16 +1435,16 @@ func StartReload(object user, int x, int y, bool forced)
 
 	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
 
-	var effect = IsReloading();
+	var process = IsReloading();
 
-	if (effect != nil)
+	if (process != nil)
 	{
-		if (effect.user == user && effect.firemode == firemode)
+		if (process.user == user && process.firemode == firemode)
 		{
-			effect.x = x;
-			effect.y = y;
+			process.x = x;
+			process.y = y;
 
-			if (effect.has_reloaded)
+			if (process.has_reloaded)
 			{
 				return false; // fire away
 			}
@@ -1473,15 +1482,15 @@ func StartReload(object user, int x, int y, bool forced)
 */
 func CancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
-	var effect = IsReloading();
+	var process = IsReloading();
 
 	var auto_reload = firemode->GetAutoReload() && requested_by_user;
 
-	if (effect != nil)
+	if (process != nil)
 	{
-		this->OnCancelReload(effect.user, x, y, effect.firemode, requested_by_user);
+		this->OnCancelReload(process.user, x, y, process.firemode, requested_by_user);
 
-		if (!auto_reload) RemoveEffect(nil, nil, effect);
+		if (!auto_reload) RemoveEffect(nil, nil, process);
 	}
 }
 
@@ -1524,12 +1533,12 @@ func IsReloading()
  */
 public func GetReloadProgress()
 {
-	var effect = IsReloading();
+	var process = IsReloading();
 
-	if (effect == nil)
+	if (process == nil)
 		return -1;
 	else
-		return effect.percentage;
+		return process.percentage;
 }
 
 
@@ -1615,8 +1624,9 @@ public func OnCancelReload(object user, int x, int y, proplist firemode, bool re
 {
 }
 
-local IntReloadEffect = new Effect {
-	Construction = func(object user, int x, int y, proplist firemode)
+local IntReloadEffect = new Effect
+{
+	Construction = func (object user, int x, int y, proplist firemode)
 	{
 		this.user = user;
 		this.x = x; // x and y will be updated by StartReload
@@ -1628,7 +1638,8 @@ local IntReloadEffect = new Effect {
 		this.progress = 0;
 		this.is_reloaded = false;
 	},
-	Timer = func(int time)
+
+	Timer = func (int time)
 	{
 		// Increase progress percentage depending on the reloading delay of the firemode
 		this.percentage = BoundBy(time * 100 / this.firemode->GetReloadDelay(), 0, 100);
@@ -1883,9 +1894,10 @@ public func ResetScheduledFiremode()
 	}
 }
 
+
 local IntChangeFiremodeEffect = new Effect
 {
-	Timer = func()
+	Timer = func ()
 	{
 		// Stop if there is no mode
 		if (this.mode == nil) return FX_Execute_Kill;
@@ -1983,11 +1995,11 @@ func HandleAmmoUsage(proplist firemode)
  */
 public func LockWeapon(int lock_time)
 {
-	var effect = IsWeaponLocked();
-	if (effect == nil)
+	var locked = IsWeaponLocked();
+	if (locked == nil)
 		AddEffect("IntWeaponLocked", this, 1, lock_time, this, nil);
 	else
-		effect.Interval = lock_time;
+		locked.Interval = lock_time;
 }
 
 
@@ -1996,8 +2008,8 @@ public func LockWeapon(int lock_time)
  */
 public func UnlockWeapon()
 {
-	var effect = IsWeaponLocked();
-	if (effect) RemoveEffect(nil, this, effect);
+	var locked = IsWeaponLocked();
+	if (locked) RemoveEffect(nil, this, locked);
 }
 
 
