@@ -670,12 +670,7 @@ func IsCharging()
  */
 public func GetChargeProgress()
 {
-	var charge_process = IsCharging();
-
-	if (charge_process == nil)
-		return -1;
-	else
-		return charge_process->GetProgress();
+	return GetEffectProgress(IsCharging());
 }
 
 
@@ -1166,15 +1161,7 @@ func CancelRecovery()
  */
 func GetRecoveryProgress()
 {
-	var recovery_process = IsRecovering();
-	if (recovery_process)
-	{
-		return recovery_process->GetProgress();
-	}
-	else
-	{
-		return -1;
-	}
+	return GetEffectProgress(IsRecovering());
 }
 
 
@@ -1337,15 +1324,7 @@ func DoCooldown(object user, proplist firemode)
  */
 func GetCooldownProgress()
 {
-	var cooldown = IsCoolingDown();
-	if (cooldown)
-	{
-		return cooldown->GetProgress();
-	}
-	else
-	{
-		return -1;
-	}
+	return GetEffectProgress(IsCoolingDown());
 }
 
 
@@ -1545,12 +1524,7 @@ func DoReload(object user, int x, int y, proplist firemode)
  */
 public func GetReloadProgress()
 {
-	var process = this->~IsReloading();
-
-	if (process == nil)
-		return -1;
-	else
-		return process->GetProgress();
+	return GetEffectProgress(this->~IsReloading());
 }
 
 
@@ -2027,4 +2001,23 @@ public func GetAnimationSet()
 		WalkSpeed      = anim_walk_speed_front,
 		WalkBack       = anim_walk_speed_back,
 	};
+}
+
+
+/**
+	Calls {@code GetProgress()} in a proplist
+	
+	@return the return value of the call, or {@code -1} if
+	        there is no proplist.
+ */
+func GetEffectProgress(proplist process)
+{
+	if (process == nil)
+	{
+		return -1;
+	}
+	else
+	{
+		return process->GetProgress();
+	}
 }
