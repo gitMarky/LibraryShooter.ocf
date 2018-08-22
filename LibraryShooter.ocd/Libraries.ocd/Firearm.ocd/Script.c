@@ -1441,7 +1441,7 @@ func StartReload(object user, int x, int y, bool forced)
 
 	if (process != nil)
 	{
-		if (process.user == user && process.firemode == firemode)
+		if (process.user == user && process.firemode == firemode && this->IsUserReadyToReload(user))
 		{
 			process.x = x;
 			process.y = y;
@@ -1461,7 +1461,7 @@ func StartReload(object user, int x, int y, bool forced)
 		}
 	}
 
-	if (CanReload(user, firemode))
+	if (CanReload(user, firemode) && this->IsUserReadyToReload(user))
 	{
 		this->~StartReloadProcess(user, x, y, firemode);
 		this->OnStartReload(user, x, y, firemode);
@@ -1536,6 +1536,21 @@ public func GetReloadProgress()
 	@return {@c true} by default. Overload this function for a custom condition.
  */
 public func CanReload(object user, proplist firemode)
+{
+	return true;
+}
+
+
+/**
+	Interface for signaling that the user is ready to reload.
+
+	@par user The object that is trying to reload this weapon. 
+
+	@return true, if the object is ready to reload. By default, it is true.
+	        False means, that the user cannot reload and an ongoing reload
+	        will be cancelled.
+ */
+func IsUserReadyToReload(object user)
 {
 	return true;
 }
