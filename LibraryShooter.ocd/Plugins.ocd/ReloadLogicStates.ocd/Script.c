@@ -1,8 +1,26 @@
 /**
-	Plugin for weapons: Basic reload logic for weapons.@br
+	Plugin for weapons: Reloading stages.
+	
+	@note
+	You have to call the inherited function in:
+	- Construction()
+	if you use this.
 
 	@author Marky
  */
+
+/* --- Properties --- */
+
+local firearm_reload;
+
+/* --- Engine callbacks --- */
+
+func Construction(object by)
+{
+	firearm_reload = firearm_reload ?? {};
+	firearm_reload.current_state = nil; // Ready to go!
+	return _inherited(by, ...);
+}
 
 /* --- Interface --- */
 
@@ -13,7 +31,7 @@
 */
 func IsReloading()
 {
-	return GetEffect("IntReloadEffect", this);
+	return GetEffect("IntReloadStagesEffect", this);
 }
 
 
@@ -27,12 +45,12 @@ func IsReloading()
  */
 func StartReloadProcess(object user, int x, int y, proplist firemode)
 {
-	CreateEffect(IntReloadEffect, 1, 1, user, x, y, firemode);
+	CreateEffect(IntReloadStagesEffect, 1, 1, user, x, y, firemode);
 }
 
 /* --- Internal --- */
 
-local IntReloadEffect = new Effect
+local IntReloadStagesEffect = new Effect
 {
 	Construction = func (object user, int x, int y, proplist firemode)
 	{
@@ -84,4 +102,60 @@ local IntReloadEffect = new Effect
 	{
 		return this.percentage;
 	},
+};
+
+/* --- State definition --- */
+
+/**
+	Prototype for reloading state.
+	
+	State 'nil' is the 'ready to reload' or default state.
+	
+	@note
+	For every own state you will have to implement some functions:
+	<ul>
+	<li>{@code Setup = func ()}. This is an optional callback that lets you define the next state, duration, etc.</li>
+	</ul>
+ */
+static const Firearm_ReloadState = new Global
+{
+	is_defined = false,
+	state_next = nil,
+
+	// Use this function as a constructor for the state; Call
+	Create = func ()
+	{
+		this->~Setup();
+		is_defined = true;
+		return this;
+	},
+
+	// --- Getters
+
+	// Gets the state that should be set after this one.
+	// If the function returns 'nil', this means that reloading
+	// is done and 
+	GetNextState = func ()
+	{
+		return this.state_next;
+	}
+	
+	// --- Setters
+	
+	SetNextState = func (proplist state)
+	{
+		AssertOnlyBeforeCreation();
+		this.state_next = state;
+		return this;
+	}
+	
+	// --- Internals
+	
+	AssertOnlyBeforeCreation = func ()
+	{
+		if (is_defined)
+		{
+			FatalError("You should called this function after the state was created with ->Create(). This is prohibited.");
+		}
+	}
 };
