@@ -1529,7 +1529,8 @@ public func GetReloadProgress()
 
 
 /**
-	Condition if the weapon can be reloaded.@br
+	Condition if the weapon can be reloaded. Checked only when reloading is started, i.e.
+	is there enough ammo.
 
 	@par user The object that is using the weapon.
 

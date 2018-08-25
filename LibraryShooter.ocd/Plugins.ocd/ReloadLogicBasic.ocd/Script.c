@@ -47,6 +47,12 @@ local IntReloadEffect = new Effect
 
 	Timer = func (int time)
 	{
+		// Cancel if user cannot reload
+		if (!this.Target->IsUserReadyToReload())
+		{
+			this.Target->CancelReload(this.user, this.x, this.y, this.firemode, false);
+		}
+	
 		// Increase progress percentage depending on the reloading delay of the firemode
 		this.percentage = BoundBy(time * 100 / this.firemode->GetReloadDelay(), 0, 100);
 		// Save the progress (i.e. the difference between the current percentage and during the last update)
@@ -59,7 +65,9 @@ local IntReloadEffect = new Effect
 
 			// Do the reload if anything is necessary and end the effect if successful
 			if (this.Target->DoReload(this.user, this.x, this.y, this.firemode))
+			{
 				return FX_Execute_Kill;
+			}
 		}
 
 		// Do a progress update if necessary
