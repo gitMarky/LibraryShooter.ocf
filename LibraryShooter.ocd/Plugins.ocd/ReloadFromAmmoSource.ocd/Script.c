@@ -29,6 +29,14 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 {
 	_inherited(user, x, y, firemode, ...);
 
+	//ReloadRefillAmmo(firemode);
+	
+	if (firemode.progress_bar) firemode.progress_bar->Close();
+}
+
+
+func ReloadRefillAmmo(proplist firemode) // FIXME: Better name, make a better concept
+{
 	var source = this->GetAmmoReloadContainer();
 	if (source)
 	{	
@@ -58,8 +66,6 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 	
 		this->DoAmmo(ammo_type, ammo_received);
 	}
-	
-	if (firemode.progress_bar) firemode.progress_bar->Close();
 }
 
 

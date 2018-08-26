@@ -1,5 +1,5 @@
 [DefCore]
-id=Plugin_Firearm_ReloadStages
+id=Plugin_Firearm_ReloadStates
 Version=8,0
 Category=C4D_StaticBack
 HideInCreator=true

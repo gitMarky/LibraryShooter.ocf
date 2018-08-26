@@ -133,7 +133,7 @@ local IntReloadStagesEffect = new Effect
 	SetState = func (proplist state)
 	{
 		this.state = state;
-		state->~OnStart(this.user, this.x, this.y, this.firemode);
+		state->~OnStart(this.Target, this.user, this.x, this.y, this.firemode);
 	},
 
 	Timer = func (int time)
@@ -143,7 +143,7 @@ local IntReloadStagesEffect = new Effect
 		{
 			if (this.state)
 			{
-				this.state->~OnCancel(this.user, this.x, this.y, this.firemode);
+				this.state->~OnCancel(this.Target, this.user, this.x, this.y, this.firemode);
 			}
 			this.Target->CancelReload(this.user, this.x, this.y, this.firemode, false);
 		}
@@ -163,6 +163,7 @@ local IntReloadStagesEffect = new Effect
 		if (this.is_reloaded)
 		{
 			// TODO
+			this.state->~OnFinish(this.Target, this.user, this.x, this.y, this.firemode);
 			
 			// Do the reload if anything is necessary and end the effect if successful
 			if (this.Target->DoReload(this.user, this.x, this.y, this.firemode))
