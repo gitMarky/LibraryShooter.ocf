@@ -50,7 +50,7 @@ local IntReloadEffect = new Effect
 	Timer = func (int time)
 	{
 		// Cancel if user cannot reload
-		if (!this.Target->IsUserReadyToReload())
+		if (!this.Target->IsUserReadyToReload(this.user))
 		{
 			this.Target->CancelReload(this.user, this.x, this.y, this.firemode, false);
 		}

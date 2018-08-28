@@ -44,7 +44,7 @@ func IsReloading()
  */
 func GetReloadState()
 {
-	return firearm_reload.current_state ?? GetReloadStateDefault();
+	return firearm_reload.current_state;
 }
 
 
@@ -81,16 +81,7 @@ func SetReloadState(proplist state)
  */
 func StartReloadProcess(object user, int x, int y, proplist firemode)
 {
-	var state = GetReloadState();
-	if (state)
-	{
-		var process = CreateEffect(IntReloadStagesEffect, 1, 1, user, x, y, firemode);
-		process->SetState(state);
-	}
-	else
-	{
-		FatalError("Cannot start reloading: No default state is set");
-	}
+	CreateEffect(IntReloadStagesEffect, 1, 1, user, x, y, firemode);
 }
 
 
@@ -105,11 +96,7 @@ func StartReloadProcess(object user, int x, int y, proplist firemode)
  */
 public func OnCancelReload(object user, int x, int y, proplist firemode, bool requested_by_user)
 {
-	var state = GetReloadState();
-	if (state)
-	{
-		SetReloadState(state->GetCancelState());
-	}
+	_inherited(user, x, y, firemode, requested_by_user, ...);
 }
 
 
@@ -123,57 +110,74 @@ local IntReloadStagesEffect = new Effect
 		this.x = x; // x and y will be updated by StartReload
 		this.y = y;
 		this.firemode = firemode;
-
+		ResetState();
+	},
+	
+	ResetState = func ()
+	{
+		this.Time = 0;
 		this.percent_old = 0;
 		this.percentage = 0;
 		this.progress = 0;
-		this.is_reloaded = false;
-	},
-	
-	SetState = func (proplist state)
-	{
-		this.state = state;
-		state->~OnStart(this.Target, this.user, this.x, this.y, this.firemode);
+		this.state_started = false;
+		this.state_finished = false;
 	},
 
 	Timer = func (int time)
 	{
+		// Request current state
+		var state = this.Target->GetReloadState() ?? this.Target->GetReloadStateDefault();
+
 		// Cancel if user cannot reload
-		if (!this.Target->IsUserReadyToReload() || !this.state)
+		if (!this.Target->IsUserReadyToReload(this.user) || !state)
 		{
-			if (this.state)
+			//TODO: Move this to CancelReload-Callback
+			if (state)
 			{
-				this.state->~OnCancel(this.Target, this.user, this.x, this.y, this.firemode);
+				state->~OnCancel(this.Target, this.user, this.x, this.y, this.firemode);
 			}
 			this.Target->CancelReload(this.user, this.x, this.y, this.firemode, false);
+			return FX_Execute_Kill;
 		}
-	
+		
+		// Initial callback
+		if (!this.state_started)
+		{
+			this.state_started = true;
+			state->~OnStart(this.Target, this.user, this.x, this.y, this.firemode);
+		}
+
 		// Increase progress percentage depending on the reloading delay of the firemode
-		this.percentage = BoundBy(time * 100 / this.firemode->GetReloadDelay(), 0, 100);
+		this.percentage = BoundBy(time * 100 / state->GetDelay(), 0, 100);
 		// Save the progress (i.e. the difference between the current percentage and during the last update)
 		this.progress = this.percentage - this.percent_old;
 
 		// Check if the reloading process is finished based on the reloading delay of the firemode
-		if (time > this.state->GetDelay() && !this.is_reloaded)
+		if (time > state->GetDelay() && !this.state_finished)
 		{
-			this.is_reloaded = true;
+			this.state_finished = true;
 		}
 		
-		// Done reloading?
-		if (this.is_reloaded)
+		// Done with this state?
+		if (this.state_finished)
 		{
 			// TODO
-			this.state->~OnFinish(this.Target, this.user, this.x, this.y, this.firemode);
+			state->~OnFinish(this.Target, this.user, this.x, this.y, this.firemode);
+			
+			var next_state = this.Target->GetReloadState();
 			
 			// Do the reload if anything is necessary and end the effect if successful
-			if (this.Target->DoReload(this.user, this.x, this.y, this.firemode))
+			if (next_state == nil)
 			{
+				this.Target->DoReload(this.user, this.x, this.y, this.firemode);
 				return FX_Execute_Kill;
 			}
+			else
+			{
+				ResetState();
+			}
 		}
-
-		// Do a progress update if necessary
-		if (this.progress > 0)
+		else if (this.progress > 0) // Do a progress update if necessary
 		{
 			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
 			this.percent_old = this.progress;
