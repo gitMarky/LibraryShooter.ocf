@@ -227,11 +227,29 @@ func HandleAmmoUsage(proplist firemode)
 			}
 		}
 	}
+}
 
-	if (ammo_changed)
+
+/**
+	Changes the amount of ammunition that the object currently has.
+
+	@par ammo The type of the ammunition.
+
+	@par amount The change, can be positive or negative.
+                The amount of ammunition cannot be changed beyond the capacity
+                of the object, so the actual amount by which the ammunition was
+                changed will be returned. 
+
+	@return The actual change that happened.
+*/
+public func DoAmmo(id ammo_type, int amount)
+{
+	var change = _inherited(ammo_type, amount);
+	if (change != 0)
 	{
 		this->OnAmmoChange(ammo_type);
 	}
+	return change;
 }
 
 
