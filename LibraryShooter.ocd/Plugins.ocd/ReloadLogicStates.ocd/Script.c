@@ -126,7 +126,12 @@ local IntReloadStagesEffect = new Effect
 	Timer = func (int time)
 	{
 		// Request current state
-		var state = this.Target->GetReloadState() ?? this.Target->GetReloadStateDefault();
+		var state = this.Target->GetReloadState();
+		if (state == nil)
+		{
+			state = this.Target->GetReloadStateDefault();
+			this.Target->SetReloadState(state);
+		}
 
 		// Cancel if user cannot reload
 		if (!this.Target->IsUserReadyToReload(this.user) || !state)

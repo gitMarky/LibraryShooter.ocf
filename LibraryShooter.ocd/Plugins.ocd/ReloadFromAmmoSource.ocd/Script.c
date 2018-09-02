@@ -35,37 +35,85 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 }
 
 
+// Function for taking ammo from the weapon, gives it to the container
+// Leaves ammo in the chamber
+func ReloadRemoveAmmo(proplist firemode, bool add_to_container) // FIXME: Better name, make a better concept
+{
+	var info = ReloadGetAmmoInfo(firemode);
+	var ammo_available = Max(0, info.ammo_available - info.ammo_chambered);
+	var ammo_removed = Abs(this->DoAmmo(info.ammo_type, -ammo_available));
+
+	var target = this->GetAmmoReloadContainer();
+	if (target && add_to_container)
+	{
+		target->DoAmmo(info.ammo_type, ammo_removed);
+	}
+}
+
+// Function for taking ammo from the weapon, gives it to the container
+// Takes ammo from the chamber, too
+func ReloadRemoveAllAmmo(proplist firemode, bool add_to_container) // FIXME: Better name, make a better concept
+{
+	var info = ReloadGetAmmoInfo(firemode);
+	var ammo_removed = Abs(this->DoAmmo(info.ammo_type, -info.ammo_available));
+
+	var target = this->GetAmmoReloadContainer();
+	if (target && add_to_container)
+	{
+		target->DoAmmo(info.ammo_type, ammo_removed);
+	}
+}
+
+// Function for filling the weapon from the ammo
 func ReloadRefillAmmo(proplist firemode) // FIXME: Better name, make a better concept
 {
 	var source = this->GetAmmoReloadContainer();
 	if (source)
-	{	
-		var ammo_type = firemode.ammo_id;
-		var ammo_max = firemode.ammo_load ?? 1;
-		var ammo_available = this->GetAmmo(ammo_type); // how many do I have
+	{
+		var info = ReloadGetAmmoInfo(firemode);
 		
-		var ammo_requested = ammo_max - ammo_available; // receive only as much as you need
+		var ammo_requested = info.ammo_max + info.ammo_chambered - info.ammo_available; // receive only as much as you need
 
 // TODO: remove the log output once unit testing is complete
 //		Log("Reloaded: ");
-//		Log(" * ammo in source before = %d", source->GetAmmo(ammo_type));
-//		Log(" * ammo_type = %d", ammo_type);
-//		Log(" * ammo_max = %d", ammo_max);
-//		Log(" * ammo_available = %d", ammo_available);
+//		Log(" * ammo in source before = %d", source->GetAmmo(info.ammo_type));
+//		Log(" * ammo_type = %d", info.ammo_type);
+//		Log(" * ammo_max = %d", info.ammo_max);
+//		Log(" * ammo_available = %d", info.ammo_available);
 //		Log(" * ammo_requested = %d", ammo_requested);
 
-		var ammo_received = Abs(source->DoAmmo(ammo_type, -ammo_requested)); // see how much you can get
+		var ammo_received = Abs(source->DoAmmo(info.ammo_type, -ammo_requested)); // see how much you can get
 //		Log(" * ammo_received = %d", ammo_received);
-		var ammo_spare = (ammo_available + ammo_received) % (firemode.ammo_usage ?? 1); // get ammo only in increments of ammo_usage
+		var ammo_spare = (info.ammo_available + ammo_received) % (firemode.ammo_usage ?? 1); // get ammo only in increments of ammo_usage
 
-		source->DoAmmo(ammo_type, ammo_spare); // give back the unecessary ammo
+		source->DoAmmo(info.ammo_type, ammo_spare); // give back the unecessary ammo
 		ammo_received -= ammo_spare;           // adjust the counter accordingly
 //		Log(" * ammo_spare = %d", ammo_spare);
 //		Log(" * ammo_inserted = %d", ammo_received);
-//		Log(" * ammo in source after = %d", source->GetAmmo(ammo_type));
+//		Log(" * ammo in source after = %d", source->GetAmmo(info.ammo_type));
 	
-		this->DoAmmo(ammo_type, ammo_received);
+		this->DoAmmo(info.ammo_type, ammo_received);
 	}
+}
+
+
+func ReloadGetAmmoInfo(proplist firemode)
+{
+	var ammo_type = firemode.ammo_id;
+	var ammo_max = firemode.ammo_load ?? 1;
+	var ammo_available = this->GetAmmo(ammo_type);
+	var ammo_chambered = 0;
+	if (this->~AmmoChamberIsLoaded(ammo_type))
+	{
+		ammo_chambered = this->~AmmoChamberCapacity(ammo_type);
+	}
+ 	return
+ 	{
+ 		ammo_type = ammo_type,
+ 		ammo_max = ammo_max,
+ 		ammo_available = ammo_available,
+ 		ammo_chambered = ammo_chambered,
+	};
 }
 
 
