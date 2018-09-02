@@ -1,4 +1,4 @@
-﻿﻿﻿/**
+﻿﻿﻿﻿/**
 	Shared functions between all firearms.
 
 	@note Basic workings
@@ -1435,7 +1435,7 @@ func StartReload(object user, int x, int y, bool forced)
 		FatalError("Fire mode 'nil' not supported");
 	}
 
-	if ((!is_using && !forced) || !NeedsReload(user, firemode)) return false;
+	if ((!is_using && !forced) || !NeedsReload(user, firemode, forced)) return false;
 
 	var process = this->~IsReloading();
 
@@ -1562,10 +1562,13 @@ func IsUserReadyToReload(object user)
 
 	@par user The object that is using the weapon.
 	@par firemode A proplist containing the fire mode information.
+	@par forced {@code true} If the reload is requested by a user,
+	            instead of request from the fire cycle.
 
-	@return {@c false} by default. Overload this function for a custom condition. Otherwise no reloading needs ever to be done.
+	@return {@c false} by default. Overload this function for a custom condition.
+	        Otherwise no reloading needs ever to be done.
  */
-public func NeedsReload(object user, proplist firemode)
+public func NeedsReload(object user, proplist firemode, bool forced)
 {
 	return false;
 }
