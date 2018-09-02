@@ -48,6 +48,7 @@ func ReloadRemoveAmmo(proplist firemode, bool add_to_container) // FIXME: Better
 	{
 		target->DoAmmo(info.ammo_type, ammo_removed);
 	}
+	return ammo_removed;
 }
 
 // Function for taking ammo from the weapon, gives it to the container
@@ -62,6 +63,7 @@ func ReloadRemoveAllAmmo(proplist firemode, bool add_to_container) // FIXME: Bet
 	{
 		target->DoAmmo(info.ammo_type, ammo_removed);
 	}
+	return ammo_removed;
 }
 
 // Function for filling the weapon from the ammo

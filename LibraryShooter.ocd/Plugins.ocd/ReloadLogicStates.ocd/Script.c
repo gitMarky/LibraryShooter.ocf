@@ -41,17 +41,21 @@ func IsReloading()
 
 /**
 	Gets the current reload state.
+	
+	@par firemode The reload state is requested for this firemode.
  */
-func GetReloadState()
+func GetReloadState(proplist firemode)
 {
 	return firearm_reload.current_state;
 }
 
 
 /**
-	Gets the default reload state that the weapon starts reloading from.
+	Gets the reload state that the weapon starts reloading from.
+	
+	@par firemode The reload state is requested for this firemode.
  */
-func GetReloadStateDefault()
+func GetReloadStartState(proplist firemode)
 {
 	return nil;
 }
@@ -125,11 +129,12 @@ local IntReloadStagesEffect = new Effect
 
 	Timer = func (int time)
 	{
-		// Request current state
-		var state = this.Target->GetReloadState();
-		if (state == nil)
+		// Request current state, or default state
+		// The if-clause is not part of GetReloadState(), so that the reloading can stop in the exit condition where next_state is determined
+		var state = this.Target->GetReloadState(this.firemode);
+		if (nil == state)
 		{
-			state = this.Target->GetReloadStateDefault();
+			state = this.Target->GetReloadStartState(this.firemode);
 			this.Target->SetReloadState(state);
 		}
 
@@ -169,7 +174,7 @@ local IntReloadStagesEffect = new Effect
 			// TODO
 			state->~OnFinish(this.Target, this.user, this.x, this.y, this.firemode);
 			
-			var next_state = this.Target->GetReloadState();
+			var next_state = this.Target->GetReloadState(this.firemode);
 			
 			// Do the reload if anything is necessary and end the effect if successful
 			if (next_state == nil)
