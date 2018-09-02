@@ -21,7 +21,11 @@
 	  the fire mode!) when reloading.
 	- If the weapon is reloaded, it keeps the saved ammo
 	  additionally.
-	  
+	- The easiest way is to keep set this status only
+	  if the bullet is not chambered, because status
+	  changes every x frames from a fire cycle are
+	  "super realistic" in modelling the behaviour,
+	  but do not improve the code.
 	
 	@note
 	There is a lot of things that would need to be addressed
@@ -29,16 +33,6 @@
 	- what if you chamber ammo in one firemode, change to 
 	  a different firemode that has the same ammo type,
 	  but a different ammo usage amount?
-
-    @note
-	The abstraction works as follows (old / planned):
-	- There is a function that loads ammo to the chamber: TODO
-	- You can define how much ammo is put into the chamber: TODO
-	- You can define that chambering is possible only if there
-	  is enough ammo: TODO
-	- You can define that chambering is skipped if the chamber
-	  is not completely empty: TODO 
-	- Ammo is subtracted and kept in the chamber virtually: TODO
 
 	@author Marky
  */
