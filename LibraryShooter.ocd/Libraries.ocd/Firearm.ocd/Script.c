@@ -1,4 +1,4 @@
-﻿﻿/**
+﻿﻿﻿/**
 	Shared functions between all firearms.
 
 	@note Basic workings
@@ -680,11 +680,11 @@ public func GetChargeProgress()
 	@par user The object that is using the weapon.
 	@par firemode A proplist containing the fire mode information.
 
-	@return {@c true} by default. Overload this function for a custom condition.
+	@return {@c false} by default. Overload this function for a custom condition.
  */
 public func NeedsCharge(object user, proplist firemode)
 {
-	return true;
+	return false;
 }
 
 
