@@ -211,9 +211,15 @@ local IntReloadStagesEffect = new Effect
 	State 'nil' is the 'ready to reload' or default state.
 	
 	@note
-	For every own state you will have to implement some functions or properties:
+	For every state you will have to implement some functions or properties:
 	<ul>
 	<li>Delay - the delay of the state, in frames; Default value = 1</li>
+	<li>Event - if set to a value other than 0, in frames, there will be a callback; Default value = 0</li>
+	<li>OnStart - (optional) callback when the state starts</li>
+	<li>OnFinish - (optional) callback when the state is completed</li>
+	<li>OnCancel - (optional) callback when the state is interrupted</li>
+	<li>OnEvent - (optional) callback when the event is fired, if .Event is other than 0</li>
+	<li>Parameters for all callbacks: {@code object firearm, object user, int x, int y, proplist firemode}</li>
 	</ul>
  */
 static const Firearm_ReloadState = new Global
