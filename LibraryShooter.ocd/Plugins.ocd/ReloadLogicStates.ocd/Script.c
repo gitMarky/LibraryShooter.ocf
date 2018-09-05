@@ -125,6 +125,7 @@ local IntReloadStagesEffect = new Effect
 		this.progress = 0;
 		this.state_started = false;
 		this.state_finished = false;
+		this.state_event = false;
 	},
 
 	Timer = func (int time)
@@ -141,7 +142,6 @@ local IntReloadStagesEffect = new Effect
 		// Cancel if user cannot reload
 		if (!this.Target->IsUserReadyToReload(this.user) || !state)
 		{
-			//TODO: Move this to CancelReload-Callback
 			if (state)
 			{
 				state->~OnCancel(this.Target, this.user, this.x, this.y, this.firemode);
@@ -158,25 +158,32 @@ local IntReloadStagesEffect = new Effect
 		}
 
 		// Increase progress percentage depending on the reloading delay of the firemode
-		this.percentage = BoundBy(time * 100 / state->GetDelay(), 0, 100);
+		this.percentage = BoundBy(time * 100 / state.Delay, 0, 100);
 		// Save the progress (i.e. the difference between the current percentage and during the last update)
 		this.progress = this.percentage - this.percent_old;
-
-		// Check if the reloading process is finished based on the reloading delay of the firemode
-		if (time > state->GetDelay() && !this.state_finished)
+		
+		// Do a progress update if necessary
+		if (this.progress > 0)
 		{
-			this.state_finished = true;
+			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
+			this.percent_old = this.progress;
 		}
 		
-		// Done with this state?
-		if (this.state_finished)
+		// Check if there should be an event callback
+		if (state.Event > 0 && time > state.Event && !this.state_event)
 		{
-			// TODO
+			this.state_event = true;
+			state->~OnEvent(this.Target, this.user, this.x, this.y, this.firemode);
+		}
+
+		// Done with this state?
+		if (time > state.Delay && !this.state_finished)
+		{
+			this.state_finished = true;
 			state->~OnFinish(this.Target, this.user, this.x, this.y, this.firemode);
-			
-			var next_state = this.Target->GetReloadState(this.firemode);
-			
+						
 			// Do the reload if anything is necessary and end the effect if successful
+			var next_state = this.Target->GetReloadState(this.firemode);
 			if (next_state == nil)
 			{
 				this.Target->DoReload(this.user, this.x, this.y, this.firemode);
@@ -185,12 +192,8 @@ local IntReloadStagesEffect = new Effect
 			else
 			{
 				ResetState();
+				return FX_OK;
 			}
-		}
-		else if (this.progress > 0) // Do a progress update if necessary
-		{
-			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
-			this.percent_old = this.progress;
 		}
 	},
 	
@@ -208,88 +211,13 @@ local IntReloadStagesEffect = new Effect
 	State 'nil' is the 'ready to reload' or default state.
 	
 	@note
-	For every own state you will have to implement some functions:
+	For every own state you will have to implement some functions or properties:
 	<ul>
-	<li>{@code Setup = func ()}. This is an optional callback that lets you define the next state, duration, etc.</li>
+	<li>Delay - the delay of the state, in frames; Default value = 1</li>
 	</ul>
  */
 static const Firearm_ReloadState = new Global
 {
-	is_defined = false,
-	state_next = nil,   // This state is assumed if the current state was finished successfully.
-	state_cancel = nil, // This state is assumed if the current state was cancelled.
-	delay = 1,          // The state takes this long.
-
-	// Use this function as a constructor for the state; Call
-	Create = func ()
-	{
-		// Repeat the state upon cancellation, as a default
-		SetCancelState(this);
-		// Allow user-defined setup
-		this->~Setup();
-		// Finish
-		is_defined = true;
-		return this;
-	},
-
-	// --- Getters
-	
-	// The state lasts this long
-	GetDelay = func ()
-	{
-		return this.delay;
-	},
-
-	// Gets the state that should be set after this one,
-	// if the action was successful.
-	//
-	// If the function returns 'nil', this means that reloading
-	// is done.
-	GetNextState = func ()
-	{
-		return this.state_next;
-	},
-	
-	// Gets the state that should be set after this one,
-	// if the action was cancelled.
-	//
-	// If the function returns 'nil', this means that reloading
-	// is done.
-	GetCancelState = func ()
-	{
-		return this.state_cancel;
-	},
-	
-	// --- Setters
-	
-	SetDelay = func (int delay)
-	{
-		AssertOnlyBeforeCreation();
-		this.delay = delay;
-		return this;
-	},
-	
-	SetNextState = func (proplist state)
-	{
-		AssertOnlyBeforeCreation();
-		this.state_next = state;
-		return this;
-	},
-	
-	SetCancelState = func (proplist state)
-	{
-		AssertOnlyBeforeCreation();
-		this.state_cancel = state;
-		return this;
-	},
-	
-	// --- Internals
-	
-	AssertOnlyBeforeCreation = func ()
-	{
-		if (is_defined)
-		{
-			FatalError("You should called this function after the state was created with ->Create(). This is prohibited.");
-		}
-	},
+	Event = 0,          // An event takes place at this time
+	Delay = 1,          // The state takes this long.
 };
