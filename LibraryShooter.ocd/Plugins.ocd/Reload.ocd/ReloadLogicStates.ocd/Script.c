@@ -64,10 +64,11 @@ func GetReloadStartState(proplist firemode)
 /**
 	Sets the current reload state.
 	
+	@par firemode The reload state is changed for this firemode.
 	@par state the reload state. A value of {@code nil} means, that
 	     the weapon is reloaded.
  */
-func SetReloadState(proplist state)
+func SetReloadState(proplist firemode, proplist state)
 {
 	firearm_reload.current_state[GetReloadStateID(this->GetFiremode())] = state; // FIXME: Hack, needs a parameter
 }
