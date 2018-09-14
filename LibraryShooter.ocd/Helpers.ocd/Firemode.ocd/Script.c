@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
 	A dummy definition, used to provide various getters and setters for fire modes.
 	Keep in mind that for fire modes to be writable, they must be created using {@link Library_Firearm#AddFiremode}.
 	
@@ -105,6 +105,17 @@ public func GetCondition()
 public func GetAmmoID()
 {
 	return this.ammo_id;
+}
+
+
+/**
+	Get the ammunition maximum of this fire mode.
+
+	@return An integer.
+*/
+public func GetAmmoAmount()
+{
+	return this.ammo_load;
 }
 
 
@@ -481,6 +492,21 @@ public func SetAmmoID(id value)
 
 
 /**
+	Set the ammunition maximum of this fire mode.
+
+	@par value This fire mode can have this many ammunition.
+
+	@return proplist Returns the fire mode, so that 
+	                 further function calls can be issued.
+*/
+public func SetAmmoAmount(int value)
+{
+	this.ammo_load = value;
+	return this;
+}
+
+
+/**
 	Set the ammunition usage of this fire mode.
 
 	@par value How much ammunition is needed per {@link Library_Firearm_Firemode#GetAmmoRate} shots.
@@ -498,7 +524,9 @@ public func SetAmmoUsage(int value)
 /**
 	Set the ammunition rate of this fire mode.
 
-	@par value An integer.
+	@par value An integer. The firearm can fire this many shots after
+	           using up {@link Library_Firearm_Firemode#GetAmmoUsage}
+	           ammunition.
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
@@ -531,6 +559,10 @@ public func SetChargeDelay(int value)
 
 	@par value Recovery duration between consecutive shots in frames.
                If 0 or nil, no recovery is required
+               
+    @note Use this to model a (semi-)automatic loading cycle of the
+          weapon. The recovery from recoil, etc. should be modeled
+          via {@link Library_Firearm_Firemode#SetCooldownDelay} 
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
@@ -549,6 +581,10 @@ public func SetRecoveryDelay(int value)
                The last shot is the last shot in a series of consecutive
                shots (as opposed to the last shot before ammo runs out).
                If 0 or nil, no cooldown is required.
+               
+    @note Use this to model recoil, letting a gatling gun roll out, etc.
+          Time for loading a new shot should be modeled
+          via {@link Library_Firearm_Firemode#SetRecoveryDelay} 
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
