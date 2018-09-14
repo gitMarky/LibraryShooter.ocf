@@ -22,7 +22,7 @@ local firearm_reload;
 func Construction(object by)
 {
 	firearm_reload = firearm_reload ?? {};
-	firearm_reload.current_state = nil; // Ready to go. Can be changed to array or proplist in case that multiple states are necessary.
+	firearm_reload.current_state = {};
 	return _inherited(by, ...);
 }
 
@@ -46,7 +46,7 @@ func IsReloading()
  */
 func GetReloadState(proplist firemode)
 {
-	return firearm_reload.current_state;
+	return firearm_reload.current_state[GetReloadStateID(firemode)];
 }
 
 
@@ -69,9 +69,25 @@ func GetReloadStartState(proplist firemode)
  */
 func SetReloadState(proplist state)
 {
-	firearm_reload.current_state = state;
+	firearm_reload.current_state[GetReloadStateID(this->GetFiremode())] = state; // FIXME: Hack, needs a parameter
 }
 
+
+/**
+	Gets an identifier for accessing the reload state
+	from the saved data.
+	
+	@par firemode The identifier is queried for this firemode.
+	@return string Should return the type of reload state
+	               depending on the firemode.
+	               By default, that is the {@link Library_Firearm_Firemode#GetAmmoID}
+	               but you are free to overload according to whatever logic
+	               seems best.
+ */
+func GetReloadStateID(proplist firemode)
+{
+	return Format("%i", firemode->GetAmmoID());
+}
 
 /* --- Callbacks from the firearm --- */
 
