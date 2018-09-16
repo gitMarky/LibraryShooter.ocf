@@ -225,6 +225,7 @@ local IntReloadStagesEffect = new Effect
 /**
 	Prototype for reloading state.
 	
+	@note
 	State 'nil' is the 'ready to reload' or default state.
 	
 	@note
@@ -238,6 +239,11 @@ local IntReloadStagesEffect = new Effect
 	<li>OnEvent - (optional) callback when the event is fired, if .Event is other than 0</li>
 	<li>Parameters for all callbacks: {@code object firearm, object user, int x, int y, proplist firemode}</li>
 	</ul>
+	
+	@note
+	As a design rule, each state should play create permanent effects or status changes only when it is finished.
+	If you create a state that does something when it begins, then it does not matter whether you finish it
+	correctly or cancel it.
  */
 static const Firearm_ReloadState = new Global
 {
