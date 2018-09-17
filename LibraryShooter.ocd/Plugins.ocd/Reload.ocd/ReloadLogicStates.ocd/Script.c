@@ -143,6 +143,12 @@ local IntReloadStagesEffect = new Effect
 		this.state_started = false;
 		this.state_finished = false;
 		this.state_event = false;
+		
+		if (this.user_animation && this.user)
+		{
+			this.user->StopAnimation(this.user_animation);
+		}
+		this.user_animation = nil;
 	},
 
 	Timer = func (int time)
@@ -172,6 +178,17 @@ local IntReloadStagesEffect = new Effect
 		{
 			this.state_started = true;
 			state->~OnStart(this.Target, this.user, this.x, this.y, this.firemode);
+			
+			if (state.UserAnimation)
+			{
+				var begin = state.UserAnimation.Begin ?? 0;
+				var end = state.UserAnimation.End ?? this.user->GetAnimationLength(state.UserAnimation.Name);
+				var position = BoundBy(state.UserAnimation.Position, begin, end);
+				this.UserAnimation = this.user->PlayAnimation(state.UserAnimation.Name, 
+				                                          state.UserAnimation.Slot ?? (CLONK_ANIM_SLOT_Arms + 1),
+				                                          Anim_Linear(position, begin, end, state.Delay, ANIM_Remove),
+				                                          Anim_Linear(0, 0, 1000, Max(1, state.Delay / 4), ANIM_Remove));
+			}
 		}
 
 		// Increase progress percentage depending on the reloading delay of the firemode
@@ -231,13 +248,21 @@ local IntReloadStagesEffect = new Effect
 	@note
 	For every state you will have to implement some functions or properties:
 	<ul>
-	<li>Delay - the delay of the state, in frames; Default value = 1</li>
-	<li>Event - if set to a value other than 0, in frames, there will be a callback; Default value = 0</li>
-	<li>OnStart - (optional) callback when the state starts</li>
-	<li>OnFinish - (optional) callback when the state is completed</li>
-	<li>OnCancel - (optional) callback when the state is interrupted</li>
-	<li>OnEvent - (optional) callback when the event is fired, if .Event is other than 0</li>
+	<li>Delay - int, the delay of the state, in frames; Default value = 1</li>
+	<li>Event - int, if set to a value other than 0, in frames, there will be a callback; Default value = 0</li>
+	<li>OnStart - (optional) func, callback when the state starts</li>
+	<li>OnFinish - (optional) func, callback when the state is completed</li>
+	<li>OnCancel - (optional) func, callback when the state is interrupted</li>
+	<li>OnEvent - (optional) func, callback when the event is fired, if .Event is other than 0</li>
 	<li>Parameters for all callbacks: {@code object firearm, object user, int x, int y, proplist firemode}</li>
+	<li>UserAnimation - (optional) proplist, animation that should be played in the user
+	<ul>
+		<li>Name - string, name of the animation in the user.</li>
+		<li>Begin - (optional) int, beginning position of the animation; Default value = 0</li>
+		<li>End - (optional) int, end position of the animation; Default value = animation length</li>
+		<li>Position - (optional) int, position that the animation plays from, between Begin and End</li>
+	</ul>
+	</li>
 	</ul>
 	
 	@note
