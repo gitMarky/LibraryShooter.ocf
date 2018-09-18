@@ -155,9 +155,8 @@ local Reload_Container_ReadyWeapon = new Firearm_ReloadState
 	},
 };
 
+
 /* --- Support adding spare ammo back to the user --- */
-
-
 
 // Take out a partially filled magazine and stash it
 local Reload_Container_StashStart = new Firearm_ReloadState
