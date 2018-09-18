@@ -15,7 +15,7 @@ func GetReloadStartState(proplist firemode)
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
 	if (this->~AmmoChamberCapacity(ammo_type)
-	&& !this->~AmmoChamberIsLoaded(ammo_type)
+	&& !this->~AmmoChamberIsLoaded(ammo_type))
 	{
 		if (ammo >= firemode->GetAmmoAmount())
 		{
