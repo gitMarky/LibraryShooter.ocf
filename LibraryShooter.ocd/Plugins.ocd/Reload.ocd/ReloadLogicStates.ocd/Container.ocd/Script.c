@@ -1,4 +1,11 @@
 
+public func Initialize()
+{
+	_inherited(...);
+	// Reloading, the state saves some custom infos
+	this.Reload_Container_StashStart = new Reload_Container_StashStart{};
+}
+
 /* --- Reload animations --- */
 
 // 	Gets the default reload state that the weapon starts reloading from.

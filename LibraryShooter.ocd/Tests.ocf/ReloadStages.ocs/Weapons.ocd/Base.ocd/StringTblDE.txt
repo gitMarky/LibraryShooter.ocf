@@ -1,0 +1,13 @@
+Name=Sturmpistole
+Description=Die Sturmpistole geh�rt zur Standardausr�stung eines Hazardclonks. F�r die n�tige Durchschlagskraft sorgt der eingebaute kleine Granatenwerfer.
+
+Standard=Einzelschuss
+GrenadeLauncher=Granatenwerfer
+Laser=Laser
+Slime=Biowerfer
+
+KLASUpgradeDesc=Ersetzt den Schussmechanismus durch einen Laser.
+KSLMUpgradeDesc=Ersetzt den Granatenmechanismus durch einen Biowerfer.
+
+UpgradedToLaser=Schussmechanismus durch|einen Laser ersetzt.
+UpgradedToSlime=Granatenmechanismus durch|Biowerfer ersetzt.
