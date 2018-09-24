@@ -70,7 +70,8 @@ func GetReloadStartState(proplist firemode)
  */
 func SetReloadState(proplist firemode, proplist state)
 {
-	firearm_reload.current_state[GetReloadStateID(this->GetFiremode())] = state; // FIXME: Hack, needs a parameter
+	firearm_reload.current_state[GetReloadStateID(firemode)] = state;
+	_inherited(firemode, state, ...);
 }
 
 
@@ -159,7 +160,7 @@ local IntReloadStagesEffect = new Effect
 		if (nil == state)
 		{
 			state = this.Target->GetReloadStartState(this.firemode);
-			this.Target->SetReloadState(state);
+			this.Target->SetReloadState(this.firemode, state);
 		}
 
 		// Cancel if user cannot reload

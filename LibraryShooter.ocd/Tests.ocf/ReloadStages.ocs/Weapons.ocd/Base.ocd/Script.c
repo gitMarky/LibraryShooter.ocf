@@ -36,6 +36,17 @@ public func NeedsReload(object user)
 	return true;
 }
 
+func SetReloadState(proplist firemode, proplist state)
+{
+	var name = nil;
+	if (state)
+	{
+		name = RegexReplace(Format("%v", state), "(.+)\\.(.+)", "$2");
+	}
+	PushBack(CurrentTest().states, name);
+	_inherited(firemode, state, ...);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

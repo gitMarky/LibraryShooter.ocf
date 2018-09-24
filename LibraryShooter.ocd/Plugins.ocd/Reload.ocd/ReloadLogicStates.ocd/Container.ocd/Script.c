@@ -153,12 +153,12 @@ local Reload_Container_ReadyWeapon = new Firearm_ReloadState
 
 	OnFinish = func (object firearm, object user, int x, int y, proplist firemode)
 	{
-		firearm->SetReloadState(nil); // Done!
+		firearm->SetReloadState(firemode, nil); // Done!
 	},
 	
 	OnCancel = func (object firearm, object user, int x, int y, proplist firemode)
 	{
-		firearm->SetReloadState(nil); // Done!
+		firearm->SetReloadState(firemode, nil); // Done!
 	},
 };
 
@@ -230,7 +230,7 @@ local Reload_Container_StashFinish = new Firearm_ReloadState
 		Log("Reload [Stashing] - Cancel");
 
 		// Put a magazine in next
-		firearm->SetReloadState(firemode, firearm.Reload_MagIn);
+		firearm->SetReloadState(firemode, firearm.Reload_Container_InsertAmmo);
 	},
 };
 

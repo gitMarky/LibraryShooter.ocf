@@ -145,12 +145,12 @@ local Reload_Single_ReadyWeapon = new Firearm_ReloadState
 
 	OnFinish = func (object firearm, object user, int x, int y, proplist firemode)
 	{
-		firearm->SetReloadState(nil); // Done!
+		firearm->SetReloadState(firemode, nil); // Done!
 	},
 	
 	OnCancel = func (object firearm, object user, int x, int y, proplist firemode)
 	{
-		firearm->SetReloadState(nil); // Done!
+		firearm->SetReloadState(firemode, nil); // Done!
 	},
 };
 
