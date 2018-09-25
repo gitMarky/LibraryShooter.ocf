@@ -103,16 +103,6 @@ func Hit()
 	Sound("Hits::GeneralHit?");
 }
 
-public func GetAmmoSource(id ammo)
-{
-	return AMMO_Source_Container;
-}
-
-public func GetAmmoContainer()
-{
-	return Contained();
-}
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
