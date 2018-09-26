@@ -35,7 +35,7 @@ global func Test_Reset()
 	CurrentTest().initialized = false;
 }
 
-global func Test_ReloadSequence(int user_initial_ammo, int weapon_initial_ammo, int user_final_ammo, int weapon_final_ammo, array expected)
+global func Test_ReloadSequence(int weapon_initial_ammo, int weapon_final_ammo, int user_initial_ammo, int user_final_ammo, array expected, string initial_state)
 {
 	if (CurrentTest().loading)
 	{
@@ -47,6 +47,11 @@ global func Test_ReloadSequence(int user_initial_ammo, int weapon_initial_ammo, 
 	else
 	{
 		SetupAmmo(user_initial_ammo, weapon_initial_ammo);
+		
+		if (initial_state)
+		{
+			CurrentTest().weapon->SetReloadState(CurrentTest().weapon->GetFiremode(), CurrentTest().weapon[initial_state]);
+		}
 
 		// Do it!
 		CurrentTest().weapon->StartReload(CurrentTest().user, 100, 0, true);
@@ -90,12 +95,12 @@ global func doTestTransitions(array expected)
 
 global func Test1_OnStart()
 {
-	return Test_Init("Test for reloading: Reloading with container plugin, default settings", Realod_Container_Default);
+	return Test_Init("Reload an empty weapon [Reloading with container plugin, default settings]", Realod_Container_Default);
 }
 global func Test1_Execute()
 {
-	return Test_ReloadSequence(14,  0, 
-	                            4, 10,
+	return Test_ReloadSequence( 0, 10,  // Weapon ammo changes 
+	                           14,  4,  // User ammo changes
 	                           ["Reload_Container_Prepare",
 	                            "Reload_Container_EjectAmmo",
 	                            "Reload_Container_InsertAmmo",
@@ -106,12 +111,12 @@ global func Test1_Execute()
 
 global func Test2_OnStart()
 {
-	return Test_Init("Test for reloading: Reloading with container plugin, default settings", Realod_Container_Default);
+	return Test_Init("Reload a partially filled weapon [Reloading with container plugin, default settings]", Realod_Container_Default);
 }
 global func Test2_Execute()
 {
-	return Test_ReloadSequence(14,  5, 
-	                            9, 10,
+	return Test_ReloadSequence( 5, 10,  // Weapon ammo changes
+	                           14,  9,  // User ammo changes
 	                           ["Reload_Container_Prepare",
 	                            "Reload_Container_EjectAmmo",
 	                            "Reload_Container_StashStart}",
@@ -120,4 +125,30 @@ global func Test2_Execute()
 	                            "Reload_Container_Close",
 	                            "Reload_Container_ReadyWeapon",
 	                            nil]);
+}
+
+global func Test3_OnStart()
+{
+	return Test_Init("Reload a full weapon [Reloading with container plugin, default settings]", Realod_Container_Default);
+}
+global func Test3_Execute()
+{
+	return Test_ReloadSequence(10, 10,  // Weapon ammo changes
+	                           14, 14,  // User ammo changes
+	                           [nil]);  // Does not do a useless reload
+}
+
+global func Test4_OnStart()
+{
+	return Test_Init("Reload an empty weapon from non-default state [Reloading with container plugin, default settings]", Realod_Container_Default);
+}
+global func Test4_Execute()
+{
+	return Test_ReloadSequence( 0, 10,  // Weapon ammo changes 
+	                           14,  4,  // User ammo changes
+	                           ["Reload_Container_InsertAmmo",
+	                            "Reload_Container_Close",
+	                            "Reload_Container_ReadyWeapon",
+	                            nil],
+	                            "Reload_Container_InsertAmmo");
 }
