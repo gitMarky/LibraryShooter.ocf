@@ -33,6 +33,34 @@ global func Test_Reset()
 	CurrentTest().initialized = false;
 }
 
+global func SetupAmmo(int user_initial_ammo, int weapon_initial_ammo)
+{
+		// Setup 
+		CurrentTest().user.test_ammo_source = AMMO_Source_Local;
+		CurrentTest().user->SetAmmo(Dummy, user_initial_ammo);
+		CurrentTest().weapon->SetAmmo(Dummy, weapon_initial_ammo);
+
+		// Sanity check
+		doTest("Initial user ammo was %d, should be %d", CurrentTest().user->GetAmmo(Dummy), user_initial_ammo);
+		doTest("Initial weapon ammo was %d, should be %d", CurrentTest().weapon->GetAmmo(Dummy), weapon_initial_ammo);}
+}
+
+global func doTestAmmo(string description, int user_ammo, int weapon_ammo)
+{
+		doTest(Format("%s user ammo was \%d, should be \%d", description), CurrentTest().user->GetAmmo(Dummy), user_ammo);
+		doTest(Format("%s weapon ammo was \%d, should be \%d", description), CurrentTest().weapon->GetAmmo(Dummy), weapon_ammo);
+}
+
+global func doTestTransitions(array expected)
+{
+	var num_e = GetLength(expected);
+	var num_a = GetLength(CurrentTest().states);
+	doTest("Amount of state transitions was %d, should be %d", num_a, num_e);
+	for (var i = 0; i < Max(num_e, num_a); ++i)
+	{
+		doTest("State was '%s', should be '%s'", CurrentTest().states[i], expected[i]);
+	}
+}
 
 // --------------------------------------------------------------------------------------------------------
 
@@ -56,37 +84,14 @@ global func Test1_Execute()
 
 	if (CurrentTest().loading)
 	{
-		// Check the transitions
-		var num_e = GetLength(expected);
-		var num_a = GetLength(CurrentTest().states);
-		doTest("Amount of state transitions was %d, should be %d", num_a, num_e);
-		for (var i = 0; i < Max(num_e, num_a); ++i)
-		{
-			doTest("State was '%s', should be '%s'", CurrentTest().states[i], expected[i]);
-		}
-
-		// Check the remaining ammo
-		var user_final_ammo = 4;
-		var weapon_final_ammo = 10;
-
-		doTest("Final user ammo was %d, should be %d", CurrentTest().user->GetAmmo(Dummy), user_final_ammo);
-		doTest("Final weapon ammo was %d, should be %d", CurrentTest().weapon->GetAmmo(Dummy), weapon_final_ammo);
-
+		doTestTransitions(expected); // Check the transitions
+		doTestAmmo("Final", 4, 10); // Check the remaining ammo
 		Test_Reset();
 		return Evaluate();
 	}
 	else
 	{
-		// Setup 
-		var user_initial_ammo = 14;
-		var weapon_initial_ammo = 0;
-		CurrentTest().user.test_ammo_source = AMMO_Source_Local;
-		CurrentTest().user->SetAmmo(Dummy, user_initial_ammo);
-		CurrentTest().weapon->SetAmmo(Dummy, weapon_initial_ammo);
-
-		// Sanity check
-		doTest("Initial user ammo was %d, should be %d", CurrentTest().user->GetAmmo(Dummy), user_initial_ammo);
-		doTest("Initial weapon ammo was %d, should be %d", CurrentTest().weapon->GetAmmo(Dummy), weapon_initial_ammo);
+		SetupAmmo(14, 0);
 
 		// Do it!
 		CurrentTest().weapon->StartReload(CurrentTest().user, 100, 0, true);
@@ -117,37 +122,14 @@ global func Test2_Execute()
 	                
 	if (CurrentTest().loading)
 	{
-		// Check the transitions
-		var num_e = GetLength(expected);
-		var num_a = GetLength(CurrentTest().states);
-		doTest("Amount of state transitions was %d, should be %d", num_a, num_e);
-		for (var i = 0; i < Max(num_e, num_a); ++i)
-		{
-			doTest("State was '%s', should be '%s'", CurrentTest().states[i], expected[i]);
-		}
-
-		// Check the remaining ammo
-		var user_final_ammo = 9;
-		var weapon_final_ammo = 10;
-
-		doTest("Final user ammo was %d, should be %d", CurrentTest().user->GetAmmo(Dummy), user_final_ammo);
-		doTest("Final weapon ammo was %d, should be %d", CurrentTest().weapon->GetAmmo(Dummy), weapon_final_ammo);
-
+		doTestTransitions(expected); // Check the transitions
+		doTestAmmo("Final", 9, 10);  // Check the remaining ammo
 		Test_Reset();
 		return Evaluate();
 	}
 	else
 	{
-		// Setup 
-		var user_initial_ammo = 14;
-		var weapon_initial_ammo = 5;
-		CurrentTest().user.test_ammo_source = AMMO_Source_Local;
-		CurrentTest().user->SetAmmo(Dummy, user_initial_ammo);
-		CurrentTest().weapon->SetAmmo(Dummy, weapon_initial_ammo);
-
-		// Sanity check
-		doTest("Initial user ammo was %d, should be %d", CurrentTest().user->GetAmmo(Dummy), user_initial_ammo);
-		doTest("Initial weapon ammo was %d, should be %d", CurrentTest().weapon->GetAmmo(Dummy), weapon_initial_ammo);
+		SetupAmmo(14, 5);
 
 		// Do it!
 		CurrentTest().weapon->StartReload(CurrentTest().user, 100, 0, true);
