@@ -91,11 +91,15 @@ global func doTestTransitions(array expected)
 }
 
 // --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+
+// --- Container, default
 
 
 global func Test1_OnStart()
 {
-	return Test_Init("Reload an empty weapon [Reloading with container plugin, default settings]", Realod_Container_Default);
+	return Test_Init("Reload an empty weapon [Reloading with container plugin, default settings]", Reload_Container_Default);
 }
 global func Test1_Execute()
 {
@@ -111,7 +115,7 @@ global func Test1_Execute()
 
 global func Test2_OnStart()
 {
-	return Test_Init("Reload a partially filled weapon [Reloading with container plugin, default settings]", Realod_Container_Default);
+	return Test_Init("Reload a partially filled weapon [Reloading with container plugin, default settings]", Reload_Container_Default);
 }
 global func Test2_Execute()
 {
@@ -129,7 +133,7 @@ global func Test2_Execute()
 
 global func Test3_OnStart()
 {
-	return Test_Init("Reload a full weapon [Reloading with container plugin, default settings]", Realod_Container_Default);
+	return Test_Init("Reload a full weapon [Reloading with container plugin, default settings]", Reload_Container_Default);
 }
 global func Test3_Execute()
 {
@@ -140,7 +144,7 @@ global func Test3_Execute()
 
 global func Test4_OnStart()
 {
-	return Test_Init("Reload an empty weapon from non-default state [Reloading with container plugin, default settings]", Realod_Container_Default);
+	return Test_Init("Reload an empty weapon from non-default state [Reloading with container plugin, default settings]", Reload_Container_Default);
 }
 global func Test4_Execute()
 {
@@ -151,4 +155,107 @@ global func Test4_Execute()
 	                            "Reload_Container_ReadyWeapon",
 	                            nil],
 	                            "Reload_Container_InsertAmmo");
+}
+
+// --- Container, with ammo chamber
+
+
+global func Test5_OnStart()
+{
+	return Test_Init("Reload an empty weapon [Reloading with container plugin, ammo chamber]", Reload_Container_AmmoChamber);
+}
+global func Test5_Execute()
+{
+	return Test_ReloadSequence( 0, 10,  // Weapon ammo changes 
+	                           14,  4,  // User ammo changes
+	                           ["Reload_Container_Prepare",
+	                            "Reload_Container_EjectAmmo",
+	                            "Reload_Container_InsertAmmo",
+	                            "Reload_Container_Close",
+	                            "Reload_Container_LoadAmmoChamber",
+	                            "Reload_Container_ReadyWeapon",
+	                            nil]);
+}
+
+global func Test6_OnStart()
+{
+	return Test_Init("Reload a partially filled weapon [Reloading with container plugin, ammo chamber]", Reload_Container_AmmoChamber);
+}
+global func Test6_Execute()
+{
+	return Test_ReloadSequence( 5, 11,  // Weapon ammo changes
+	                           14,  8,  // User ammo changes
+	                           ["Reload_Container_Prepare",
+	                            "Reload_Container_EjectAmmo",
+	                            "Reload_Container_StashStart}",
+	                            "Reload_Container_StashFinish",
+	                            "Reload_Container_InsertAmmo",
+	                            "Reload_Container_Close",
+	                            "Reload_Container_ReadyWeapon",
+	                            nil]);
+}
+
+global func Test7_OnStart()
+{
+	return Test_Init("Reload a partially filled weapon [Reloading with container plugin, ammo chamber]", Reload_Container_AmmoChamber);
+}
+global func Test7_Execute()
+{
+	return Test_ReloadSequence( 5, 11,  // Weapon ammo changes
+	                           14,  8,  // User ammo changes
+	                           ["Reload_Container_Prepare",
+	                            "Reload_Container_EjectAmmo",
+	                            "Reload_Container_StashStart}",
+	                            "Reload_Container_StashFinish",
+	                            "Reload_Container_InsertAmmo",
+	                            "Reload_Container_Close",
+	                            "Reload_Container_ReadyWeapon",
+	                            nil]);
+}
+
+global func Test8_OnStart()
+{
+	return Test_Init("Reload a full weapon [Reloading with container plugin, ammo chamber]", Reload_Container_AmmoChamber);
+}
+global func Test8_Execute()
+{
+	return Test_ReloadSequence(10, 11,  // Weapon ammo changes
+	                           14, 13,  // User ammo changes
+	                           ["Reload_Container_Prepare",
+	                            "Reload_Container_EjectAmmo",
+	                            "Reload_Container_StashStart}",
+	                            "Reload_Container_StashFinish",
+	                            "Reload_Container_InsertAmmo",
+	                            "Reload_Container_Close",
+	                            "Reload_Container_ReadyWeapon",
+	                            nil]);
+}
+
+global func Test9_OnStart()
+{
+	return Test_Init("Reload an empty weapon from non-default state [Reloading with container plugin, ammo chamber]", Reload_Container_AmmoChamber);
+}
+global func Test9_Execute()
+{
+	return Test_ReloadSequence( 0, 10,  // Weapon ammo changes 
+	                           14,  4,  // User ammo changes
+	                           ["Reload_Container_InsertAmmo",
+	                            "Reload_Container_Close",
+	                            "Reload_Container_LoadAmmoChamber",
+	                            "Reload_Container_ReadyWeapon",
+	                            nil],
+	                            "Reload_Container_InsertAmmo");
+}
+
+global func Test10_OnStart()
+{
+	return Test_Init("Reload a full weapon with ammo chamber not loaded [Reloading with container plugin, ammo chamber]", Reload_Container_AmmoChamber);
+}
+global func Test10_Execute()
+{
+	return Test_ReloadSequence(10, 10,  // Weapon ammo changes 
+	                           14,  14,  // User ammo changes
+	                           ["Reload_Container_LoadAmmoChamber",
+	                            nil],
+	                            nil);
 }
