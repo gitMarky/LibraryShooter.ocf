@@ -7,6 +7,7 @@
 #include Plugin_Firearm_ReloadStates_Container
 #include Plugin_Firearm_AmmoChamber
 
+local Description = "Reloading with container plugin, ammo chamber";
 
 public func GetAmmoSource(id ammo)
 {

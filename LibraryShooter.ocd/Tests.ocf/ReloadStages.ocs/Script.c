@@ -66,7 +66,7 @@ global func Test_Init()
 	
 	// Basic initialization
 
-	Log(data.Title);
+	Log("%s [%s]", data.Title, data.Item.Description);
 
 	test.user = GetHiRank(test.player);
 	test.user->SetPosition(LandscapeWidth() / 2, test.user->GetY());		
@@ -141,7 +141,7 @@ global func doTestTransitions(array expected)
 
 local test_scenarios = 
 [{
-	Title = "Reload an empty weapon [Reloading with container plugin, default settings]",
+	Title = "Reload an empty weapon",
 	Item = Reload_Container_Default,
 	Weapon_Ammo = { Initial =  0, Final = 10}, 
 	User_Ammo   = { Initial = 14, Final =  4},
@@ -152,7 +152,7 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 }, {
-	Title = "Reload a partially filled weapon [Reloading with container plugin, default settings]",
+	Title = "Reload a partially filled weapon",
 	Item = Reload_Container_Default,
 	Weapon_Ammo = { Initial =  5, Final =  10},
 	User_Ammo = { Initial = 14, Final =   9},
@@ -165,13 +165,13 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 }, {
-	Title = "Reload a full weapon [Reloading with container plugin, default settings]",
+	Title = "Reload a full weapon",
 	Item = Reload_Container_Default,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
 	States = [nil], // Does not do a useless reload
 }, {
-	Title = "Reload an empty weapon from non-default state [Reloading with container plugin, default settings]",
+	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Container_Default,
 	Weapon_Ammo = { Initial =  0, Final =  10}, 
 	User_Ammo = { Initial = 14, Final =   4},
@@ -183,7 +183,7 @@ local test_scenarios =
 },
 // --- Container, with ammo chamber
 {
-	Title = "Reload an empty weapon [Reloading with container plugin, ammo chamber]",
+	Title = "Reload an empty weapon",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial =  0, Final =  10}, 
 	User_Ammo = { Initial = 14, Final =   4},
@@ -195,7 +195,7 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 }, {
-	Title = "Reload a partially filled weapon [Reloading with container plugin, ammo chamber]",
+	Title = "Reload a partially filled weapon",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial =  5, Final =  11},
 	User_Ammo = { Initial = 14, Final =   8},
@@ -208,7 +208,7 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 }, {
-	Title = "Reload a partially filled weapon [Reloading with container plugin, ammo chamber]",
+	Title = "Reload a partially filled weapon",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial =  5, Final =  11},
 	User_Ammo = { Initial = 14, Final =   8},
@@ -221,7 +221,7 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 }, {
-	Title = "Reload a full weapon [Reloading with container plugin, ammo chamber]",
+	Title = "Reload a full weapon",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial = 10, Final =  11},
 	User_Ammo = { Initial = 14, Final =  13},
@@ -234,7 +234,7 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 }, {
-	Title = "Reload an empty weapon from non-default state [Reloading with container plugin, ammo chamber]",
+	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial =  0, Final =  10}, 
 	User_Ammo = { Initial = 14, Final =   4},
@@ -245,7 +245,7 @@ local test_scenarios =
 	          nil],
 	Initial_State = "Reload_Container_InsertAmmo",
 }, {
-	Title = "Reload a full weapon with ammo chamber not loaded [Reloading with container plugin, ammo chamber]",
+	Title = "Reload a full weapon with ammo chamber not loaded",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial = 10, Final =  10}, 
 	User_Ammo = { Initial = 14, Final =   14},
