@@ -16,7 +16,7 @@ global func LaunchTest(int nr)
 	else
 	{
 		// Create a new control effect and launch the test.
-		test = Scenario->CreateEffect(IntTestControl, 100, 2);
+		test = CurrentTest(true);
 		test.player = GetPlayerByIndex(0, C4PT_User);
 		test.global_result = true;
 		test.count_total = 0;
@@ -66,9 +66,6 @@ static const IntTestControl = new Effect
 		// Launch new test if needed.
 		if (!this.launched)
 		{
-			// Log test start.
-			Log("=====================================");
-			Log("Test %d started:", this.testnr);
 			// Start the test if available, otherwise finish test sequence.
 			if (!this->HasNextTest())
 			{
@@ -89,6 +86,9 @@ static const IntTestControl = new Effect
 				}
 				return FX_Execute_Kill;
 			}
+			// Log test start.
+			Log("=====================================");
+			Log("Test %d started:", this.testnr);
 			this.launched = true;
 			this.count_total++;
 			this.current_result = false;
@@ -127,6 +127,17 @@ static const IntTestControl = new Effect
 			this.testnr++;
 		}
 		return FX_OK;
+	},
+	
+	
+	GetIndex = func () // Get the index of the test
+	{
+		return this.testnr - 1;
+	},
+	
+	GetNumber = func () // Get the test number
+	{
+		return this.testnr;
 	},
 	
 	
@@ -172,9 +183,16 @@ global func doTest(description, returned, expected)
 }
 
 
-global func CurrentTest()
+global func CurrentTest(bool create)
 {
-	return GetEffect("IntTestControl", Scenario);
+	if (create)
+	{
+		return Scenario->CreateEffect(IntTestControl, 100, 2);
+	}
+	else
+	{
+		return GetEffect("IntTestControl", Scenario);
+	}
 }
 
 global func Evaluate()
