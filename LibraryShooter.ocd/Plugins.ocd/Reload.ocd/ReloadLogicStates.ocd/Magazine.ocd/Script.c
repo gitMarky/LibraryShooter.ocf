@@ -14,24 +14,35 @@ func GetReloadStartState(proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
-	if (this->~AmmoChamberCapacity(ammo_type)
-	 && ammo >= firemode->GetAmmoAmount())
+	
+	// Special situations?
+	if (ammo >= firemode->GetAmmoAmount())
 	{
-		if (!this->~AmmoChamberIsLoaded(ammo_type))
+		if (this->~AmmoChamberCapacity(ammo_type))
 		{
-			Log("Reload: Start from manual, because no bullet chambered");
-			return Reload_Magazine_LoadAmmoChamber;
+			var extended_amount = firemode->GetAmmoAmount() + this->AmmoChamberCapacity(ammo_type);
+			if (!this->~AmmoChamberIsLoaded(ammo_type))
+			{
+				Log("Reload: Start from manual, because no bullet chambered");
+				return Reload_Magazine_LoadAmmoChamber;
+			}
+			else if (ammo >= extended_amount)
+			{
+				Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, extended_amount);
+				return nil;
+			}
 		}
 		else
 		{
-			return nil; // Full already anyway?
+			Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, firemode->GetAmmoAmount());
+			return nil;
 		}
 	}
-	else
-	{
-		return Reload_Magazine_Prepare;
-	}
+	
+	// Default
+	return Reload_Magazine_Prepare;
 }
+
 
 // Grab the magazine that is currently in the weapon
 local Reload_Magazine_Prepare = new Firearm_ReloadState

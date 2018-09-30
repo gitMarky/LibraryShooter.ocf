@@ -13,6 +13,8 @@ func GetReloadStartState(proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
+	
+	// Special situations?
 	if (ammo >= firemode->GetAmmoAmount())
 	{
 		if (this->~AmmoChamberCapacity(ammo_type))
@@ -23,12 +25,7 @@ func GetReloadStartState(proplist firemode)
 				Log("Reload: Start from manual, because no bullet chambered");
 				return Reload_Container_LoadAmmoChamber;
 			}
-			else if (ammo < extended_amount)
-			{
-				Log("Reload: Start from scratch");
-				return Reload_Container_Prepare;
-			}
-			else
+			else if (ammo >= extended_amount)
 			{
 				Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, extended_amount);
 				return nil;
@@ -40,10 +37,9 @@ func GetReloadStartState(proplist firemode)
 			return nil;
 		}
 	}
-	else
-	{
-		return Reload_Container_Prepare;
-	}
+	
+	// Default
+	return Reload_Container_Prepare;
 }
 
 // Get ready to reload
