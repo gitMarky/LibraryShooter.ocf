@@ -217,19 +217,6 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 }, {
-	Title = "Reload a partially filled weapon",
-	Item = Reload_Container_AmmoChamber,
-	Weapon_Ammo = { Initial =  5, Final =  11},
-	User_Ammo = { Initial = 14, Final =   8},
-	States = ["Reload_Container_Prepare",
-	          "Reload_Container_EjectAmmo",
-	          "Reload_Container_StashStart}",
-	          "Reload_Container_StashFinish",
-	          "Reload_Container_InsertAmmo",
-	          "Reload_Container_Close",
-	          "Reload_Container_ReadyWeapon",
-	          nil],
-}, {
 	Title = "Reload a full weapon, with ammo chamber loaded, magazine partially filled",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial = 10, Final =  11},
@@ -249,6 +236,15 @@ local test_scenarios =
 	User_Ammo = { Initial = 14, Final =  14},
 	States = [nil], // Do not do a useless reload
 }, {
+	Title = "Reload a full weapon, with ammo chamber not loaded",
+	Item = Reload_Container_AmmoChamber,
+	Weapon_Ammo = { Initial = 10, Final =  10}, 
+	User_Ammo = { Initial = 14, Final =   14},
+	States = ["Reload_Container_LoadAmmoChamber",
+	          "Reload_Container_ReadyWeapon",
+	          nil],
+	AmmoChamberEmpty = true,
+}, {
 	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial =  0, Final =  10}, 
@@ -259,14 +255,5 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 	State_Initial = "Reload_Container_InsertAmmo",
-}, {
-	Title = "Reload a full weapon, with ammo chamber not loaded",
-	Item = Reload_Container_AmmoChamber,
-	Weapon_Ammo = { Initial = 10, Final =  10}, 
-	User_Ammo = { Initial = 14, Final =   14},
-	States = ["Reload_Container_LoadAmmoChamber",
-	          "Reload_Container_ReadyWeapon",
-	          nil],
-	AmmoChamberEmpty = true,
 }
 ];
