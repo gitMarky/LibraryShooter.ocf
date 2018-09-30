@@ -146,10 +146,11 @@ global func doTestTransitions(array expected)
 // --------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------
 
-// --- Container, default
 
 local test_scenarios = 
-[{
+[
+// --- Container, default
+{
 	Title = "Reload an empty weapon",
 	Item = Reload_Container_Default,
 	Weapon_Ammo = { Initial =  0, Final = 10}, 
@@ -255,5 +256,103 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 	State_Initial = "Reload_Container_InsertAmmo",
+},
+// --- Magazine, default
+{
+	Title = "Reload an empty weapon",
+	Item = Reload_Magazine_Default,
+	Weapon_Ammo = { Initial =  0, Final = 10}, 
+	User_Ammo   = { Initial = 14, Final =  4},
+	States = ["Reload_Magazine_Prepare",
+	          "Reload_Magazine_Drop",
+	          "Reload_Magazine_Insert",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+}, {
+	Title = "Reload a partially filled weapon",
+	Item = Reload_Magazine_Default,
+	Weapon_Ammo = { Initial =  5, Final =  10},
+	User_Ammo = { Initial = 14, Final =   9},
+	States = ["Reload_Magazine_Prepare",
+	          "Reload_Magazine_StashStart}",
+	          "Reload_Magazine_StashFinish",
+	          "Reload_Magazine_Insert",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+}, {
+	Title = "Reload a full weapon",
+	Item = Reload_Magazine_Default,
+	Weapon_Ammo = { Initial = 10, Final =  10},
+	User_Ammo = { Initial = 14, Final =  14},
+	States = [nil], // Does not do a useless reload
+}, {
+	Title = "Reload an empty weapon from non-default state",
+	Item = Reload_Magazine_Default,
+	Weapon_Ammo = { Initial =  0, Final =  10}, 
+	User_Ammo = { Initial = 14, Final =   4},
+	States = ["Reload_Magazine_Insert",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+	State_Initial = "Reload_Magazine_Insert",
+},
+// --- Magazine, with ammo chamber
+{
+	Title = "Reload an empty weapon",
+	Item = Reload_Magazine_AmmoChamber,
+	Weapon_Ammo = { Initial =  0, Final =  10}, 
+	User_Ammo = { Initial = 14, Final =   4},
+	States = ["Reload_Magazine_Prepare",
+	          "Reload_Magazine_Drop",
+	          "Reload_Magazine_Insert",
+	          "Reload_Magazine_LoadAmmoChamber",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+}, {
+	Title = "Reload a partially filled weapon",
+	Item = Reload_Magazine_AmmoChamber,
+	Weapon_Ammo = { Initial =  5, Final =  11},
+	User_Ammo = { Initial = 14, Final =   8},
+	States = ["Reload_Magazine_Prepare",
+	          "Reload_Magazine_StashStart}",
+	          "Reload_Magazine_StashFinish",
+	          "Reload_Magazine_Insert",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+}, {
+	Title = "Reload a full weapon, with ammo chamber loaded, magazine partially filled",
+	Item = Reload_Magazine_AmmoChamber,
+	Weapon_Ammo = { Initial = 10, Final =  11},
+	User_Ammo = { Initial = 14, Final =  13},
+	States = ["Reload_Magazine_Prepare",
+	          "Reload_Magazine_StashStart}",
+	          "Reload_Magazine_StashFinish",
+	          "Reload_Magazine_Insert",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+}, {
+	Title = "Reload a full weapon, with ammo chamber loaded, magazine is full",
+	Item = Reload_Magazine_AmmoChamber,
+	Weapon_Ammo = { Initial = 11, Final =  11},
+	User_Ammo = { Initial = 14, Final =  14},
+	States = [nil], // Do not do a useless reload
+}, {
+	Title = "Reload a full weapon, with ammo chamber not loaded",
+	Item = Reload_Magazine_AmmoChamber,
+	Weapon_Ammo = { Initial = 10, Final =  10}, 
+	User_Ammo = { Initial = 14, Final =   14},
+	States = ["Reload_Magazine_LoadAmmoChamber",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+	AmmoChamberEmpty = true,
+}, {
+	Title = "Reload an empty weapon from non-default state",
+	Item = Reload_Magazine_AmmoChamber,
+	Weapon_Ammo = { Initial =  0, Final =  10}, 
+	User_Ammo = { Initial = 14, Final =   4},
+	States = ["Reload_Magazine_Insert",
+	          "Reload_Magazine_LoadAmmoChamber",
+	          "Reload_Magazine_ReadyWeapon",
+	          nil],
+	State_Initial = "Reload_Magazine_Insert",
 }
 ];

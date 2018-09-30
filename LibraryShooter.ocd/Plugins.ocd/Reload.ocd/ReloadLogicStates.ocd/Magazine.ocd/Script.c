@@ -29,12 +29,12 @@ func GetReloadStartState(proplist firemode)
 	}
 	else
 	{
-		return Reload_Magazine_Grab;
+		return Reload_Magazine_Prepare;
 	}
 }
 
 // Grab the magazine that is currently in the weapon
-local Reload_Magazine_Grab = new Firearm_ReloadState
+local Reload_Magazine_Prepare = new Firearm_ReloadState
 {
 	OnStart = func (object firearm, object user, int x, int y, proplist firemode)
 	{
