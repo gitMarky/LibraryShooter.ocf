@@ -15,15 +15,28 @@ func GetReloadStartState(proplist firemode)
 	var ammo = this->GetAmmo(ammo_type);
 	if (ammo >= firemode->GetAmmoAmount())
 	{
-		if (this->~AmmoChamberCapacity(ammo_type)
-		&& !this->~AmmoChamberIsLoaded(ammo_type))
+		if (this->~AmmoChamberCapacity(ammo_type))
 		{
-			Log("Reload: Start from manual, because no bullet chambered");
-			return Reload_Container_LoadAmmoChamber;
+			var extended_amount = firemode->GetAmmoAmount() + this->AmmoChamberCapacity(ammo_type);
+			if (!this->~AmmoChamberIsLoaded(ammo_type))
+			{
+				Log("Reload: Start from manual, because no bullet chambered");
+				return Reload_Container_LoadAmmoChamber;
+			}
+			else if (ammo < extended_amount)
+			{
+				Log("Reload: Start from scratch");
+				return Reload_Container_Prepare;
+			}
+			else
+			{
+				Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, extended_amount);
+				return nil;
+			}
 		}
 		else
 		{
-			Log("Reload: Do nothing, because ammo amount %d > %d", ammo, firemode->GetAmmoAmount());
+			Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, firemode->GetAmmoAmount());
 			return nil;
 		}
 	}
@@ -124,8 +137,9 @@ local Reload_Container_Close = new Firearm_ReloadState
 	{
 		Log("Reload [Close] - Finish");
 		var ammo_type = firemode->GetAmmoID();
-		if (this->~AmmoChamberCapacity(ammo_type)
-		&& !this->~AmmoChamberIsLoaded(ammo_type))
+		Log("Reload [Close] - Capacity: %d, loaded: %v, ammo %d %i", firearm->~AmmoChamberCapacity(ammo_type), firearm->~AmmoChamberIsLoaded(ammo_type), firearm->~GetAmmo(ammo_type), ammo_type);
+		if (firearm->~AmmoChamberCapacity(ammo_type)
+		&& !firearm->~AmmoChamberIsLoaded(ammo_type))
 		{
 			firearm->SetReloadState(firemode, firearm.Reload_Container_LoadAmmoChamber);
 		}

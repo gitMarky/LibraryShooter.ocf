@@ -108,8 +108,8 @@ local Reload_Magazine_Insert = new Firearm_ReloadState
 		
 		// Load a bullet now?
 		var ammo_type = firemode->GetAmmoID();
-		if (this->~AmmoChamberCapacity(ammo_type)
-		&& !this->~AmmoChamberIsLoaded(ammo_type))
+		if (firearm->~AmmoChamberCapacity(ammo_type)
+		&& !firearm->~AmmoChamberIsLoaded(ammo_type))
 		{
 			firearm->SetReloadState(firemode, firearm.Reload_Magazine_LoadAmmoChamber);
 		}
