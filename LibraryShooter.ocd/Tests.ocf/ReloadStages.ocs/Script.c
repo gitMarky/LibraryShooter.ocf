@@ -78,13 +78,22 @@ global func Test_Init()
 	
 	SetupAmmo(data.User_Ammo.Initial, data.Weapon_Ammo.Initial);
 	
-	if (data.Initial_State)
+	if (data.State_Initial)
 	{
-		CurrentTest().weapon->SetReloadState(CurrentTest().weapon->GetFiremode(), CurrentTest().weapon[data.Initial_State]);
+		test.weapon->SetReloadState(test.weapon->GetFiremode(), test.weapon[data.State_Initial]);
+	}
+	
+	if (data.AmmoChamberEmpty || data.Weapon_Ammo.Initial == 0)
+	{
+		test.weapon->~AmmoChamberEject(Dummy);
+	}
+	else
+	{
+		test.weapon->~AmmoChamberInsert(Dummy);
 	}
 
 	// Start the reloading
-	CurrentTest().weapon->StartReload(CurrentTest().user, 100, 0, true);
+	test.weapon->StartReload(CurrentTest().user, 100, 0, true);
 	return Wait(20);
 }
 
@@ -243,7 +252,7 @@ local test_scenarios =
 	          "Reload_Container_LoadAmmoChamber",
 	          "Reload_Container_ReadyWeapon",
 	          nil],
-	Initial_State = "Reload_Container_InsertAmmo",
+	State_Initial = "Reload_Container_InsertAmmo",
 }, {
 	Title = "Reload a full weapon with ammo chamber not loaded",
 	Item = Reload_Container_AmmoChamber,
@@ -251,5 +260,6 @@ local test_scenarios =
 	User_Ammo = { Initial = 14, Final =   14},
 	States = ["Reload_Container_LoadAmmoChamber",
 	          nil],
+	AmmoChamberEmpty = true,
 }
 ];
