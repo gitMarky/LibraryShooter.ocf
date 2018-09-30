@@ -1,4 +1,11 @@
 
+public func Initialize()
+{
+	_inherited(...);
+	// Reloading, the state saves some custom infos
+	this.Reload_Single_InsertAmmo = new Reload_Single_InsertAmmo{};
+}
+
 /* --- Reload animations --- */
 
 // 	Gets the default reload state that the weapon starts reloading from.
@@ -47,7 +54,7 @@ local Reload_Single_Prepare = new Firearm_ReloadState
 		}
 		else
 		{
-			firearm->SetReloadState(firemode, firearm.Reload_Single_InsertShell);
+			firearm->SetReloadState(firemode, firearm.Reload_Single_InsertAmmo);
 		}
 	},
 
@@ -59,7 +66,7 @@ local Reload_Single_Prepare = new Firearm_ReloadState
 };
 
 // Insert a single shell into the tube
-local Reload_Single_InsertShell = new Firearm_ReloadState
+local Reload_Single_InsertAmmo = new Firearm_ReloadState
 {
 	OnStart = func (object firearm, object user, int x, int y, proplist firemode)
 	{
@@ -80,7 +87,7 @@ local Reload_Single_InsertShell = new Firearm_ReloadState
 			source->DoAmmo(info.ammo_type, ammo_spare); // give back the unnecessary ammo
 			if (ammo_received > 0)
 			{
-				firearm->PlaySoundInsertShell();
+				firearm->~PlaySoundInsertShell();
 				firearm->DoAmmo(info.ammo_type, ammo_received);
 			}
 			else
@@ -101,19 +108,19 @@ local Reload_Single_InsertShell = new Firearm_ReloadState
 			is_done = true;
 		}
 		
-		firearm.Reload_Single_InsertShell.is_done = is_done;
+		firearm.Reload_Single_InsertAmmo.is_done = is_done;
 	},
 	
 	OnFinish = func (object firearm, object user, int x, int y, proplist firemode)
 	{
 		Log("Reload [Mag insert] - Finish");
 		// Finish condition?		
-		if (firearm.Reload_Single_InsertShell.do_chamber_bullet)
+		if (firearm.Reload_Single_InsertAmmo.do_chamber_bullet)
 		{
-			firearm.Reload_Single_InsertShell.do_chamber_bullet = false;
+			firearm.Reload_Single_InsertAmmo.do_chamber_bullet = false;
 			firearm->SetReloadState(firemode, firearm.Reload_Single_CloseAmmoChamber);
 		}
-		else if (firearm.Reload_Single_InsertShell.is_done)
+		else if (firearm.Reload_Single_InsertAmmo.is_done)
 		{
 			if (firearm->~AmmoChamberCapacity(firemode->GetAmmoID())
 			&& !firearm->~AmmoChamberIsLoaded(firemode->GetAmmoID()))
@@ -199,8 +206,8 @@ local Reload_Single_OpenAmmoChamber = new Firearm_ReloadState
 
 	OpenChamber = func (object firearm, object user, int x, int y, proplist firemode)
 	{
-		firearm.Reload_Single_InsertShell.do_chamber_bullet = true;
-		firearm->SetReloadState(firemode, firearm.Reload_Single_InsertShell);
+		firearm.Reload_Single_InsertAmmo.do_chamber_bullet = true;
+		firearm->SetReloadState(firemode, firearm.Reload_Single_InsertAmmo);
 	},
 };
 
@@ -235,7 +242,7 @@ local Reload_Single_CloseAmmoChamber = new Firearm_ReloadState
 		
 		if (ammo_requested > 0)
 		{
-			firearm->SetReloadState(firemode, firearm.Reload_Single_InsertShell);
+			firearm->SetReloadState(firemode, firearm.Reload_Single_InsertAmmo);
 		}
 		else
 		{

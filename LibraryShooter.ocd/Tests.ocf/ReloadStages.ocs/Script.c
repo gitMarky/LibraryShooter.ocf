@@ -94,7 +94,7 @@ global func Test_Init()
 
 	// Start the reloading
 	test.weapon->StartReload(CurrentTest().user, 100, 0, true);
-	return Wait(20);
+	return Wait(30);
 }
 
 global func Test_Reset()
@@ -354,5 +354,52 @@ local test_scenarios =
 	          "Reload_Magazine_ReadyWeapon",
 	          nil],
 	State_Initial = "Reload_Magazine_Insert",
+},
+// --- Single, default
+{
+	Title = "Reload an empty weapon",
+	Item = Reload_Single_Default,
+	Weapon_Ammo = { Initial =  0, Final = 10}, 
+	User_Ammo   = { Initial = 14, Final =  4},
+	States = ["Reload_Single_Prepare",
+	          "Reload_Single_InsertAmmo}",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+	          "Reload_Single_ReadyWeapon",
+	          nil],
+}, {
+	Title = "Reload a partially filled weapon",
+	Item = Reload_Single_Default,
+	Weapon_Ammo = { Initial =  7, Final =  10},
+	User_Ammo = { Initial = 14, Final =   11},
+	States = ["Reload_Single_Prepare",
+	          "Reload_Single_InsertAmmo}",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+		          "Single_Ammo_Insert_Counter",
+	          "Reload_Single_ReadyWeapon",
+	          nil],
+}, {
+	Title = "Reload a full weapon",
+	Item = Reload_Single_Default,
+	Weapon_Ammo = { Initial = 10, Final =  10},
+	User_Ammo = { Initial = 14, Final =  14},
+	States = [nil], // Does not do a useless reload
+}, {
+	Title = "Reload an empty weapon from non-default state",
+	Item = Reload_Single_Default,
+	Weapon_Ammo = { Initial =  0, Final =  0}, 
+	User_Ammo = { Initial = 14, Final =   14},
+	States = ["Reload_Single_ReadyWeapon",
+	          nil],
+	State_Initial = "Reload_Single_ReadyWeapon",
 }
 ];
