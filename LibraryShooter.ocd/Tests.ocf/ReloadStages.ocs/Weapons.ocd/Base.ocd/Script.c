@@ -36,14 +36,17 @@ public func NeedsReload(object user)
 	return true;
 }
 
-func SetReloadState(proplist firemode, proplist state)
+func SetReloadState(proplist firemode, state)
 {
-	var name = nil;
-	if (state)
+	if (GetType(state) == C4V_String || state == nil)
 	{
-		name = RegexReplace(Format("%v", state), "(.+)\\.(.+)", "$2");
+		Log("Adding state transition: %s", state);
+		PushBack(CurrentTest().states, state);
 	}
-	PushBack(CurrentTest().states, name);
+	else
+	{
+		Log("Ignoring state %v", state);
+	}
 	_inherited(firemode, state, ...);
 }
 

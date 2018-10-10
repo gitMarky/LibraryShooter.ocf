@@ -17,6 +17,8 @@
 
 local firearm_reload;
 
+local ReloadStateMap; // ActMap for ReloadStates
+
 /* --- Engine callbacks --- */
 
 func Construction(object by)
@@ -46,7 +48,28 @@ func IsReloading()
  */
 func GetReloadState(proplist firemode)
 {
-	return firearm_reload.current_state[GetReloadStateID(firemode)];
+	var name = firearm_reload.current_state[GetReloadStateID(firemode)];
+	if (name)
+	{
+		return FindReloadState(name);
+	}
+	else
+	{
+		return nil;
+	}
+}
+
+
+func FindReloadState(string name)
+{
+	for (var prop in GetProperties(ReloadStateMap))
+	{
+		if (ReloadStateMap[prop].Name == name)
+		{
+			return ReloadStateMap[prop];
+		}
+	}
+	return nil;
 }
 
 
@@ -68,10 +91,37 @@ func GetReloadStartState(proplist firemode)
 	@par state the reload state. A value of {@code nil} means, that
 	     the weapon is reloaded.
  */
-func SetReloadState(proplist firemode, proplist state)
+func SetReloadState(proplist firemode, state)
 {
-	firearm_reload.current_state[GetReloadStateID(firemode)] = state;
-	_inherited(firemode, state, ...);
+	if (GetType(state) == C4V_Nil)
+	{
+		// Do nothing - for compatibility with ActMap behaviour
+	}
+	else if (GetType(state) == C4V_String)
+	{
+		if (state == "Hold")
+		{
+			// Do nothing - for compatibility with ActMap behaviour
+		}
+		else
+		{
+			if (state == "Idle")
+			{
+				state = nil; // "Idle" resets to default (=nil) - for compatibility with ActMap behaviour
+			}
+			
+			firearm_reload.current_state[GetReloadStateID(firemode)] = state;
+			_inherited(firemode, state, ...);
+		}
+	}
+	else if (GetType(state) == C4V_PropList)
+	{
+		return SetReloadState(firemode, state.Name);
+	}
+	else
+	{
+		FatalError(Format("Unsupported format: %v, expected C4V_PropList or C4V_String", GetType(state)));
+	}
 }
 
 
@@ -137,6 +187,7 @@ local IntReloadStagesEffect = new Effect
 	
 	ResetState = func ()
 	{
+		Log("Reset state");
 		this.Time = 0;
 		this.percent_old = 0;
 		this.percentage = 0;
@@ -159,7 +210,8 @@ local IntReloadStagesEffect = new Effect
 		var state = this.Target->GetReloadState(this.firemode);
 		if (nil == state)
 		{
-			state = this.Target->GetReloadStartState(this.firemode);
+			var default_name = this.Target->GetReloadStartState(this.firemode);
+			state = this.Target->FindReloadState(default_name);
 			this.Target->SetReloadState(this.firemode, state);
 		}
 
@@ -168,7 +220,11 @@ local IntReloadStagesEffect = new Effect
 		{
 			if (state)
 			{
-				state->~OnCancel(this.Target, this.user, this.x, this.y, this.firemode);
+				IssueCallbacks(state, "Abort");
+				if (state.AbortAction)
+				{
+					this.Target->SetReloadState(this.firemode, Evaluate(state.AbortAction));
+				}
 			}
 			this.Target->CancelReload(this.user, this.x, this.y, this.firemode, false);
 			return FX_Execute_Kill;
@@ -177,8 +233,9 @@ local IntReloadStagesEffect = new Effect
 		// Initial callback
 		if (!this.state_started)
 		{
+			Log("Starting state: %s", state.Name);
 			this.state_started = true;
-			state->~OnStart(this.Target, this.user, this.x, this.y, this.firemode);
+			IssueCallbacks(state, "Start");
 			
 			if (state.UserAnimation)
 			{
@@ -208,21 +265,31 @@ local IntReloadStagesEffect = new Effect
 		if (state.Event > 0 && time > state.Event && !this.state_event)
 		{
 			this.state_event = true;
-			state->~OnEvent(this.Target, this.user, this.x, this.y, this.firemode);
+			IssueCallbacks(state, "Event");
 		}
 
 		// Done with this state?
 		if (time > state.Delay && !this.state_finished)
 		{
+			Log("Finishing state: %s", state.Name);
 			this.state_finished = true;
-			state->~OnFinish(this.Target, this.user, this.x, this.y, this.firemode);
-						
+			IssueCallbacks(state, "End");
+
 			// Do the reload if anything is necessary and end the effect if successful
-			var next_state = this.Target->GetReloadState(this.firemode);
-			if (next_state == nil)
+			var next_state = Evaluate(state.NextAction); // WAS: this.Target->GetReloadState(this.firemode);
+			Log("Calling SetReloadState %s", next_state);
+			this.Target->SetReloadState(this.firemode, next_state);
+			
+			// Cleanup
+			if (next_state == "Idle")
 			{
+				Log("Next state is idle");
 				this.Target->DoReload(this.user, this.x, this.y, this.firemode);
 				return FX_Execute_Kill;
+			}
+			else if (next_state == "Hold")
+			{
+				return FX_OK;
 			}
 			else
 			{
@@ -235,6 +302,35 @@ local IntReloadStagesEffect = new Effect
 	GetProgress = func ()
 	{
 		return this.percentage;
+	},
+	
+	IssueCallbacks = func (proplist state, string type)
+	{
+		var internal         = state[Format("%sFunc", type)];        // This is the one that should not be overloaded
+		var internal_default = Format("~%s_On%s", state.Name, type); // This is a fallback option
+		var user_defined     = state[Format("%sCall", type)];        // This is like the ActMap definition an can be defined by the user
+
+		IssueCallback(internal ?? internal_default); 
+		IssueCallback(user_defined);
+	},
+	
+	IssueCallback = func (callback)
+	{
+		if (callback)
+		{
+			return this.Target->Call(callback, this.user, this.x, this.y, this.firemode);
+		}
+	},
+	
+	Evaluate = func (string state_name)
+	{
+		// State name starts with '#' => evaluate as a function!
+		if (state_name && RegexSearch(state_name, "#")[0] == 0)
+		{
+			var call_name = RegexReplace(state_name, "#(.+)", "$1");
+			state_name = IssueCallback(call_name);
+		}
+		return state_name;
 	},
 };
 
@@ -249,13 +345,22 @@ local IntReloadStagesEffect = new Effect
 	@note
 	For every state you will have to implement some functions or properties:
 	<ul>
+	<li>Name - string, name of this state.</li> 
+	<li>NextAction - string, name of the state that is set once this state finishes. Special values:
+	                 <ul>
+	                 <li>nil: (same behavior as in ActMap) Repeat the same state.</li>
+	                 <li>{@code "Idle"}: (same behavior as in ActMap) Revert the weapon to default state.</li>
+	                 <li>{@code "Hold"}: (same behavior as in ActMap) The current state stays, but is not repeated.</li>
+	                 <li>{@code "#MyFunctionName"}: Will issue a callback "MyFunctionName()" in the firearm, with callback parameters (see below).</li>
+	                 </ul>
+	</li>
 	<li>Delay - int, the delay of the state, in frames; Default value = 1</li>
 	<li>Event - int, if set to a value other than 0, in frames, there will be a callback; Default value = 0</li>
-	<li>OnStart - (optional) func, callback when the state starts</li>
-	<li>OnFinish - (optional) func, callback when the state is completed</li>
-	<li>OnCancel - (optional) func, callback when the state is interrupted</li>
-	<li>OnEvent - (optional) func, callback when the event is fired, if .Event is other than 0</li>
-	<li>Parameters for all callbacks: {@code object firearm, object user, int x, int y, proplist firemode}</li>
+	<li>*Func - (optional) string, callbacks where * may be [Start, End, Abort, Event]: Use this for functions that do internal changes in the weapon.
+	                                                                                    Overload with care.
+	                                                                                    Defaults to callback "~%s_On%s", the first placeholder being the state name, and the second placeholder being *</li>
+	<li>*Call - (optional) string, callbacks where * may be [Start, End, Abort, Event]: Use this for user defined effects and overload at will.</li>
+	<li>Parameters for all callbacks: {@code object user, int x, int y, proplist firemode}</li>
 	<li>UserAnimation - (optional) proplist, animation that should be played in the user
 	<ul>
 		<li>Name - string, name of the animation in the user.</li>
@@ -275,4 +380,11 @@ static const Firearm_ReloadState = new Global
 {
 	Event = 0,          // An event takes place at this time
 	Delay = 1,          // The state takes this long.
+	NextAction    = nil,  // The state will be assumed after regular finish of the action; As in animations: nil = Repeat, "Hold" = Stay in the same state, but do not repeat, "Idle" = default state 
+	AbortCall     = nil,  // 
+	EndCall       = nil,  // 
+	StartCall     = nil,  // 
+	EventCall     = nil,  // 
+	Animation     = nil,  // 
+	UserAnimation = nil,  // Animation in the object that 'uses' the weapon
 };
