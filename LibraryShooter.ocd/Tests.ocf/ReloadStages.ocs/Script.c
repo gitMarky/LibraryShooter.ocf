@@ -179,7 +179,7 @@ local test_scenarios =
 	Item = Reload_Container_Default,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Container_Default,
@@ -235,7 +235,7 @@ local test_scenarios =
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial = 11, Final =  11},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Do not do a useless reload
+	States = [], // Do not do a useless reload
 }, {
 	Title = "Reload a full weapon, with ammo chamber not loaded",
 	Item = Reload_Container_AmmoChamber,
@@ -284,7 +284,7 @@ local test_scenarios =
 	Item = Reload_Magazine_Default,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Magazine_Default,
@@ -334,7 +334,7 @@ local test_scenarios =
 	Item = Reload_Magazine_AmmoChamber,
 	Weapon_Ammo = { Initial = 11, Final =  11},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Do not do a useless reload
+	States = [], // Do not do a useless reload
 }, {
 	Title = "Reload a full weapon, with ammo chamber not loaded",
 	Item = Reload_Magazine_AmmoChamber,
@@ -393,7 +393,7 @@ local test_scenarios =
 	Item = Reload_Single_Default,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Single_Default,
@@ -445,7 +445,7 @@ local test_scenarios =
 	Item = Reload_Single_AmmoChamber,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload a full weapon, with ammo chamber not loaded",
 	Item = Reload_Single_AmmoChamber,
