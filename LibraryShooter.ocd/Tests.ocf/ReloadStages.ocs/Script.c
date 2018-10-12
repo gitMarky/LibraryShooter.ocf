@@ -256,8 +256,7 @@ local test_scenarios =
 	          "Reload_Container_ReadyWeapon",
 	          nil],
 	State_Initial = "Reload_Container_InsertAmmo",
-}
-];/*,
+},
 // --- Magazine, default
 {
 	Title = "Reload an empty weapon",
@@ -355,7 +354,8 @@ local test_scenarios =
 	          "Reload_Magazine_ReadyWeapon",
 	          nil],
 	State_Initial = "Reload_Magazine_Insert",
-},
+}
+];/*,
 // --- Single, default
 {
 	Title = "Reload an empty weapon",
