@@ -198,7 +198,7 @@ func Reload_Magazine_StashStart_OnStart(object user, int x, int y, proplist fire
 	Log("Reload [Mag out, stash it] - Start");
 
 	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
-	SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
+	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
 }
 
 func Reload_Magazine_StashStart_OnEnd(object user, int x, int y, proplist firemode)
@@ -207,24 +207,13 @@ func Reload_Magazine_StashStart_OnEnd(object user, int x, int y, proplist firemo
 
 	// Fill ammo belt of the user
 	var ammo_type = firemode->GetAmmoID();
-	this->GetAmmoReloadContainer()->DoAmmo(ammo_type, GetTemporaryAmmo(ammo_type));
-	SetTemporaryAmmo(ammo_type, 0);
+	this->GetAmmoReloadContainer()->DoAmmo(ammo_type, this->GetTemporaryAmmo(ammo_type));
+	this->SetTemporaryAmmo(ammo_type, 0);
 }
 
 func Reload_Magazine_StashStart_OnAbort(object user, int x, int y, proplist firemode)
 {
 	Log("Reload [Mag out, stash it] - Cancel");
-}
-
-func SetTemporaryAmmo(id ammo_type, int amount) // FIXME: Globalize
-{
-	if (!this.temp_ammo) this.temp_ammo = {};
-	this.temp_ammo[Format("%i", ammo_type)] = amount;
-}
-
-func GetTemporaryAmmo(id ammo_type) // FIXME: Globalize
-{
-	return this.temp_ammo[Format("%i", ammo_type)];
 }
 
 //---------------------------------------------------------------------------------

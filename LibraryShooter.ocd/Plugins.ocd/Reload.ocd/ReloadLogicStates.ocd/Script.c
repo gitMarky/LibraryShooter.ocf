@@ -24,7 +24,9 @@ local ReloadStateMap; // ActMap for ReloadStates
 func Construction(object by)
 {
 	firearm_reload = firearm_reload ?? {};
-	firearm_reload.current_state = {};
+	firearm_reload.current_state = {};        // Saves the current reload state
+	firearm_reload.data_store = {};           // Saves whatever
+	firearm_reload.data_store.temp_ammo = {}; // Saves temporary ammo
 	return _inherited(by, ...);
 }
 
@@ -173,6 +175,16 @@ public func OnCancelReload(object user, int x, int y, proplist firemode, bool re
 
 
 /* --- Internal --- */
+
+func SetTemporaryAmmo(id ammo_type, int amount)
+{
+	this.firearm_reload.data_store.temp_ammo[Format("%i", ammo_type)] = amount;
+}
+
+func GetTemporaryAmmo(id ammo_type)
+{
+	return this.firearm_reload.data_store.temp_ammo[Format("%i", ammo_type)];
+}
 
 local IntReloadStagesEffect = new Effect
 {

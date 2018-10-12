@@ -54,7 +54,7 @@ local ReloadStateMap =
 		Prototype  = Firearm_ReloadState,
 		Name       = "Reload_Container_EjectAmmo",
 		NextAction = "#Reload_Container_EjectAmmo_NextAction", // Evaluate function
-		EndCall    = nil, // TODO
+		EndCall    = "~PlaySoundEjectAmmo",
 	},
 	
 	Container_InsertAmmo = // Insert an ammo container into the weapon
@@ -138,7 +138,6 @@ func Reload_Container_EjectAmmo_OnEnd(object user, int x, int y, proplist firemo
 {
 	Log("Reload [Ammo eject] - Finish");
 	this->~Reload_Container_EjectCasings(user, firemode);
-	this->~PlaySoundEjectAmmo();
 }
 	
 func Reload_Container_EjectAmmo_NextAction(object user, int x, int y, proplist firemode)
@@ -213,12 +212,11 @@ func Reload_Container_Close_OnAbort(object user, int x, int y, proplist firemode
 /* --- Support adding spare ammo back to the user --- */
 
 //---------------------------------------------------------------------------------
-
 func Reload_Container_StashStart_OnStart(object user, int x, int y, proplist firemode)
 {
 	Log("Reload [Mag out, stash it] - Start");
 	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
-	SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
+	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
 }
 
 func Reload_Container_StashStart_OnEnd(object user, int x, int y, proplist firemode)
@@ -227,24 +225,13 @@ func Reload_Container_StashStart_OnEnd(object user, int x, int y, proplist firem
 
 	// Fill ammo belt of the user
 	var ammo_type = firemode->GetAmmoID();
-	this->GetAmmoReloadContainer()->DoAmmo(ammo_type, GetTemporaryAmmo(ammo_type));
-	SetTemporaryAmmo(ammo_type, 0);
+	this->GetAmmoReloadContainer()->DoAmmo(ammo_type, this->GetTemporaryAmmo(ammo_type));
+	this->SetTemporaryAmmo(ammo_type, 0);
 }
 
 func Reload_Container_StashStart_OnAbort(object user, int x, int y, proplist firemode)
 {
 	Log("Reload [Mag out, stash it] - Cancel");
-}
-	
-func SetTemporaryAmmo(id ammo_type, int amount) // FIXME: Globalize
-{
-	if (!this.temp_ammo) this.temp_ammo = {};
-	this.temp_ammo[Format("%i", ammo_type)] = amount;
-}
-
-func GetTemporaryAmmo(id ammo_type) // FIXME: Globalize
-{
-	return this.temp_ammo[Format("%i", ammo_type)];
 }
 
 //---------------------------------------------------------------------------------
@@ -266,7 +253,6 @@ func Reload_Container_StashFinish_OnAbort(object user, int x, int y, proplist fi
 /* --- Support for an extra ammo chamber --- */
 
 //---------------------------------------------------------------------------------
-
 func Reload_Container_LoadAmmoChamber_OnStart(object user, int x, int y, proplist firemode)
 {
 	Log("Reload [Manual load] - Start");
