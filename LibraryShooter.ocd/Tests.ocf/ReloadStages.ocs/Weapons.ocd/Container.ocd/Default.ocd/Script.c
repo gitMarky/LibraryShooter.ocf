@@ -17,3 +17,12 @@ public func GetAmmoReloadContainer()
 {
 	return Contained();
 }
+
+
+local ReloadStateMap = 
+{
+	Container_Prepare = 
+	{
+		StartCall  = "MyCoolCustomCall",
+	},
+};

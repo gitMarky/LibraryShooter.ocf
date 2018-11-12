@@ -80,7 +80,7 @@ global func Test_Init()
 	
 	if (data.State_Initial)
 	{
-		test.weapon->SetReloadState(test.weapon->GetFiremode(), test.weapon[data.State_Initial]);
+		test.weapon->SetReloadState(test.weapon->GetFiremode(), data.State_Initial);
 	}
 	
 	if (data.AmmoChamberEmpty || data.Weapon_Ammo.Initial == 0)
@@ -168,7 +168,7 @@ local test_scenarios =
 	User_Ammo = { Initial = 14, Final =   9},
 	States = ["Reload_Container_Prepare",
 	          "Reload_Container_EjectAmmo",
-	          "Reload_Container_StashStart}",
+	          "Reload_Container_StashStart",
 	          "Reload_Container_StashFinish",
 	          "Reload_Container_InsertAmmo",
 	          "Reload_Container_Close",
@@ -179,7 +179,7 @@ local test_scenarios =
 	Item = Reload_Container_Default,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Container_Default,
@@ -211,7 +211,7 @@ local test_scenarios =
 	User_Ammo = { Initial = 14, Final =   8},
 	States = ["Reload_Container_Prepare",
 	          "Reload_Container_EjectAmmo",
-	          "Reload_Container_StashStart}",
+	          "Reload_Container_StashStart",
 	          "Reload_Container_StashFinish",
 	          "Reload_Container_InsertAmmo",
 	          "Reload_Container_Close",
@@ -224,7 +224,7 @@ local test_scenarios =
 	User_Ammo = { Initial = 14, Final =  13},
 	States = ["Reload_Container_Prepare",
 	          "Reload_Container_EjectAmmo",
-	          "Reload_Container_StashStart}",
+	          "Reload_Container_StashStart",
 	          "Reload_Container_StashFinish",
 	          "Reload_Container_InsertAmmo",
 	          "Reload_Container_Close",
@@ -235,7 +235,7 @@ local test_scenarios =
 	Item = Reload_Container_AmmoChamber,
 	Weapon_Ammo = { Initial = 11, Final =  11},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Do not do a useless reload
+	States = [], // Do not do a useless reload
 }, {
 	Title = "Reload a full weapon, with ammo chamber not loaded",
 	Item = Reload_Container_AmmoChamber,
@@ -274,7 +274,7 @@ local test_scenarios =
 	Weapon_Ammo = { Initial =  5, Final =  10},
 	User_Ammo = { Initial = 14, Final =   9},
 	States = ["Reload_Magazine_Prepare",
-	          "Reload_Magazine_StashStart}",
+	          "Reload_Magazine_StashStart",
 	          "Reload_Magazine_StashFinish",
 	          "Reload_Magazine_Insert",
 	          "Reload_Magazine_ReadyWeapon",
@@ -284,7 +284,7 @@ local test_scenarios =
 	Item = Reload_Magazine_Default,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Magazine_Default,
@@ -313,7 +313,7 @@ local test_scenarios =
 	Weapon_Ammo = { Initial =  5, Final =  11},
 	User_Ammo = { Initial = 14, Final =   8},
 	States = ["Reload_Magazine_Prepare",
-	          "Reload_Magazine_StashStart}",
+	          "Reload_Magazine_StashStart",
 	          "Reload_Magazine_StashFinish",
 	          "Reload_Magazine_Insert",
 	          "Reload_Magazine_ReadyWeapon",
@@ -324,7 +324,7 @@ local test_scenarios =
 	Weapon_Ammo = { Initial = 10, Final =  11},
 	User_Ammo = { Initial = 14, Final =  13},
 	States = ["Reload_Magazine_Prepare",
-	          "Reload_Magazine_StashStart}",
+	          "Reload_Magazine_StashStart",
 	          "Reload_Magazine_StashFinish",
 	          "Reload_Magazine_Insert",
 	          "Reload_Magazine_ReadyWeapon",
@@ -334,7 +334,7 @@ local test_scenarios =
 	Item = Reload_Magazine_AmmoChamber,
 	Weapon_Ammo = { Initial = 11, Final =  11},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Do not do a useless reload
+	States = [], // Do not do a useless reload
 }, {
 	Title = "Reload a full weapon, with ammo chamber not loaded",
 	Item = Reload_Magazine_AmmoChamber,
@@ -362,7 +362,7 @@ local test_scenarios =
 	Weapon_Ammo = { Initial =  0, Final = 10}, 
 	User_Ammo   = { Initial = 14, Final =  4},
 	States = ["Reload_Single_Prepare",
-	          "Reload_Single_InsertAmmo}",
+	          "Reload_Single_InsertAmmo",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
@@ -381,7 +381,7 @@ local test_scenarios =
 	Weapon_Ammo = { Initial =  7, Final =  10},
 	User_Ammo = { Initial = 14, Final =   11},
 	States = ["Reload_Single_Prepare",
-	          "Reload_Single_InsertAmmo}",
+	          "Reload_Single_InsertAmmo",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
@@ -392,7 +392,7 @@ local test_scenarios =
 	Item = Reload_Single_Default,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload an empty weapon from non-default state",
 	Item = Reload_Single_Default,
@@ -410,10 +410,10 @@ local test_scenarios =
 	User_Ammo   = { Initial = 14, Final =  3},
 	States = ["Reload_Single_Prepare",
 	          "Reload_Single_OpenAmmoChamber",
-	          "Reload_Single_InsertAmmo, do_chamber_bullet = true}",
+	          "Reload_Single_InsertAmmo",
 		          "Single_Ammo_Insert_Counter",
 	          "Reload_Single_CloseAmmoChamber",
-	          "Reload_Single_InsertAmmo, do_chamber_bullet = false, is_done = false}",
+	          "Reload_Single_InsertAmmo",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
@@ -432,7 +432,7 @@ local test_scenarios =
 	Weapon_Ammo = { Initial =  7, Final =  11},
 	User_Ammo = { Initial = 14, Final =   10},
 	States = ["Reload_Single_Prepare",
-	          "Reload_Single_InsertAmmo}",
+	          "Reload_Single_InsertAmmo",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
 		          "Single_Ammo_Insert_Counter",
@@ -444,7 +444,7 @@ local test_scenarios =
 	Item = Reload_Single_AmmoChamber,
 	Weapon_Ammo = { Initial = 10, Final =  10},
 	User_Ammo = { Initial = 14, Final =  14},
-	States = [nil], // Does not do a useless reload
+	States = [], // Does not do a useless reload
 }, {
 	Title = "Reload a full weapon, with ammo chamber not loaded",
 	Item = Reload_Single_AmmoChamber,
