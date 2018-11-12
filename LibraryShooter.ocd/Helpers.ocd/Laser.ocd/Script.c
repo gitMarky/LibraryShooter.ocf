@@ -102,6 +102,7 @@ public func Color(int rgba)
 
 public func Line(int x_start, int y_start, int x_end, int y_end)
 {
+	SetPosition(x_start, y_start);
 	SetRotation(Angle(x_start, y_start, x_end, y_end));
 	SetRange(Distance(x_start, y_start, x_end, y_end));
 	return this;
@@ -131,12 +132,10 @@ public func GetLaserLength()
 	return length * this.ActMap[name].Hgt / 1000;
 }
 
-public func LaserEnd(int x, int y)
+public func LaserEnd()
 {
-	x = +Sin(GetRotation(), GetLaserLength());
-	y = -Cos(GetRotation(), GetLaserLength());
-	
-	return [x, y];
+	return [GetX() + Sin(GetRotation(), GetLaserLength()),
+	        GetY() - Cos(GetRotation(), GetLaserLength())];
 }
 
 func Activate()
