@@ -6,6 +6,7 @@ local length;	// int - the laser beam is this long, in pixels
 local angle;	// int - the rotation of the laser, in degrees
 local lifetime;	// int - the time until the laser is removed, in frames
 local timer;	// int - the time that has already passed, in frames
+local alpha;    // int - the alpha modulation
 
 local pAttach;
 local dx;
@@ -56,6 +57,7 @@ func Initialize()
 	width = 3;
 	length = 300;
 	timer = 0;
+	alpha = 200;
 }
 
 
@@ -93,10 +95,8 @@ public func Attach(object pAtt)
 
 public func Color(int rgba)
 {
-	var a = GetRGBaValue(GetClrModulation(), RGBA_ALPHA);
-	rgba = SetRGBaValue(rgba, a, RGBA_ALPHA);
+	alpha = GetRGBaValue(GetClrModulation(), RGBA_ALPHA);
 	SetClrModulation(rgba);
-	
 	return this;
 }
 
@@ -166,7 +166,7 @@ func Laser()
 	// fade out (only if lifetime != 0)
 	if(!lifetime) return;
 
-	var a = 200 * (lifetime - timer) / lifetime;
+	var a = alpha * (lifetime - timer) / lifetime;
 	var rgba = SetRGBaValue(GetClrModulation(), a, RGBA_ALPHA);
 	SetClrModulation(rgba);
 
