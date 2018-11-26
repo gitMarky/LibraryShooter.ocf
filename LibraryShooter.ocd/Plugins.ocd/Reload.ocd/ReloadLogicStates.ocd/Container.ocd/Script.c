@@ -17,18 +17,15 @@ func GetReloadStartState(proplist firemode)
 			var extended_amount = firemode->GetAmmoAmount() + this->AmmoChamberCapacity(ammo_type);
 			if (!this->~AmmoChamberIsLoaded(ammo_type))
 			{
-				Log("Reload: Start from manual, because no bullet chambered");
 				return "Reload_Container_LoadAmmoChamber";
 			}
 			else if (ammo >= extended_amount)
 			{
-				Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, extended_amount);
 				return nil;
 			}
 		}
 		else
 		{
-			Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, firemode->GetAmmoAmount());
 			return nil;
 		}
 	}
@@ -114,29 +111,29 @@ local ReloadStateMap =
 //---------------------------------------------------------------------------------
 func Reload_Container_Prepare_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Prepare] - Start");
+	DebugLog("Reload [Prepare] - Start");
 }
 
 func Reload_Container_Prepare_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Prepare] - Finish");
+	DebugLog("Reload [Prepare] - Finish");
 }
 
 func Reload_Container_Prepare_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Prepare] - Cancel");
+	DebugLog("Reload [Prepare] - Cancel");
 }
 
 
 //---------------------------------------------------------------------------------
 func Reload_Container_EjectAmmo_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Ammo eject] - Start");
+	DebugLog("Reload [Ammo eject] - Start");
 }
 
 func Reload_Container_EjectAmmo_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Ammo eject] - Finish");
+	DebugLog("Reload [Ammo eject] - Finish");
 	this->~Reload_Container_EjectCasings(user, firemode);
 }
 	
@@ -156,14 +153,14 @@ func Reload_Container_EjectAmmo_NextAction(object user, int x, int y, proplist f
 
 func Reload_Container_EjectAmmo_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Ammo eject] - Cancel");
+	DebugLog("Reload [Ammo eject] - Cancel");
 	// Stay in the same state, be fair and keep magazine ;)
 }
 
 //---------------------------------------------------------------------------------
 func Reload_Container_InsertAmmo_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Ammo insert] - Start");
+	DebugLog("Reload [Ammo insert] - Start");
 }
 
 func Reload_Container_InsertAmmo_OnEnd(object user, int x, int y, proplist firemode)
@@ -173,25 +170,25 @@ func Reload_Container_InsertAmmo_OnEnd(object user, int x, int y, proplist firem
 
 func Reload_Container_InsertAmmo_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Ammo insert] - Cancel");
+	DebugLog("Reload [Ammo insert] - Cancel");
 	// Stay in the same state, be fair and keep magazine ;)
 }
 
 //---------------------------------------------------------------------------------
 func Reload_Container_Close_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Close] - Start");
+	DebugLog("Reload [Close] - Start");
 }
 
 func Reload_Container_Close_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Close] - Finish");
+	DebugLog("Reload [Close] - Finish");
 }
 
 func Reload_Container_Close_NextAction(object user, int x, int y, proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
-	Log("Reload [Close] - Capacity: %d, loaded: %v, ammo %d %i", this->~AmmoChamberCapacity(ammo_type), this->~AmmoChamberIsLoaded(ammo_type), this->~GetAmmo(ammo_type), ammo_type);
+	DebugLog("Reload [Close] - Capacity: %d, loaded: %v, ammo %d %i", this->~AmmoChamberCapacity(ammo_type), this->~AmmoChamberIsLoaded(ammo_type), this->~GetAmmo(ammo_type), ammo_type);
 	if (this->~AmmoChamberCapacity(ammo_type)
 	&& !this->~AmmoChamberIsLoaded(ammo_type))
 	{
@@ -206,7 +203,7 @@ func Reload_Container_Close_NextAction(object user, int x, int y, proplist firem
 func Reload_Container_Close_OnAbort(object user, int x, int y, proplist firemode)
 {
 	// Repeat the same action
-	Log("Reload [Close] - Cancel");
+	DebugLog("Reload [Close] - Cancel");
 }
 
 /* --- Support adding spare ammo back to the user --- */
@@ -214,14 +211,14 @@ func Reload_Container_Close_OnAbort(object user, int x, int y, proplist firemode
 //---------------------------------------------------------------------------------
 func Reload_Container_StashStart_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, stash it] - Start");
+	DebugLog("Reload [Mag out, stash it] - Start");
 	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
 	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
 }
 
 func Reload_Container_StashStart_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, stash it] - Finish");
+	DebugLog("Reload [Mag out, stash it] - Finish");
 
 	// Fill ammo belt of the user
 	var ammo_type = firemode->GetAmmoID();
@@ -231,23 +228,23 @@ func Reload_Container_StashStart_OnEnd(object user, int x, int y, proplist firem
 
 func Reload_Container_StashStart_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, stash it] - Cancel");
+	DebugLog("Reload [Mag out, stash it] - Cancel");
 }
 
 //---------------------------------------------------------------------------------
 func Reload_Container_StashFinish_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Stashing] - Start");
+	DebugLog("Reload [Stashing] - Start");
 }
 
 func Reload_Container_StashFinish_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Stashing] - Finish");
+	DebugLog("Reload [Stashing] - Finish");
 }
 
 func Reload_Container_StashFinish_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Stashing] - Cancel");
+	DebugLog("Reload [Stashing] - Cancel");
 }
 
 /* --- Support for an extra ammo chamber --- */
@@ -255,16 +252,16 @@ func Reload_Container_StashFinish_OnAbort(object user, int x, int y, proplist fi
 //---------------------------------------------------------------------------------
 func Reload_Container_LoadAmmoChamber_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Start");
+	DebugLog("Reload [Manual load] - Start");
 }
 
 func Reload_Container_LoadAmmoChamber_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Finish");
+	DebugLog("Reload [Manual load] - Finish");
 	this->~AmmoChamberInsert(firemode->GetAmmoID());
 }
 
 func Reload_Container_LoadAmmoChamber_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Cancel");
+	DebugLog("Reload [Manual load] - Cancel");
 }

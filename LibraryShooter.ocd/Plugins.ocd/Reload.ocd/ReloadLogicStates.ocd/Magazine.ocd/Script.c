@@ -16,18 +16,15 @@ func GetReloadStartState(proplist firemode)
 			var extended_amount = firemode->GetAmmoAmount() + this->AmmoChamberCapacity(ammo_type);
 			if (!this->~AmmoChamberIsLoaded(ammo_type))
 			{
-				Log("Reload: Start from manual, because no bullet chambered");
 				return "Reload_Magazine_LoadAmmoChamber";
 			}
 			else if (ammo >= extended_amount)
 			{
-				Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, extended_amount);
 				return nil;
 			}
 		}
 		else
 		{
-			Log("Reload: Do nothing, because ammo amount %d >= %d", ammo, firemode->GetAmmoAmount());
 			return nil;
 		}
 	}
@@ -109,12 +106,12 @@ local ReloadStateMap =
 //---------------------------------------------------------------------------------
 func Reload_Magazine_Prepare_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Grab mag] - Start");
+	DebugLog("Reload [Grab mag] - Start");
 }
 
 func Reload_Magazine_Prepare_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Grab mag] - Finish");
+	DebugLog("Reload [Grab mag] - Finish");
 }
 
 func Reload_Magazine_Prepare_NextAction(object user, int x, int y, proplist firemode)
@@ -134,13 +131,13 @@ func Reload_Magazine_Prepare_NextAction(object user, int x, int y, proplist fire
 func Reload_Magazine_Prepare_OnAbort(object user, int x, int y, proplist firemode)
 {
 	// Repeat the same action
-	Log("Reload [Grab mag] - Cancel");
+	DebugLog("Reload [Grab mag] - Cancel");
 }
 
 //---------------------------------------------------------------------------------
 func Reload_Magazine_Drop_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, drop it] - Start");
+	DebugLog("Reload [Mag out, drop it] - Start");
 	
 	// Lose current ammo
 	this->ReloadRemoveAmmo(firemode, false);
@@ -148,23 +145,23 @@ func Reload_Magazine_Drop_OnStart(object user, int x, int y, proplist firemode)
 
 func Reload_Magazine_Drop_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, drop it] - Finish");
+	DebugLog("Reload [Mag out, drop it] - Finish");
 }
 
 func Reload_Magazine_Drop_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, drop it] - Cancel");
+	DebugLog("Reload [Mag out, drop it] - Cancel");
 }
 
 //---------------------------------------------------------------------------------
 func Reload_Magazine_Insert_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag insert] - Start");
+	DebugLog("Reload [Mag insert] - Start");
 }
 
 func Reload_Magazine_Insert_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag insert] - Finish");
+	DebugLog("Reload [Mag insert] - Finish");
 	this->ReloadRefillAmmo(firemode);
 }
 
@@ -185,7 +182,7 @@ func Reload_Magazine_Insert_NextAction(object user, int x, int y, proplist firem
 
 func Reload_Magazine_Insert_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag insert] - Cancel");
+	DebugLog("Reload [Mag insert] - Cancel");
 	
 	// Stay in the same state, be fair and keep magazine ;)
 }
@@ -195,7 +192,7 @@ func Reload_Magazine_Insert_OnAbort(object user, int x, int y, proplist firemode
 //---------------------------------------------------------------------------------
 func Reload_Magazine_StashStart_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, stash it] - Start");
+	DebugLog("Reload [Mag out, stash it] - Start");
 
 	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
 	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
@@ -203,7 +200,7 @@ func Reload_Magazine_StashStart_OnStart(object user, int x, int y, proplist fire
 
 func Reload_Magazine_StashStart_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, stash it] - Finish");
+	DebugLog("Reload [Mag out, stash it] - Finish");
 
 	// Fill ammo belt of the user
 	var ammo_type = firemode->GetAmmoID();
@@ -213,23 +210,23 @@ func Reload_Magazine_StashStart_OnEnd(object user, int x, int y, proplist firemo
 
 func Reload_Magazine_StashStart_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag out, stash it] - Cancel");
+	DebugLog("Reload [Mag out, stash it] - Cancel");
 }
 
 //---------------------------------------------------------------------------------
 func Reload_Magazine_StashFinish_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Stashing] - Start");
+	DebugLog("Reload [Stashing] - Start");
 }
 
 func Reload_Magazine_StashFinish_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Stashing] - Finish");
+	DebugLog("Reload [Stashing] - Finish");
 }
 
 func Reload_Magazine_StashFinish_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Stashing] - Cancel");
+	DebugLog("Reload [Stashing] - Cancel");
 }
 
 /* --- Support for an extra ammo chamber --- */
@@ -237,16 +234,16 @@ func Reload_Magazine_StashFinish_OnAbort(object user, int x, int y, proplist fir
 //---------------------------------------------------------------------------------
 func Reload_Magazine_LoadAmmoChamber_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Start");
+	DebugLog("Reload [Manual load] - Start");
 }
 
 func Reload_Magazine_LoadAmmoChamber_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Finish");
+	DebugLog("Reload [Manual load] - Finish");
 	this->~AmmoChamberInsert(firemode->GetAmmoID());
 }
 
 func Reload_Magazine_LoadAmmoChamber_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Cancel");
+	DebugLog("Reload [Manual load] - Cancel");
 }

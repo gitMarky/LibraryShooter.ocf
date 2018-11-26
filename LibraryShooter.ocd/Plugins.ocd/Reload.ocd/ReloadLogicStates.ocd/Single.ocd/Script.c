@@ -11,7 +11,6 @@ func GetReloadStartState(proplist firemode)
 		if (this->~AmmoChamberCapacity(ammo_type)
 		&& !this->~AmmoChamberIsLoaded(ammo_type))
 		{
-			Log("Reload: Start from manual, because no bullet chambered");
 			return "Reload_Single_LoadAmmoChamber";
 		}
 		else
@@ -83,18 +82,18 @@ local ReloadStateMap =
 //---------------------------------------------------------------------------------
 func Reload_Single_Prepare_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Prepare] - Start");
+	DebugLog("Reload [Prepare] - Start");
 }
 
 func Reload_Single_Prepare_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Prepare] - Finish");
+	DebugLog("Reload [Prepare] - Finish");
 	this->~Reload_Single_EjectCasings(user, firemode);
 }
 
 func Reload_Single_Prepare_NextAction(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Prepare] - Finish");
+	DebugLog("Reload [Prepare] - Finish");
 	if (this->~AmmoChamberCapacity(firemode->GetAmmoID())
 	&& !this->~AmmoChamberIsLoaded(firemode->GetAmmoID()))
 	{
@@ -109,7 +108,7 @@ func Reload_Single_Prepare_NextAction(object user, int x, int y, proplist firemo
 func Reload_Single_Prepare_OnAbort(object user, int x, int y, proplist firemode)
 {
 	// Repeat the same action
-	Log("Reload [Prepare] - Cancel");
+	DebugLog("Reload [Prepare] - Cancel");
 }
 
 //---------------------------------------------------------------------------------
@@ -118,7 +117,7 @@ func Reload_Single_InsertAmmo_OnStart(object user, int x, int y, proplist firemo
 	// Do everything at the beginning here and count the next rest of the process
 	// as a delay for getting the next shell ready - if that fails, start from
 	// the beginning
-	Log("Reload [Mag insert] - Start");
+	DebugLog("Reload [Mag insert] - Start");
 	
 	var is_done = false;
 	var source = this->GetAmmoReloadContainer();
@@ -158,7 +157,7 @@ func Reload_Single_InsertAmmo_OnStart(object user, int x, int y, proplist firemo
 
 func Reload_Single_InsertAmmo_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag insert] - Finish");
+	DebugLog("Reload [Mag insert] - Finish");
 }
 
 func Reload_Single_InsertAmmo_NextAction(object user, int x, int y, proplist firemode)
@@ -185,7 +184,7 @@ func Reload_Single_InsertAmmo_NextAction(object user, int x, int y, proplist fir
 
 func Reload_Single_InsertAmmo_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Mag insert] - Cancel");
+	DebugLog("Reload [Mag insert] - Cancel");
 }
 
 
@@ -194,24 +193,24 @@ func Reload_Single_InsertAmmo_OnAbort(object user, int x, int y, proplist firemo
 //---------------------------------------------------------------------------------
 func Reload_Single_LoadAmmoChamber_OnStart(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Start");
+	DebugLog("Reload [Manual load] - Start");
 }
 
 func Reload_Single_LoadAmmoChamber_OnEnd(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Finish");
+	DebugLog("Reload [Manual load] - Finish");
 	this->~AmmoChamberInsert(firemode->GetAmmoID());
 }
 
 func Reload_Single_LoadAmmoChamber_OnAbort(object user, int x, int y, proplist firemode)
 {
-	Log("Reload [Manual load] - Cancel");
+	DebugLog("Reload [Manual load] - Cancel");
 }
 
 //---------------------------------------------------------------------------------
 func OpenChamber(object user, int x, int y, proplist firemode)
 {
-	Log("Call open chamber");
+	DebugLog("Call open chamber");
 	this.firearm_reload.data_store.single_insert_ammo_do_chamber_bullet = true;
 }
 
@@ -225,7 +224,7 @@ func Reload_Single_CloseAmmoChamber_OnStart(object user, int x, int y, proplist 
 
 func CloseChamber(object user, int x, int y, proplist firemode)
 {
-	Log("Call close chamber");
+	DebugLog("Call close chamber");
 	var source = this->GetAmmoReloadContainer();
 	var ammo_requested = 0;
 	if (source)

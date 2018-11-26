@@ -199,7 +199,7 @@ local IntReloadStagesEffect = new Effect
 	
 	ResetState = func ()
 	{
-		Log("Reset state");
+		DebugLog("Reset state");
 		this.Time = 0;
 		this.percent_old = 0;
 		this.percentage = 0;
@@ -245,7 +245,7 @@ local IntReloadStagesEffect = new Effect
 		// Initial callback
 		if (!this.state_started)
 		{
-			Log("Starting state: %s", state.Name);
+			DebugLog("Starting state: %s", state.Name);
 			this.state_started = true;
 			IssueCallbacks(state, "Start");
 			
@@ -283,19 +283,19 @@ local IntReloadStagesEffect = new Effect
 		// Done with this state?
 		if (time > state.Delay && !this.state_finished)
 		{
-			Log("Finishing state: %s", state.Name);
+			DebugLog("Finishing state: %s", state.Name);
 			this.state_finished = true;
 			IssueCallbacks(state, "End");
 
 			// Do the reload if anything is necessary and end the effect if successful
 			var next_state = Evaluate(state.NextAction); // WAS: this.Target->GetReloadState(this.firemode);
-			Log("Calling SetReloadState %s", next_state);
+			DebugLog("Calling SetReloadState %s", next_state);
 			this.Target->SetReloadState(this.firemode, next_state);
 			
 			// Cleanup
 			if (next_state == "Idle")
 			{
-				Log("Next state is idle");
+				DebugLog("Next state is idle");
 				this.Target->DoReload(this.user, this.x, this.y, this.firemode);
 				return FX_Execute_Kill;
 			}
