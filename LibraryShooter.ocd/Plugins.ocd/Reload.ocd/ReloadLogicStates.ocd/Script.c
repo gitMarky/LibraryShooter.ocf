@@ -39,7 +39,7 @@ func Construction(object by)
 */
 func IsReloading()
 {
-	return GetEffect("IntReloadStagesEffect", this);
+	return GetEffect(IntReloadStagesEffect.Name, this);
 }
 
 
@@ -188,6 +188,8 @@ func GetTemporaryAmmo(id ammo_type)
 
 local IntReloadStagesEffect = new Effect
 {
+	Name = "IntReloadStagesEffect",
+	
 	Construction = func (object user, int x, int y, proplist firemode)
 	{
 		this.user = user;
