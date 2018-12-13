@@ -104,16 +104,6 @@ local ReloadStateMap =
 
 
 //---------------------------------------------------------------------------------
-func Reload_Magazine_Prepare_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Grab mag] - Start");
-}
-
-func Reload_Magazine_Prepare_OnEnd(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Grab mag] - Finish");
-}
-
 func Reload_Magazine_Prepare_NextAction(object user, int x, int y, proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
@@ -128,40 +118,16 @@ func Reload_Magazine_Prepare_NextAction(object user, int x, int y, proplist fire
 	}
 }
 
-func Reload_Magazine_Prepare_OnAbort(object user, int x, int y, proplist firemode)
-{
-	// Repeat the same action
-	DebugLog("Reload [Grab mag] - Cancel");
-}
-
 //---------------------------------------------------------------------------------
 func Reload_Magazine_Drop_OnStart(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Mag out, drop it] - Start");
-
 	// Lose current ammo
 	this->ReloadRemoveAmmo(firemode, false);
 }
 
-func Reload_Magazine_Drop_OnEnd(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Mag out, drop it] - Finish");
-}
-
-func Reload_Magazine_Drop_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Mag out, drop it] - Cancel");
-}
-
 //---------------------------------------------------------------------------------
-func Reload_Magazine_Insert_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Mag insert] - Start");
-}
-
 func Reload_Magazine_Insert_OnEnd(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Mag insert] - Finish");
 	this->ReloadRefillAmmo(firemode);
 }
 
@@ -180,70 +146,29 @@ func Reload_Magazine_Insert_NextAction(object user, int x, int y, proplist firem
 	}
 }
 
-func Reload_Magazine_Insert_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Mag insert] - Cancel");
-
-	// Stay in the same state, be fair and keep magazine ;)
-}
 
 /* --- Support adding spare ammo back to the user --- */
 
 //---------------------------------------------------------------------------------
 func Reload_Magazine_StashStart_OnStart(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Mag out, stash it] - Start");
-
 	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
 	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
 }
 
 func Reload_Magazine_StashStart_OnEnd(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Mag out, stash it] - Finish");
-
 	// Fill ammo belt of the user
 	var ammo_type = firemode->GetAmmoID();
 	this->GetAmmoReloadContainer()->DoAmmo(ammo_type, this->GetTemporaryAmmo(ammo_type));
 	this->SetTemporaryAmmo(ammo_type, 0);
 }
 
-func Reload_Magazine_StashStart_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Mag out, stash it] - Cancel");
-}
-
-//---------------------------------------------------------------------------------
-func Reload_Magazine_StashFinish_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Stashing] - Start");
-}
-
-func Reload_Magazine_StashFinish_OnEnd(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Stashing] - Finish");
-}
-
-func Reload_Magazine_StashFinish_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Stashing] - Cancel");
-}
 
 /* --- Support for an extra ammo chamber --- */
 
 //---------------------------------------------------------------------------------
-func Reload_Magazine_LoadAmmoChamber_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Manual load] - Start");
-}
-
 func Reload_Magazine_LoadAmmoChamber_OnEnd(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Manual load] - Finish");
 	this->~AmmoChamberInsert(firemode->GetAmmoID());
-}
-
-func Reload_Magazine_LoadAmmoChamber_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Manual load] - Cancel");
 }

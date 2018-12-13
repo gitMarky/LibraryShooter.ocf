@@ -108,32 +108,10 @@ local ReloadStateMap =
 	},
 };
 
-//---------------------------------------------------------------------------------
-func Reload_Container_Prepare_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Prepare] - Start");
-}
-
-func Reload_Container_Prepare_OnEnd(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Prepare] - Finish");
-}
-
-func Reload_Container_Prepare_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Prepare] - Cancel");
-}
-
 
 //---------------------------------------------------------------------------------
-func Reload_Container_EjectAmmo_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Ammo eject] - Start");
-}
-
 func Reload_Container_EjectAmmo_OnEnd(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Ammo eject] - Finish");
 	this->~Reload_Container_EjectCasings(user, firemode);
 }
 
@@ -151,44 +129,16 @@ func Reload_Container_EjectAmmo_NextAction(object user, int x, int y, proplist f
 	}
 }
 
-func Reload_Container_EjectAmmo_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Ammo eject] - Cancel");
-	// Stay in the same state, be fair and keep magazine ;)
-}
-
 //---------------------------------------------------------------------------------
-func Reload_Container_InsertAmmo_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Ammo insert] - Start");
-}
-
 func Reload_Container_InsertAmmo_OnEnd(object user, int x, int y, proplist firemode)
 {
 	this->ReloadRefillAmmo(firemode);
 }
 
-func Reload_Container_InsertAmmo_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Ammo insert] - Cancel");
-	// Stay in the same state, be fair and keep magazine ;)
-}
-
 //---------------------------------------------------------------------------------
-func Reload_Container_Close_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Close] - Start");
-}
-
-func Reload_Container_Close_OnEnd(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Close] - Finish");
-}
-
 func Reload_Container_Close_NextAction(object user, int x, int y, proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
-	DebugLog("Reload [Close] - Capacity: %d, loaded: %v, ammo %d %i", this->~AmmoChamberCapacity(ammo_type), this->~AmmoChamberIsLoaded(ammo_type), this->~GetAmmo(ammo_type), ammo_type);
 	if (this->~AmmoChamberCapacity(ammo_type)
 	&& !this->~AmmoChamberIsLoaded(ammo_type))
 	{
@@ -200,68 +150,27 @@ func Reload_Container_Close_NextAction(object user, int x, int y, proplist firem
 	}
 }
 
-func Reload_Container_Close_OnAbort(object user, int x, int y, proplist firemode)
-{
-	// Repeat the same action
-	DebugLog("Reload [Close] - Cancel");
-}
-
 /* --- Support adding spare ammo back to the user --- */
 
 //---------------------------------------------------------------------------------
 func Reload_Container_StashStart_OnStart(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Mag out, stash it] - Start");
 	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
 	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
 }
 
 func Reload_Container_StashStart_OnEnd(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Mag out, stash it] - Finish");
-
 	// Fill ammo belt of the user
 	var ammo_type = firemode->GetAmmoID();
 	this->GetAmmoReloadContainer()->DoAmmo(ammo_type, this->GetTemporaryAmmo(ammo_type));
 	this->SetTemporaryAmmo(ammo_type, 0);
 }
 
-func Reload_Container_StashStart_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Mag out, stash it] - Cancel");
-}
-
-//---------------------------------------------------------------------------------
-func Reload_Container_StashFinish_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Stashing] - Start");
-}
-
-func Reload_Container_StashFinish_OnEnd(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Stashing] - Finish");
-}
-
-func Reload_Container_StashFinish_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Stashing] - Cancel");
-}
-
 /* --- Support for an extra ammo chamber --- */
 
 //---------------------------------------------------------------------------------
-func Reload_Container_LoadAmmoChamber_OnStart(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Manual load] - Start");
-}
-
 func Reload_Container_LoadAmmoChamber_OnEnd(object user, int x, int y, proplist firemode)
 {
-	DebugLog("Reload [Manual load] - Finish");
 	this->~AmmoChamberInsert(firemode->GetAmmoID());
-}
-
-func Reload_Container_LoadAmmoChamber_OnAbort(object user, int x, int y, proplist firemode)
-{
-	DebugLog("Reload [Manual load] - Cancel");
 }
