@@ -6,6 +6,12 @@ static const RELOAD_CONTAINER_PREPARE = "Reload_Container_Prepare";
 // 	Gets the default reload state that the weapon starts reloading from.
 func GetReloadStartState(proplist firemode)
 {
+	return GetReloadStartStateContainer(firemode);
+}
+
+// Separate function, for weapons that have different start states
+func GetReloadStartStateContainer(proplist firemode)
+{
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
 

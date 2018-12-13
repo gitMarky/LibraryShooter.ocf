@@ -5,6 +5,12 @@
 // 	Gets the default reload state that the weapon starts reloading from.
 func GetReloadStartState(proplist firemode)
 {
+	return GetReloadStartStateMagazine(firemode);
+}
+
+// Separate function, for weapons that have different start states
+func GetReloadStartStateMagazine(proplist firemode)
+{
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
 
