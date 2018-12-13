@@ -918,6 +918,11 @@ func Fire(object user, int x, int y)
 		FatalError("No firemode selected");
 	}
 
+	if (this->~IsReloading())
+	{
+		CancelReload(user, x, y, firemode, false);
+	}
+
 	if (HasAmmo(firemode))
 	{
 		var angle = GetFireAngle(x, y, firemode);
