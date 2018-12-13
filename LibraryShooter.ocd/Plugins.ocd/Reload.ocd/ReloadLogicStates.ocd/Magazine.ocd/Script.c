@@ -50,7 +50,6 @@ local ReloadStateMap =
 		Prototype   = Firearm_ReloadState,
 		Name        = "Reload_Magazine_Drop",
 		NextAction  = "Reload_Magazine_Insert",
-		AbortAction = "Reload_Magazine_Insert", // FIXME: Violates design guideline
 		StartCall   = "~PlaySoundEjectMagazine",
 	},
 
@@ -67,7 +66,6 @@ local ReloadStateMap =
 		Prototype   = Firearm_ReloadState,
 		Name        = "Reload_Magazine_ReadyWeapon",
 		NextAction  = "Idle",
-		AbortAction = "Idle",  // FIXME: Violates design guideline
 	},
 
 	/* --- Support adding spare ammo back to the user --- */
@@ -77,18 +75,16 @@ local ReloadStateMap =
 		Prototype  = Firearm_ReloadState,
 		Name       = "Reload_Magazine_StashStart",
 		NextAction = "Reload_Magazine_StashFinish",
-		AbortAction = "Reload_Magazine_Insert", // FIXME: Violates design guideline
 		StartCall  = "~PlaySoundEjectMagazine",
+		EndCall    = "~PlaySoundResupplyAmmo",
 	},
 
-
-	Magazine_StashFinish = // Short delay and sound while stashing the magazine, merely cosmetic
+	Magazine_StashFinish = // Short delay while stashing the magazine, merely cosmetic
 	{
 		Prototype   = Firearm_ReloadState,
 		Name        = "Reload_Magazine_StashFinish",
 		NextAction  = "Reload_Magazine_Insert",
-		AbortAction = "Reload_Magazine_Insert", // FIXME: Violates design guideline
-		StartCall   = "~PlaySoundResupplyAmmo",
+		AbortAction = "Reload_Magazine_Insert", // This serves as a delay only, so if it gets aborted no harm is done
 	},
 
 	/* --- Support for an extra ammo chamber --- */
@@ -110,6 +106,8 @@ func Reload_Magazine_Prepare_NextAction(object user, int x, int y, proplist fire
 	var ammo = this->GetAmmo(ammo_type);
 	if (ammo > this->~AmmoChamberCapacity(ammo_type))
 	{
+		// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
+		this->DoTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
 		return "Reload_Magazine_StashStart";
 	}
 	else
@@ -119,7 +117,7 @@ func Reload_Magazine_Prepare_NextAction(object user, int x, int y, proplist fire
 }
 
 //---------------------------------------------------------------------------------
-func Reload_Magazine_Drop_OnStart(object user, int x, int y, proplist firemode)
+func Reload_Magazine_Drop_OnEnd(object user, int x, int y, proplist firemode)
 {
 	// Lose current ammo
 	this->ReloadRemoveAmmo(firemode, false);
@@ -150,12 +148,6 @@ func Reload_Magazine_Insert_NextAction(object user, int x, int y, proplist firem
 /* --- Support adding spare ammo back to the user --- */
 
 //---------------------------------------------------------------------------------
-func Reload_Magazine_StashStart_OnStart(object user, int x, int y, proplist firemode)
-{
-	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
-	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
-}
-
 func Reload_Magazine_StashStart_OnEnd(object user, int x, int y, proplist firemode)
 {
 	// Fill ammo belt of the user

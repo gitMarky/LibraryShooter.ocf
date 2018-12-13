@@ -176,6 +176,11 @@ public func OnCancelReload(object user, int x, int y, proplist firemode, bool re
 
 /* --- Internal --- */
 
+func DoTemporaryAmmo(id ammo_type, int change)
+{
+	SetTemporaryAmmo(ammo_type, Max(0, GetTemporaryAmmo(ammo_type) + change));
+}
+
 func SetTemporaryAmmo(id ammo_type, int amount)
 {
 	this.firearm_reload.data_store.temp_ammo[Format("%i", ammo_type)] = amount;

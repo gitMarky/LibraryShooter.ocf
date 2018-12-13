@@ -58,7 +58,7 @@ local ReloadStateMap =
 		Prototype  = Firearm_ReloadState,
 		Name       = "Reload_Single_LoadAmmoChamber",
 		NextAction = "Reload_Single_ReadyWeapon",
-		EndCall    = "~PlaySoundLoadAmmoChamber",
+		StartCall    = "~PlaySoundLoadAmmoChamber",
 	},
 
 	Single_OpenAmmoChamber = // Open the chamber, for manually inserting a shell 
@@ -99,21 +99,18 @@ func Reload_Single_Prepare_NextAction(object user, int x, int y, proplist firemo
 }
 
 //---------------------------------------------------------------------------------
-func Reload_Single_InsertAmmo_OnStart(object user, int x, int y, proplist firemode)
+func Reload_Single_InsertAmmo_OnEnd(object user, int x, int y, proplist firemode)
 {
-	// Do everything at the beginning here and count the next rest of the process
-	// as a delay for getting the next shell ready - if that fails, start from
-	// the beginning
 	var is_done = false;
 	var source = this->GetAmmoReloadContainer();
 	if (source)
 	{
 		var info = this->ReloadGetAmmoInfo(firemode);
-		var ammo_requested = BoundBy(info.ammo_max + info.ammo_chambered - info.ammo_available, 0, firemode.ammo_usage ?? 1);
-		var ammo_received = Abs(source->DoAmmo(firemode->GetAmmoID(), -ammo_requested)); // see how much you can get
-		var ammo_spare = (info.ammo_available + ammo_received) % (firemode.ammo_usage ?? 1); // get ammo only in increments of ammo_usage
+		var ammo_requested = BoundBy(info.ammo_max + info.ammo_chambered - info.ammo_available, 0, firemode->GetAmmoUsage());
+		var ammo_received = Abs(source->DoAmmo(firemode->GetAmmoID(), -ammo_requested));     // See how much you can get
+		var ammo_spare = (info.ammo_available + ammo_received) % firemode->GetAmmoUsage(); // Get ammo only in increments of ammo_usage
 
-		source->DoAmmo(info.ammo_type, ammo_spare); // give back the unnecessary ammo
+		source->DoAmmo(info.ammo_type, ammo_spare); // Give back the unnecessary ammo
 		if (ammo_received > 0)
 		{
 			this->~PlaySoundInsertShell();
@@ -177,9 +174,8 @@ func OpenChamber(object user, int x, int y, proplist firemode)
 	this.firearm_reload.data_store.single_insert_ammo_do_chamber_bullet = true;
 }
 
-
 //---------------------------------------------------------------------------------
-func Reload_Single_CloseAmmoChamber_OnStart(object user, int x, int y, proplist firemode)
+func Reload_Single_CloseAmmoChamber_OnEnd(object user, int x, int y, proplist firemode)
 {
 	this->~AmmoChamberInsert(firemode->GetAmmoID());
 }

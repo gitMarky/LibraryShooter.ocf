@@ -85,16 +85,15 @@ local ReloadStateMap =
 		Prototype   = Firearm_ReloadState,
 		Name        = "Reload_Container_StashStart",
 		NextAction  = "Reload_Container_StashFinish",
-		AbortAction = "Reload_Container_InsertAmmo", // FIXME: Violates design guideline
+		EndCall     = "~PlaySoundResupplyAmmo",
 	},
 
-	Container_StashFinish = // Short delay and sound while stashing the magazine, merely cosmetic
+	Container_StashFinish = // Short delay while stashing the magazine, merely cosmetic
 	{
 		Prototype   = Firearm_ReloadState,
 		Name        = "Reload_Container_StashFinish",
 		NextAction  = "Reload_Container_InsertAmmo",
-		AbortAction = "Reload_Container_InsertAmmo", // FIXME: Violates design guideline
-		StartCall   = "~PlaySoundResupplyAmmo",
+		AbortAction = "Reload_Container_InsertAmmo", // This serves as a delay only, so if it gets aborted no harm is done
 	},
 
 	/* --- Support for an extra ammo chamber --- */
@@ -119,8 +118,10 @@ func Reload_Container_EjectAmmo_NextAction(object user, int x, int y, proplist f
 {
 	var ammo_type = firemode->GetAmmoID();
 
-	if (this->GetAmmo(ammo_type) > this->~AmmoChamberCapacity(ammo_type))
+	if (this->GetAmmo(ammo_type) > this->~AmmoChamberCapacity(ammo_type)) // FIXME: Is bugged if the chamber is not loaded, but there is ammo left. Needs a separate function
 	{
+		// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
+		this->DoTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
 		return "Reload_Container_StashStart";
 	}
 	else
@@ -153,12 +154,6 @@ func Reload_Container_Close_NextAction(object user, int x, int y, proplist firem
 /* --- Support adding spare ammo back to the user --- */
 
 //---------------------------------------------------------------------------------
-func Reload_Container_StashStart_OnStart(object user, int x, int y, proplist firemode)
-{
-	// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
-	this->SetTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
-}
-
 func Reload_Container_StashStart_OnEnd(object user, int x, int y, proplist firemode)
 {
 	// Fill ammo belt of the user
