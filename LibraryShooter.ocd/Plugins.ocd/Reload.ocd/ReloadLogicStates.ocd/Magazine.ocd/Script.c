@@ -104,7 +104,7 @@ func Reload_Magazine_Prepare_NextAction(object user, int x, int y, proplist fire
 {
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
-	if (ammo > this->~AmmoChamberCapacity(ammo_type))
+	if (ammo > this->~AmmoChamberStored(ammo_type))
 	{
 		// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
 		this->DoTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));

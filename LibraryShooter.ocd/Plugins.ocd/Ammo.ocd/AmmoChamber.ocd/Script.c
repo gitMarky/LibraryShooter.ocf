@@ -95,7 +95,7 @@ public func AmmoChamberEject(id ammo)
 
 
 /**
-	Gets the amount of ammo that is protected by the ammo chamber
+	Gets the amount of ammo that can be put into the ammo chamber
 	when reloading the weapon.
 
 	@par ammo The ammo type.
@@ -104,6 +104,27 @@ public func AmmoChamberEject(id ammo)
 public func AmmoChamberCapacity(id ammo)
 {
 	return 1;
+}
+
+
+/**
+	Gets the amount of ammo that is protected by the ammo chamber
+	when reloading the weapon.
+
+	@par ammo The ammo type.
+	@return int The amount. Is equal to the ammo chamber capacity
+	            while the chamber is loaded, otherwise 0.
+ */
+public func AmmoChamberStored(id ammo)
+{
+	if (AmmoChamberIsLoaded(ammo))
+	{
+		return AmmoChamberCapacity(ammo);
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 

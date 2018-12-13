@@ -104,11 +104,7 @@ func ReloadGetAmmoInfo(proplist firemode)
 	var ammo_type = firemode.ammo_id;
 	var ammo_max = firemode.ammo_load ?? 1;
 	var ammo_available = this->GetAmmo(ammo_type);
-	var ammo_chambered = 0;
-	if (this->~AmmoChamberIsLoaded(ammo_type))
-	{
-		ammo_chambered = this->~AmmoChamberCapacity(ammo_type);
-	}
+	var ammo_chambered = this->~AmmoChamberStored(ammo_type);
  	return
  	{
  		ammo_type = ammo_type,

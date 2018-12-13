@@ -118,7 +118,7 @@ func Reload_Container_EjectAmmo_NextAction(object user, int x, int y, proplist f
 {
 	var ammo_type = firemode->GetAmmoID();
 
-	if (this->GetAmmo(ammo_type) > this->~AmmoChamberCapacity(ammo_type)) // FIXME: Is bugged if the chamber is not loaded, but there is ammo left. Needs a separate function
+	if (this->GetAmmo(ammo_type) > this->~AmmoChamberStored(ammo_type))
 	{
 		// Take out ammo now, because the previous version where ammo state is changed only on finish looked strange ingame
 		this->DoTemporaryAmmo(firemode->GetAmmoID(), this->ReloadRemoveAmmo(firemode, false));
