@@ -1,7 +1,7 @@
 ﻿﻿/**
 	A dummy definition, used to provide various getters and setters for fire modes.
 	Keep in mind that for fire modes to be writable, they must be created using {@link Library_Firearm#AddFiremode}.
-	
+
 	@note
 	A fire mode is a proplist that can define the following properties:@br
 	mode: Integer. Must be set. This defines the basic firing mode. Can simply be one of the following constants:@br
@@ -289,7 +289,7 @@ public func GetYOffset()
 
 /**
 	Get the spread of this fire mode.
-	
+
 	This spread value is static and defines how inaccurate
 	the weapon or firemode is by itself in this fire mode.
 
@@ -305,10 +305,10 @@ public func GetSpread()
 /**
 	Get the spread that is passed to the user after
 	each shot.
-	
+
 	This spread value is static and defines how inaccurate
 	the weapon or firemode is by itself in this fire mode.
-	
+
 	@note This depends entirely on how the user handles
 	      spread. Can be handley for example by
 	      including {@link Plugin_Firearm_DynamicSpread}
@@ -444,7 +444,7 @@ public func SetIcon(id value)
 
 /**
 	Set the index of this fire mode, for {@link Library_Firearm#GetFiremode}.
-	
+
 	@note This is automatically called by {@link Library_Firearm#AddFiremode}.
 
 	@par value The index of the firemode.
@@ -559,7 +559,7 @@ public func SetChargeDelay(int value)
 
 	@par value Recovery duration between consecutive shots in frames.
                If 0 or nil, no recovery is required
-               
+
     @note Use this to model a (semi-)automatic loading cycle of the
           weapon. The recovery from recoil, etc. should be modeled
           via {@link Library_Firearm_Firemode#SetCooldownDelay} 
@@ -581,7 +581,7 @@ public func SetRecoveryDelay(int value)
                The last shot is the last shot in a series of consecutive
                shots (as opposed to the last shot before ammo runs out).
                If 0 or nil, no cooldown is required.
-               
+
     @note Use this to model recoil, letting a gatling gun roll out, etc.
           Time for loading a new shot should be modeled
           via {@link Library_Firearm_Firemode#SetRecoveryDelay} 
@@ -647,7 +647,7 @@ public func SetDamageType(int value)
 	Sets the number of projectiles to be fired by a single shot.
 
 	@par value The number of projectiles per shot.
-	
+
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
 */
@@ -722,7 +722,7 @@ public func SetProjectileSpread(int value)
 	@par value Maximum range a projectile flies. May
 	           be an integer, or an array for use with
 	           {@link Library_Random#SampleValue}.
-	
+
 
 	@return proplist Returns the fire mode, so that 
 	                 further function calls can be issued.
@@ -794,7 +794,7 @@ public func SetSpread(int value)
 /**
 	Set the spread that is passed to the user after
 	each shot.
-	
+
 	@note This depends entirely on how the user handles
 	      spread. Can be handley for example by
 	      including {@link Plugin_Firearm_DynamicSpread}
@@ -913,7 +913,7 @@ public func SetBackwardWalkingSpeed(int value)
 
 /**
 	Find out whether the firemode is available.
-	
+
 	@return {@code true} if the firemode has no condition,
 	        or the return value of the function defined in
 	        {@link Library_Firearm_Firemode#GetCondition}.

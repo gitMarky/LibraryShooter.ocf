@@ -9,7 +9,7 @@ local reload_progress_bar;
 public func OnStartReload(object user, int x, int y, proplist firemode)
 {
 	_inherited(user, x, y, firemode);
-	
+
 	if (reload_progress_bar) reload_progress_bar->Close();
 	reload_progress_bar = CreateReloadProgressBar(user, firemode);
 }
@@ -32,7 +32,7 @@ public func OnCancelReload(object user, int x, int y, proplist firemode, bool re
 public func OnProgressReload(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
 {
 	_inherited(user, x, y, firemode, current_percent, change_percent);
-	
+
 	if (reload_progress_bar)
 	{
 		reload_progress_bar->SetValue(current_percent);

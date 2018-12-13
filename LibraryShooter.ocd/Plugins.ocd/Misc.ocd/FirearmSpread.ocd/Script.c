@@ -1,8 +1,8 @@
 /**
 	Plugin for the user of a firemode.
-	
+
 	Enables accumulation of spread for the user.
-	
+
 	Must call inherited function in:
 	- Construction
 

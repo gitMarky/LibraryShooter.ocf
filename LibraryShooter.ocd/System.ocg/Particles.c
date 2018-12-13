@@ -4,12 +4,12 @@ global func CreateImpactEffect(int size, int xoff, int yoff, string name, partic
 	{
 		particles = Particles_Glimmer();
 	}
-	
+
 	if (name == nil)
 	{
 		name = "Frazzle";
 	}
-	
+
 	particles.Phase = PV_Random(0, 4);
 	CreateParticle(name, PV_Random(xoff - 2, xoff + 2), PV_Random(yoff - 2, yoff + 2), PV_Random(-size, size), PV_Random(-size, size), PV_Random(20, 40), particles, size * 2);
 }

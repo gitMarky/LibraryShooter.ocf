@@ -1,11 +1,11 @@
 /**
 	Plugin for weapons: Reloading stages.
-	
+
 	@note
 	You have to call the inherited function in:
 	- Construction()
 	if you use this.
-	
+
 	@note
 	Issues: Handle multiple fire modes how?
 	Theoretically there can be fire modes that use the same ammo, so it makes sense to share the reload state between ammo types.
@@ -45,7 +45,7 @@ func IsReloading()
 
 /**
 	Gets the current reload state.
-	
+
 	@par firemode The reload state is requested for this firemode.
  */
 func GetReloadState(proplist firemode)
@@ -77,7 +77,7 @@ func FindReloadState(string name)
 
 /**
 	Gets the reload state that the weapon starts reloading from.
-	
+
 	@par firemode The reload state is requested for this firemode.
  */
 func GetReloadStartState(proplist firemode)
@@ -88,7 +88,7 @@ func GetReloadStartState(proplist firemode)
 
 /**
 	Sets the current reload state.
-	
+
 	@par firemode The reload state is changed for this firemode.
 	@par state the reload state. A value of {@code nil} means, that
 	     the weapon is reloaded.
@@ -111,7 +111,7 @@ func SetReloadState(proplist firemode, state)
 			{
 				state = nil; // "Idle" resets to default (=nil) - for compatibility with ActMap behaviour
 			}
-			
+
 			firearm_reload.current_state[GetReloadStateID(firemode)] = state;
 			_inherited(firemode, state, ...);
 		}
@@ -130,7 +130,7 @@ func SetReloadState(proplist firemode, state)
 /**
 	Gets an identifier for accessing the reload state
 	from the saved data.
-	
+
 	@par firemode The identifier is queried for this firemode.
 	@return string Should return the type of reload state
 	               depending on the firemode.
@@ -189,7 +189,7 @@ func GetTemporaryAmmo(id ammo_type)
 local IntReloadStagesEffect = new Effect
 {
 	Name = "IntReloadStagesEffect",
-	
+
 	Construction = func (object user, int x, int y, proplist firemode)
 	{
 		this.user = user;
@@ -198,7 +198,7 @@ local IntReloadStagesEffect = new Effect
 		this.firemode = firemode;
 		ResetState();
 	},
-	
+
 	ResetState = func ()
 	{
 		DebugLog("Reset state");
@@ -209,7 +209,7 @@ local IntReloadStagesEffect = new Effect
 		this.state_started = false;
 		this.state_finished = false;
 		this.state_event = false;
-		
+
 		if (this.user_animation && this.user)
 		{
 			this.user->StopAnimation(this.user_animation);
@@ -243,14 +243,14 @@ local IntReloadStagesEffect = new Effect
 			this.Target->CancelReload(this.user, this.x, this.y, this.firemode, false);
 			return FX_Execute_Kill;
 		}
-		
+
 		// Initial callback
 		if (!this.state_started)
 		{
 			DebugLog("Starting state: %s", state.Name);
 			this.state_started = true;
 			IssueCallbacks(state, "Start");
-			
+
 			if (state.UserAnimation)
 			{
 				var begin = state.UserAnimation.Begin ?? 0;
@@ -267,14 +267,14 @@ local IntReloadStagesEffect = new Effect
 		this.percentage = BoundBy(time * 100 / state.Delay, 0, 100);
 		// Save the progress (i.e. the difference between the current percentage and during the last update)
 		this.progress = this.percentage - this.percent_old;
-		
+
 		// Do a progress update if necessary
 		if (this.progress > 0)
 		{
 			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
 			this.percent_old = this.progress;
 		}
-		
+
 		// Check if there should be an event callback
 		if (state.Event > 0 && time > state.Event && !this.state_event)
 		{
@@ -293,7 +293,7 @@ local IntReloadStagesEffect = new Effect
 			var next_state = Evaluate(state.NextAction); // WAS: this.Target->GetReloadState(this.firemode);
 			DebugLog("Calling SetReloadState %s", next_state);
 			this.Target->SetReloadState(this.firemode, next_state);
-			
+
 			// Cleanup
 			if (next_state == "Idle")
 			{
@@ -312,12 +312,12 @@ local IntReloadStagesEffect = new Effect
 			}
 		}
 	},
-	
+
 	GetProgress = func ()
 	{
 		return this.percentage;
 	},
-	
+
 	IssueCallbacks = func (proplist state, string type)
 	{
 		var internal         = state[Format("%sFunc", type)];        // This is the one that should not be overloaded
@@ -327,7 +327,7 @@ local IntReloadStagesEffect = new Effect
 		IssueCallback(internal ?? internal_default); 
 		IssueCallback(user_defined);
 	},
-	
+
 	IssueCallback = func (callback)
 	{
 		if (callback)
@@ -335,7 +335,7 @@ local IntReloadStagesEffect = new Effect
 			return this.Target->Call(callback, this.user, this.x, this.y, this.firemode);
 		}
 	},
-	
+
 	Evaluate = func (string state_name)
 	{
 		// State name starts with '#' => evaluate as a function!
@@ -352,10 +352,10 @@ local IntReloadStagesEffect = new Effect
 
 /**
 	Prototype for reloading state.
-	
+
 	@note
 	State 'nil' is the 'ready to reload' or default state.
-	
+
 	@note
 	For every state you will have to implement some functions or properties:
 	<ul>
@@ -384,7 +384,7 @@ local IntReloadStagesEffect = new Effect
 	</ul>
 	</li>
 	</ul>
-	
+
 	@note
 	As a design rule, each state should play create permanent effects or status changes only when it is finished.
 	If you create a state that does something when it begins, then it does not matter whether you finish it

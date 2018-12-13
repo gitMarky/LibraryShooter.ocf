@@ -34,7 +34,7 @@ global func Control2Player(int plr, int ctrl, int x, int y, int strength, bool r
 		g_player_cursor_pos[plr] = [x, y];
 		return true;
 	}
-	
+
 	if(ctrl == CON_CaedesAimingCursor)
 	{
 		var cursor = GetCursor(plr);
@@ -44,7 +44,7 @@ global func Control2Player(int plr, int ctrl, int x, int y, int strength, bool r
 		}
 		return true;
 	}
-	
+
 	return inherited(plr, ctrl, x, y, strength, repeat, release);
 }
 */

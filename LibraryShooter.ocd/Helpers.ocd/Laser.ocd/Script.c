@@ -128,7 +128,7 @@ public func GetLaserLength()
 { 
 	var name = GetAction();
 	if (name == "Idle") name = "Laser";
-	
+
 	return length * this.ActMap[name].Hgt / 1000;
 }
 
@@ -144,7 +144,7 @@ func Activate()
 	{
 		SetAction("Laser");
 	}
-	
+
 	DrawTransform();
 }
 

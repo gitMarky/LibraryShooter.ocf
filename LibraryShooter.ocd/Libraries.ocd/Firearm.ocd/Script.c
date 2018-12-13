@@ -10,7 +10,7 @@
 
 	@note Fire modes
 	Each weapon must define at least one fire mode. fire_mode_default provides an example of how these could look and should also be used as a Prototype, to provide default values.@br
-	
+
 	@note Reloading
 	Reloading can be implemented via {@link Plugin_Firearm_ReloadLogic}, or a custom plugin that
 	implements the functions
@@ -759,7 +759,7 @@ local IntChargeEffect = new Effect
 		this.is_charged = false;
 		this.has_charged = false;
 	},
-	
+
 	Timer = func (int time)
 	{
 		// Increase progress percentage depending on the charging delay of the firemode
@@ -776,7 +776,7 @@ local IntChargeEffect = new Effect
 			// However, keep the effect, to track that this weapon is now charged
 		}
 	},
-	
+
 	GetProgress = func ()
 	{
 		return this.percent;
@@ -897,7 +897,7 @@ func GetFireAngle(int x, int y, proplist firemode)
 	- call {@link Library_Firearm#FireEffect}.@br
 	- call {@link Library_Firearm#FireProjectiles}.@br
 	- call {@link Library_Firearm#FireRecovery}.@br
-	
+
 	@note Issues a callback "OnFirearmFire(object weapon, proplist firemode)"
 	      to the user after the projectile was fired.
 
@@ -956,7 +956,7 @@ func FireProjectiles(object user, int angle, proplist firemode)
 	{
 		FatalError("The function expects a fire mode that is not nil");
 	}
-	
+
 	var user_x = user->~GetWeaponX(this); if (user_x) user_x -= GetX();
 	var user_y = user->~GetWeaponY(this); if (user_y) user_y -= GetY();
 
@@ -1004,7 +1004,7 @@ func ComposeSpread(object user, proplist firemode)
 	// Get static values from the weapon
 	var weapon_spread = firemode->GetSpread();
 	var projectile_spread = firemode->GetProjectileSpread();
-	
+
 	// Get dynamic values from the user
 	var user_spread;
 	if (user)
@@ -1023,7 +1023,7 @@ func ComposeSpread(object user, proplist firemode)
 	Callback that happens each time an individual projectile is fired.
 
 	@note By default this function is empty. You should create some kind of sound here.
-	
+
 	@par user The object that is using the weapon.
 	@par firemode A proplist containing the fire mode information.
  */
@@ -1065,9 +1065,9 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
 	{
 		FatalError("This function expects a user that is not nil");
 	}
-	
+
 	particle = particle ?? "MuzzleFlash";
-	
+
 	var r, g, b;
 	if (color == nil)
 	{
@@ -1086,7 +1086,7 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
 	{
 		var xdir = +Sin(angle, size * 2);
 		var ydir = -Cos(angle, size * 2);
-	
+
 		CreateParticle("StarFlash", x, y, PV_Random(xdir - size, xdir + size), PV_Random(ydir - size, ydir + size), PV_Random(20, 60), Particles_Glimmer(), size);
 	}
 
@@ -1147,7 +1147,7 @@ public func NeedsRecovery(object user, proplist firemode)
 func CancelRecovery()
 {
 	var recovery_process = IsRecovering();
-	
+
 	if (recovery_process != nil)
 		RemoveEffect(nil, nil, recovery_process);
 }
@@ -1241,13 +1241,13 @@ local IntRecoveryEffect = new Effect
 		this.y = y;
 		this.firemode = firemode;
 	},
-	
+
 	Timer = func ()
 	{
 		this.Target->DoRecovery(this.user, this.x, this.y, this.firemode);
 		return FX_Execute_Kill;
 	},
-	
+
 	GetProgress = func ()
 	{
 		var progress = BoundBy(this.Time, 0, this.Interval);
@@ -1393,13 +1393,13 @@ local IntCooldownEffect = new Effect
 		this.user = user;
 		this.firemode = firemode;
 	},
-	
+
 	Timer = func ()
 	{
 		this.Target->DoCooldown(this.user, this.firemode);
 		return FX_Execute_Kill;
 	},
-	
+
 	GetProgress = func ()
 	{
 		var progress = BoundBy(this.Time, 0, this.Interval);
@@ -2025,7 +2025,7 @@ public func GetAnimationSet()
 
 /**
 	Calls {@code GetProgress()} in a proplist
-	
+
 	@return the return value of the call, or {@code -1} if
 	        there is no proplist.
  */

@@ -73,7 +73,7 @@ public func GetAmmo(id ammo)
 	{
 		FatalError("You have to specify a type of ammunition.");
 	}
-	
+
 	var ammo_source = GetAmmoSource(ammo);
 
 	if (ammo_source == AMMO_Source_Local)
@@ -87,7 +87,7 @@ public func GetAmmo(id ammo)
 	else if (ammo_source == AMMO_Source_Container)
 	{
 		var owner = this->~GetAmmoContainer();
-		
+
 		if (owner == nil)
 		{
 			FatalError("Could not find the object that should contain the ammunition. Make sure that GetAmmoContainer() returns an existing object.");
@@ -124,7 +124,7 @@ public func DoAmmo(id ammo, int amount)
 	{
 		FatalError("You have to specify a type of ammunition.");
 	}
-	
+
 	if (GetAmmoSource(ammo) == AMMO_Source_Infinite)
 	{
 		return amount;
@@ -133,7 +133,7 @@ public func DoAmmo(id ammo, int amount)
 	{
 		var before = GetAmmo(ammo);
 		var after = SetAmmo(ammo, before + amount);
-	
+
 		return after - before;
 	}
 }
@@ -171,7 +171,7 @@ public func SetAmmo(id ammo, int new_value)
 	else if (ammo_source == AMMO_Source_Container)
 	{
 		var owner = this->~GetAmmoContainer();
-		
+
 		if (owner == nil)
 		{
 			FatalError("Could not find the object that should contain the ammunition. Make sure that GetAmmoContainer() returns an existing object.");

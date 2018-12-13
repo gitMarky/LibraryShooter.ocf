@@ -2,10 +2,10 @@ func InitializePlayer(int plr)
 {
 	// Set zoom to full map size.
 	SetPlayerZoomByViewRange(plr, 300, nil, PLRZOOM_Direct);
-	
+
 	// No FoW to see everything happening.
 	SetFoW(false, plr);
-		
+
 	// Start!
 	LaunchTest(1);
 	return;
@@ -67,21 +67,21 @@ global func Test1_Execute()
 
 			var actual_angle = Angle(0, 0, projectile->GetXDir(), projectile->GetYDir(), precision);
 			var range = 1000;
-			
+
 			var x_actual = +Sin(actual_angle, range, precision);
 			var y_actual = -Cos(actual_angle, range, precision);
-			
+
 			var x_expected = +Sin(angle * precision, range, precision);
 			var y_expected = -Cos(angle * precision, range, precision);
-			
+
 			var dist = Distance(x_actual, y_actual, x_expected, y_expected);
-			
+
 			Log("Launched projectile at angle %d, final angle is %d; deviation from target would be %d", angle * precision, actual_angle, dist);
 
 			doTest("Deviation from target is <= 3 pixels.", dist <= 3, true);
 		}
 	}
-	
+
 	return Evaluate();
 }
 
@@ -112,7 +112,7 @@ global func Test2_Execute()
 			doTest("Launch angle is %d, expected %d.", launch_angle, expected_angle);
 		}
 	}
-	
+
 	if (projectile) projectile->RemoveObject();
 
 	return Evaluate();
@@ -139,7 +139,7 @@ global func Test3_Execute()
 			Log("Testing precision %d, angle %d", precision, angle);
 			var deviation = 5;
 
-			
+
 			var max_launch_angle = angle * precision;
 			var min_launch_angle = angle * precision;
 
@@ -149,7 +149,7 @@ global func Test3_Execute()
 			for (var i = 0; i < 1000; ++i)
 			{
 				var launch_angle = projectile->GetLaunchAngle(angle, precision, deviation);
-				
+
 				if (launch_angle < min_launch_angle) min_launch_angle = launch_angle;
 				if (launch_angle > max_launch_angle) max_launch_angle = launch_angle;
 			}

@@ -3,10 +3,10 @@ func InitializePlayer(int plr)
 {
 	// Set zoom to full map size.
 	SetPlayerZoomByViewRange(plr, 300, nil, PLRZOOM_Direct);
-	
+
 	// No FoW to see everything happening.
 	SetFoW(false, plr);
-		
+
 	// Start!
 	LaunchTest(1);
 	return;
@@ -37,7 +37,7 @@ global func Test1_Execute()
 			doTest("Exponent is %d, should be %d", GetExponent(value, base), exponent);
 		}
 	}
-	
+
 	return Evaluate();
 }
 
@@ -56,13 +56,13 @@ global func Test1_Execute()
 global func GetExponent(int value, int base)
 {
 	var exponent = 0;
-	
+
 	base = base ?? 10;
-	
+
 	for (var test = value; test%base == 0; test = test/base)
 	{
 		exponent += 1;
 	}
-	
+
 	return exponent;
 }

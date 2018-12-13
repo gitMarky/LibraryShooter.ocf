@@ -2,10 +2,10 @@ func InitializePlayer(int plr)
 {
 	// Set zoom to full map size.
 	SetPlayerZoomByViewRange(plr, 300, nil, PLRZOOM_Direct);
-	
+
 	// No FoW to see everything happening.
 	SetFoW(false, plr);
-		
+
 	// Start!
 	LaunchTest(1);
 	return;
@@ -46,16 +46,16 @@ global func Test1_Execute()
 	                 [1000, -1000], // 45°
 	                 [1000, 0],     // 90°
 	                 [1000, 1000]]; // 135°
-	                 
-	                 
+
+
 	for (var coordinates in test_data)
 	{
 		var aim_angle = CurrentTest().weapon->GetAngle(coordinates[0], coordinates[1]);
 		var fire_angle = CurrentTest().weapon->GetFireAngle(coordinates[0], coordinates[1], CurrentTest().weapon->GetFiremode());
-		
+
 		var expected_aim_angle = Angle(0, 0, coordinates[0], coordinates[1]);
 		var expected_fire_angle = Angle(0, -5, coordinates[0], coordinates[1]);
-		
+
 		doTest("Aiming angle is %d, should be %d", aim_angle, expected_aim_angle);
 		doTest("Firing angle is %d, should be %d", fire_angle, expected_fire_angle);
 	}

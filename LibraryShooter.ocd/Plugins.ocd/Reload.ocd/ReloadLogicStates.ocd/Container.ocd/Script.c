@@ -8,7 +8,7 @@ func GetReloadStartState(proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
-	
+
 	// Special situations?
 	if (ammo >= firemode->GetAmmoAmount())
 	{
@@ -29,7 +29,7 @@ func GetReloadStartState(proplist firemode)
 			return nil;
 		}
 	}
-	
+
 	// Default
 	return RELOAD_CONTAINER_PREPARE;
 }
@@ -45,7 +45,7 @@ local ReloadStateMap =
 		NextAction = "Reload_Container_EjectAmmo",
 		StartCall  = "~PlaySoundOpenAmmoContainer",
 	},
-	
+
 	Container_EjectAmmo = // Remove an ammo container from the weapon
 	{
 		Prototype  = Firearm_ReloadState,
@@ -53,7 +53,7 @@ local ReloadStateMap =
 		NextAction = "#Reload_Container_EjectAmmo_NextAction", // Evaluate function
 		EndCall    = "~PlaySoundEjectAmmo",
 	},
-	
+
 	Container_InsertAmmo = // Insert an ammo container into the weapon
 	{
 		Prototype  = Firearm_ReloadState,
@@ -61,7 +61,7 @@ local ReloadStateMap =
 		NextAction = "Reload_Container_Close",
 		EndCall    = "~PlaySoundInsertAmmo",
 	},
-	
+
 	Container_Close = 
 	{
 		Prototype  = Firearm_ReloadState,
@@ -69,7 +69,7 @@ local ReloadStateMap =
 		NextAction = "#Reload_Container_Close_NextAction", // Evaluate the function
 		StartCall  = "~PlaySoundCloseAmmoContainer",
 	},
-	
+
 	Container_ReadyWeapon = // Bring the weapon to ready stance
 	{
 		Prototype  = Firearm_ReloadState,
@@ -77,9 +77,9 @@ local ReloadStateMap =
 		NextAction = "Idle",
 		StartCall  = "~PlaySoundCloseAmmoContainer",
 	},
-	
+
 	/* --- Support adding spare ammo back to the user --- */
-	
+
 	Container_StashStart = // Take out a partially filled magazine and stash it
 	{
 		Prototype   = Firearm_ReloadState,
@@ -87,7 +87,7 @@ local ReloadStateMap =
 		NextAction  = "Reload_Container_StashFinish",
 		AbortAction = "Reload_Container_InsertAmmo", // FIXME: Violates design guideline
 	},
-	
+
 	Container_StashFinish = // Short delay and sound while stashing the magazine, merely cosmetic
 	{
 		Prototype   = Firearm_ReloadState,
@@ -96,9 +96,9 @@ local ReloadStateMap =
 		AbortAction = "Reload_Container_InsertAmmo", // FIXME: Violates design guideline
 		StartCall   = "~PlaySoundResupplyAmmo",
 	},
-	
+
 	/* --- Support for an extra ammo chamber --- */
-	
+
 	Container_LoadAmmoChamber = // Manually load a new shell to the chamber (open and close in one)
 	{
 		Prototype  = Firearm_ReloadState,
@@ -136,11 +136,11 @@ func Reload_Container_EjectAmmo_OnEnd(object user, int x, int y, proplist firemo
 	DebugLog("Reload [Ammo eject] - Finish");
 	this->~Reload_Container_EjectCasings(user, firemode);
 }
-	
+
 func Reload_Container_EjectAmmo_NextAction(object user, int x, int y, proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
-	
+
 	if (this->GetAmmo(ammo_type) > this->~AmmoChamberCapacity(ammo_type))
 	{
 		return "Reload_Container_StashStart";

@@ -54,7 +54,7 @@ local IntReloadEffect = new Effect
 		{
 			this.Target->CancelReload(this.user, this.x, this.y, this.firemode, false);
 		}
-	
+
 		// Increase progress percentage depending on the reloading delay of the firemode
 		this.percentage = BoundBy(time * 100 / this.firemode->GetReloadDelay(), 0, 100);
 		// Save the progress (i.e. the difference between the current percentage and during the last update)
@@ -79,7 +79,7 @@ local IntReloadEffect = new Effect
 			this.percent_old = this.progress;
 		}
 	},
-	
+
 	GetProgress = func ()
 	{
 		return this.percentage;

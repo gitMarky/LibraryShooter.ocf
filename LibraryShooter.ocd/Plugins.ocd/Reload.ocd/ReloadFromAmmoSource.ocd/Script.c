@@ -1,10 +1,10 @@
 /**
 	Plugin for weapons: The weapon has to reload from a specified ammo source container.
- 
+
 	It can reload only if the ammo source container has ammo.
 	It updates the weapon ammo of the weapon when reloading is finished.
 	Does not support reload animations yet.
- 
+
 	This plugin is best used to model weapons that have a magazine or clip of some kind in
 	the weapon. The {@link Plugin_Weapon_ReloadFromAmmoSource#GetAmmoReloadContainer} in this
 	case is the person, vehicle, or whatever that holds the ammo reserves.
@@ -30,7 +30,7 @@ public func OnFinishReload(object user, int x, int y, proplist firemode)
 	_inherited(user, x, y, firemode, ...);
 
 	//ReloadRefillAmmo(firemode);
-	
+
 	if (firemode.progress_bar) firemode.progress_bar->Close();
 }
 
@@ -73,7 +73,7 @@ func ReloadRefillAmmo(proplist firemode) // FIXME: Better name, make a better co
 	if (source)
 	{
 		var info = ReloadGetAmmoInfo(firemode);
-		
+
 		var ammo_requested = info.ammo_max + info.ammo_chambered - info.ammo_available; // receive only as much as you need
 
 // TODO: remove the log output once unit testing is complete
@@ -93,7 +93,7 @@ func ReloadRefillAmmo(proplist firemode) // FIXME: Better name, make a better co
 //		Log(" * ammo_spare = %d", ammo_spare);
 //		Log(" * ammo_inserted = %d", ammo_received);
 //		Log(" * ammo in source after = %d", source->GetAmmo(info.ammo_type));
-	
+
 		this->DoAmmo(info.ammo_type, ammo_received);
 	}
 }

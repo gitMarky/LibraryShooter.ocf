@@ -21,25 +21,25 @@ local IntToggleFiremode = new Effect
 			{
 				Target->ScheduleSetFiremode(next_index);
 			}
-			
+
 			return FX_Execute_Kill;
 		}
-		
+
 		delay -= 1;
 	},
-	
+
 	SetIndex = func (int index)
 	{
 		current_index = index;
 		next_index = index;
 		NextIndex();
 	},
-	
+
 	SetFiremodes = func (array firemodes)
 	{
 		modes = firemodes;
 	},
-	
+
 	SetDelay = func (int delay)
 	{
 		this.delay = delay;
@@ -59,14 +59,14 @@ local IntToggleFiremode = new Effect
 public func ToggleFiremode()
 {
 	var modes = this->GetAvailableFiremodes();
-	
+
 	if (!modes || GetLength(modes) == 0)
 	{
 		FatalError("Cannot toggle fire modes: The GetAvailableFiremodes() returns nothing or an empty array.");
 	}
-	
+
 	var toggle_effect = GetEffect("IntToggleFiremode", this);
-	
+
 	if (!toggle_effect)
 	{
 		toggle_effect = CreateEffect(IntToggleFiremode, 1, 1);

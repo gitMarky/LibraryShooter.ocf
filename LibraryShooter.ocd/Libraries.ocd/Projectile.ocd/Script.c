@@ -49,7 +49,7 @@ local ActMap = {
 		FacetBase = 1,
 		StartCall="Travelling",
 	},
-	
+
 	TravelBallistic = {
 		Prototype = Action,
 		Name = "TravelBallistic",
@@ -132,7 +132,7 @@ public func IsHitscan()
 public func Shooter(object shooter)
 {
 	ProhibitedWhileLaunched();
-	
+
 	if (shooter == nil)
 	{
 		FatalError(Format("Parameter 'shooter' expects an object, got nil"));
@@ -164,7 +164,7 @@ public func GetShooter()
 public func Weapon(value)
 {
 	ProhibitedWhileLaunched();
-	
+
 	if (GetType(value) == C4V_Def)
 	{
 		weapon_ID = value;
@@ -203,17 +203,17 @@ public func GetWeaponID()
 public func Range(int value)
 {
 	ProhibitedWhileLaunched();
-	
+
 	if (value < 0)
 	{
 		FatalError(Format("Cannot set negative range - the function received %d", value));
 	}
-	
+
 	if (GetLifetime() > 0)
 	{
 		FatalError(Format("Cannot set range, because a lifetime of %d was specified already", GetLifetime()));
 	}
-	
+
 	range = value;
 	return this;
 }
@@ -240,12 +240,12 @@ public func GetRange()
 public func Lifetime(int value)
 {
 	ProhibitedWhileLaunched();
-	
+
 	if (value <= 0)
 	{
 		FatalError(Format("Must sef positive lifetime - the function received %d", value));
 	}
-	
+
 	if (GetRange() > 0)
 	{
 		FatalError(Format("Cannot set lifetime, because a range of %d was specified already", GetRange()));
@@ -277,9 +277,9 @@ public func GetLifetime()
 public func DamageAmount(int value)
 {
 	ProhibitedWhileLaunched();
-	
+
 	// may receive negative damage! healing projectiles :D
-	
+
 	damage = value;
 	return this;
 }
@@ -306,7 +306,7 @@ public func GetDamageAmount()
 public func DamageType(int value)
 {
 	ProhibitedWhileLaunched();
-	
+
 	damage_type = value;
 	return this;
 }
@@ -333,7 +333,7 @@ public func GetDamageType()
 public func Velocity(int value)
 {
 	ProhibitedWhileLaunched();
-		
+
 	if (value < 0)
 	{
 		FatalError(Format("Cannot set negative velocity - the function received %d", value));
@@ -353,7 +353,7 @@ public func Velocity(int value)
 public func HitScan()
 {
 	ProhibitedWhileLaunched();
-	
+
 	instant = true;
 	return this;
 }
@@ -370,12 +370,12 @@ public func HitScan()
 public func Trail(int width, int length, string gfx, int speed)
 {
 	ProhibitedWhileLaunched();
-	
+
 	if (width < 0 || length < 0)
 	{
 		FatalError(Format("The trail dimensions must be positive. Got: %d/%d", width, length));
 	}
-	
+
 	trail_width = width;
 	trail_length = length;
 	return this;
@@ -395,14 +395,14 @@ func Initialize()
 func Hit(int xdir, int ydir)
 {
 	var self = this;
-	
+
 	_inherited(xdir, ydir, ...);
-	
+
 	if (self && !instant)
 	{
 		SetXDir(0);
 		SetYDir(0);
-	
+
 		if (nextX)
 		{
 			var x = GetX(), y = GetY();
@@ -420,7 +420,7 @@ func Hit(int xdir, int ydir)
 			}
 		}
 
-		
+
 		if (trail)
 		{
 			trail->ProjectileUpdate();
@@ -429,11 +429,11 @@ func Hit(int xdir, int ydir)
 
 		DoHitCheckCall();
 	}
-	
+
 	if(self)
 	{	
 		self->OnHitLandscape();
-		
+
 		if (self && self->ShouldRemoveOnHit()) RemoveObject();
 	}
 }
@@ -472,9 +472,9 @@ public func Launch(int angle, deviation)
 	RemoveOnHit();
 
 	SetController(user->GetController());
-	
+
 	var precision = 1000;
-	
+
 	// get angle and velocity
 	angle = GetLaunchAngle(angle, precision, deviation);
 	velocity_x = +Sin(angle, velocity, precision);
@@ -492,7 +492,7 @@ public func Launch(int angle, deviation)
 	{
 		LaunchAsProjectile(angle, precision);
 	}
-	
+
 	if (self)
 	{
 		this->OnLaunched();
@@ -555,7 +555,7 @@ func LaunchHitscan(int angle, int precision)
 	}
 
 	//-- actual hit detection
-	
+
 	// we are at the end position now, check targets
 	DoHitCheckCall();
 
@@ -681,16 +681,16 @@ func FxPositionCheckTimer(target, effect, time)
 public func Travelling()
 {
 	ControlSpeed();
-	
+
 	DrawColorModulation();
-	
+
 	if (trail)
 	{
 		trail->ProjectileUpdate();
 	}
-	
+
 	this->OnTravelling();
-	
+
 	var self = this;
 	DoHitCheckCall();
 	if (self && GetLifetime() > 0 && GetActTime() >= GetLifetime()) Remove();
@@ -703,14 +703,14 @@ func ControlSpeed()
 		SetXDir(velocity_x);
 		SetYDir(velocity_y);
 	}
-	
+
 	if (!rotation_by_rdir) SetR(Angle(0, 0, GetXDir(), GetYDir()));
 }
 
 func DrawColorModulation()
 {
 	var color = ProjectileColor(GetActTime());
-	
+
 	if (color != nil)
 	{
 		SetClrModulation(color);
@@ -1051,7 +1051,7 @@ func Hit()
 							),
 							Find_Func("CheckEnemy",this())
 							);
- 
+
 	for(var pTarget in objs) {
 		BulletStrike(pTarget);
 	}

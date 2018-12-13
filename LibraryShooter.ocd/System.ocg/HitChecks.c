@@ -1,7 +1,7 @@
 /**
 	HitCheck.c
 	Authors: Newton, Boni
-		
+
 	Effect for hit checking.
 	Facilitates any hit check of a projectile. The Projectile hits anything
 	which is either alive or returns for IsProjectileTarget(object projectile,
@@ -31,7 +31,7 @@ global func UpdateHitCheckCoordinates(int x_start, int y_start, int x_end, int y
 
 	var e = GetHitCheck();
 	if (!e) return;
-	
+
 	e.oldx = x_start;
 	e.oldy = y_start;
 	e.newx = x_end;
@@ -42,7 +42,7 @@ global func UpdateHitCheckCoordinates(int x_start, int y_start, int x_end, int y
 global func ExcludedFromHitCheckCall()
 {
 	AssertObjectContext("ExcludedFromHitCheckCall()");
-	
+
 	var e = GetHitCheck();
 	if (!e) return [];
 	return e.excluded;
@@ -52,7 +52,7 @@ global func ExcludedFromHitCheckCall()
 global func SetHitCheckCallCounter(int value)
 {
 	AssertObjectContext("ResetHitCheckCallCounter()");
-	
+
 	var e = GetHitCheck();
 	if (!e) return;
 	e.registered_hit = value ?? -1;
@@ -69,12 +69,12 @@ global func GetHitCheck()
 global func FxHitCheck2Start(object target, proplist fx, int temp, object by_obj, bool never_shooter, bool limit_velocity)
 {
 	if (temp) return;
-	
+
 	fx.startx = target->GetX();
 	fx.starty = target->GetY();
 	fx.oldx = fx.startx;
 	fx.oldy = fx.starty;
-	
+
 	if (!by_obj)
 		by_obj = target;
 	if (by_obj->Contained())
@@ -86,15 +86,15 @@ global func FxHitCheck2Start(object target, proplist fx, int temp, object by_obj
 	fx.limit_velocity = limit_velocity;
 	fx.registered_hit = -1;
 	fx.excluded = [];
-	
+
 	// C4D_Object has a hitcheck too -> change to vehicle to supress that.
 	if (target->GetCategory() & C4D_Object)
 		target->SetCategory((target->GetCategory() - C4D_Object) | C4D_Vehicle);
-	
+
 	//fx.range = target.bulletRange;
-	
+
 	EffectCall(target, fx, "DoCheck");
-	
+
 	return;
 }
 
@@ -102,7 +102,7 @@ global func FxHitCheck2Stop(object target, proplist fx, int reason, bool temp)
 {
 	if (temp)
 		return;
-	
+
 	target->SetCategory(target->GetID()->GetCategory());
 	return;
 }
@@ -125,13 +125,13 @@ global func FxHitCheck2DoCheck(object target, proplist fx, int timer)
 	fx.oldx = newx;
 	fx.oldy = newy;
 	var dist = Distance(oldx, oldy, newx, newy);
-	
+
 	var shooter = fx.shooter;
 	var live = fx.live;
-	
+
 	if (live && !fx.never_shooter)
 		shooter = target;
-	
+
 	if (!fx.limit_velocity || (dist <= Max(1, Max(Abs(target->GetXDir()), Abs(target->GetYDir()))) * 2))
 	{
 		// We search for objects along the line on which we moved since the last check
@@ -171,9 +171,9 @@ global func FxHitCheck2DoCheck(object target, proplist fx, int timer)
 			}
 		}
 	}
-	
+
 	if (target) target->~OnHitCheckCall(fx);
-	
+
 	return;
 }
 
@@ -207,10 +207,10 @@ global func FxHitCheck2Timer(object target, proplist fx, int time)
 	// The effect will be deleted right after this.
 	if (!target)
 		return -1;
-		
+
 	//if(effect.range - 1 == time)
 	//	return -1;
-	
+
 	fx.x = target->GetX();
 	fx.y = target->GetY();
 	var live = fx.live;

@@ -1,6 +1,6 @@
 /**
 	Allows fire mode selection via the object interaction menu.
- 
+
 	{@c public func HasInteractionMenu()} must be implemented in order for this to work.
  */
 
@@ -37,7 +37,7 @@ public func GetGUIFiremodeInactiveColor(){ return "bbbbbb";}
 public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 {
 	var menu_entries = [];
-	
+
 	// default design of a control menu item
 	var custom_entry = 
 	{
@@ -46,21 +46,21 @@ public func GetGUIFiremodeMenuEntries(object crew, object weapon)
 		image = {Right = "2em"},
 		text = {Left = "2em"}
 	};
-	
-		
+
+
 	// Add info message for every defender
 	var modes = weapon->~GetAvailableFiremodes();
-	
+
 	if (!modes) return menu_entries;
-	
+
 	var selected = weapon->~GetFiremode();
-	
+
 	for (var firemode in modes)
 	{
 		var firemode_symbol = firemode.icon ?? weapon->GetID();
-		
+
 		var text_color;
-		
+
 		if (firemode == selected)
 		{
 			text_color = GetGUIFiremodeActiveColor();
@@ -100,7 +100,7 @@ public func OnGUIChangeFiremode(id symbol, proplist action, object crew)
 public func SetFiremode(int number, bool force)
 {
 	var return_value = _inherited(number, force, ...);
-	
+
 	if (Contained())
 	{
 		Contained()->UpdateInteractionMenus();

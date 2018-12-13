@@ -3,20 +3,20 @@
 
 	@author Marky
  */
- 
- 
+
+
 /* --- Global functions --- */
 
 /**
 	Defines a range for random values that can be sampled with
 	{@link Library_Random#SampleValue}.
-	
+
 	@par min_value The lower end of the random value range.
 	@par max_value The upper end of the random value range.
 	@par steps [optional] The steps in which the values can occur.
 	           For example, {@code RND_Random(2, 10, 2)} returns
 	           values from [2, 4, 6, 8, 10].
-	           
+
 	@return int The sampled value.
  */
 global func RND_Random(int min_value, int max_value, int steps)
@@ -49,7 +49,7 @@ func SampleValue(value)
 		var min = value[0];
 		var max = value[1];
 		var step = value[2] ?? 1;
-		
+
 		if (step == nil || step == 1)
 		{
 			return RandomX(min, max);

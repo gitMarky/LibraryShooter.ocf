@@ -7,7 +7,7 @@ func GetReloadStartState(proplist firemode)
 {
 	var ammo_type = firemode->GetAmmoID();
 	var ammo = this->GetAmmo(ammo_type);
-	
+
 	// Special situations?
 	if (ammo >= firemode->GetAmmoAmount())
 	{
@@ -28,7 +28,7 @@ func GetReloadStartState(proplist firemode)
 			return nil;
 		}
 	}
-	
+
 	// Default
 	return "Reload_Magazine_Prepare";
 }
@@ -53,7 +53,7 @@ local ReloadStateMap =
 		AbortAction = "Reload_Magazine_Insert", // FIXME: Violates design guideline
 		StartCall   = "~PlaySoundEjectMagazine",
 	},
-	
+
 	Magazine_Insert = // Insert a new mag into the weapon
 	{
 		Prototype  = Firearm_ReloadState,
@@ -138,7 +138,7 @@ func Reload_Magazine_Prepare_OnAbort(object user, int x, int y, proplist firemod
 func Reload_Magazine_Drop_OnStart(object user, int x, int y, proplist firemode)
 {
 	DebugLog("Reload [Mag out, drop it] - Start");
-	
+
 	// Lose current ammo
 	this->ReloadRemoveAmmo(firemode, false);
 }
@@ -183,7 +183,7 @@ func Reload_Magazine_Insert_NextAction(object user, int x, int y, proplist firem
 func Reload_Magazine_Insert_OnAbort(object user, int x, int y, proplist firemode)
 {
 	DebugLog("Reload [Mag insert] - Cancel");
-	
+
 	// Stay in the same state, be fair and keep magazine ;)
 }
 

@@ -118,7 +118,7 @@ func Reload_Single_InsertAmmo_OnStart(object user, int x, int y, proplist firemo
 	// as a delay for getting the next shell ready - if that fails, start from
 	// the beginning
 	DebugLog("Reload [Mag insert] - Start");
-	
+
 	var is_done = false;
 	var source = this->GetAmmoReloadContainer();
 	if (source)
@@ -127,7 +127,7 @@ func Reload_Single_InsertAmmo_OnStart(object user, int x, int y, proplist firemo
 		var ammo_requested = BoundBy(info.ammo_max + info.ammo_chambered - info.ammo_available, 0, firemode.ammo_usage ?? 1);
 		var ammo_received = Abs(source->DoAmmo(firemode->GetAmmoID(), -ammo_requested)); // see how much you can get
 		var ammo_spare = (info.ammo_available + ammo_received) % (firemode.ammo_usage ?? 1); // get ammo only in increments of ammo_usage
-		
+
 		source->DoAmmo(info.ammo_type, ammo_spare); // give back the unnecessary ammo
 		if (ammo_received > 0)
 		{
@@ -138,7 +138,7 @@ func Reload_Single_InsertAmmo_OnStart(object user, int x, int y, proplist firemo
 		{
 			is_done = true;
 		}
-		
+
 		// Finish condition?
 		var is_full = this->GetAmmo(info.ammo_type) >= (info.ammo_max + info.ammo_chambered);
 		var no_ammo = source->GetAmmo(info.ammo_type) == 0;
@@ -151,7 +151,7 @@ func Reload_Single_InsertAmmo_OnStart(object user, int x, int y, proplist firemo
 	{
 		is_done = true;
 	}
-	
+
 	this.firearm_reload.data_store.single_insert_ammo_is_done = is_done;
 }
 
@@ -232,7 +232,7 @@ func CloseChamber(object user, int x, int y, proplist firemode)
 		var info = this->ReloadGetAmmoInfo(firemode);
 		ammo_requested = BoundBy(info.ammo_max + info.ammo_chambered - info.ammo_available, 0, firemode.ammo_usage ?? 1);
 	}
-	
+
 	if (ammo_requested > 0)
 	{
 		return "Reload_Single_InsertAmmo";

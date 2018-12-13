@@ -24,12 +24,12 @@ func FxIntAimRestarterTimer(object target, proplist effect, int time)
 	var weapon = GetHandItem(0);
 	if (!weapon) return;
 	if (weapon->~RejectUse(this)) return;
-	
+
 	aim_set = weapon.animation_set;
 	if (!aim_set) return;
-	
+
 	aim_weapon = weapon;
-	
+
 	if (aim_set["AnimationAim"] != nil)
 	{
 		if (aim_set["AimMode"] == AIM_Position)
@@ -98,7 +98,7 @@ func FxIntAimStop(object target, proplist effect, int reason, int temp)
 		e.Interval = 1;
 		SetPlayerControlEnabled(target->GetOwner(), CON_CaedesAimingCursor, false);
 	}
-	
+
 	if (effect.artificial)
 	{
 		StopAnimation(GetRootAnimation(10));
@@ -119,9 +119,9 @@ func FxIntAimTimer(object target, proplist effect, int time)
 		if (aim_weapon->Contained() != target) return FX_Execute_Kill;
 		if (aim_weapon->RejectUse(target)) return FX_Execute_Kill;
 	}
-	
+
 	if (!aim_set) return;
-	
+
 	var angle, delta_angle, length;
 	var speed = aim_set["AimSpeed"];
 	if (speed == nil)

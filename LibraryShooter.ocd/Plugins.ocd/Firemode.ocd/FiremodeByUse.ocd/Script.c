@@ -31,7 +31,7 @@ public func OnPressUseAlt(object user, int x, int y)
 
 	user->StartAim(this);
 	this->ControlUseHolding(user, x, y);
-	
+
 	_inherited(...);
 }
 

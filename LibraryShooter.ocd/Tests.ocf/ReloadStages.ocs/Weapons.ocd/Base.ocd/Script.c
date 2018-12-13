@@ -21,12 +21,12 @@ public func Initialize()
 	_inherited(...);
 	this->ClearFiremodes();
 	var firemode_default = new /*firemode_default*/ Library_Firearm_Firemode {};
-	
+
 	firemode_default->SetAmmoID(Dummy)
 	                ->SetName("Standard")
 	                ->SetRecoveryDelay(10)
 	                ->SetAmmoAmount(10);
-	
+
 	this->AddFiremode(firemode_default);
 	this->SetFiremode(firemode_default->GetIndex());
 }
@@ -60,11 +60,11 @@ local Collectible = 1;
 local firemode_default = 
 {
 	Prototype = Library_Firearm_Firemode,
-	
+
 	name = 				"Standard", // string - menu caption
 	icon = 				nil, // id - menu icon
 	condition = 		nil, // string - callback for a condition
-	
+
 	ammo_id = 			Dummy,
 	ammo_usage =          1, // int - this many units of ammo
 	ammo_rate =           1, // int - per this many shots fired

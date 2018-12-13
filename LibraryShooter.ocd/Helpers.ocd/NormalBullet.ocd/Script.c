@@ -21,12 +21,12 @@ func Initialize()
 func Hit()
 {
 	var self = this;
-	
+
 	if(!instant)
 	{
 		SetXDir(0);
 		SetYDir(0);
-	
+
 		if(nextX)
 		{
 			var x = GetX(), y = GetY();
@@ -45,15 +45,15 @@ func Hit()
 				}
 			}
 		}
-			
+
 		DoHitCheckCall();
 	}
-	
+
 	if(self)
 	{
 		Sound("BulletHitGround?");
 		CreateImpactEffect(Max(5, damage*2/3));
-	  	
+
 	  	RemoveObject();
 	}
 }
@@ -72,27 +72,27 @@ public func Fire(object shooter, int angle, int dev, int dist, int dmg, id weapo
 	damage = dmg;
 	deviation = dev;
 	bulletRange = range;
-	
+
 	instant = true;
-		
+
 	SetController(shooter->GetController());
 
 	angle *= 100;
 	angle += RandomX(-deviation, deviation);
-	
+
 	// set position to final point
 	var x_p = GetX();
 	var y_p = GetY();
-	
+
 	var t_x = GetX() + Sin(angle, bulletRange, 100);
 	var t_y = GetY() - Cos(angle, bulletRange, 100);
-	
+
 	var coords = PathFree2(x_p, y_p, t_x, t_y);
-	
+
 	if(!coords) // path is free
 		SetPosition(t_x, t_y);
 	else SetPosition(coords[0], coords[1]);
-		
+
 	// we are at the end position now, check targets
 	var hit_object = false;
 	for (var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY(), 0, 0),
@@ -112,13 +112,13 @@ public func Fire(object shooter, int angle, int dev, int dist, int dmg, id weapo
 			break;
 		}
 	}
-	
+
 	// at end position now
 	for(var obj in FindObjects(Find_OnLine(x_p - GetX(), y_p - GetY()), Find_Func("IsProjectileInteractionTarget")))
 	{
 		obj->~OnProjectileInteraction(x_p, y_p, angle, shooter, damage);
 	}
-	
+
 	if(!shooter.silencer)
 	{
 		var t = CreateObject(Bullet_TrailEffect, 0, 0, NO_OWNER);
@@ -126,12 +126,12 @@ public func Fire(object shooter, int angle, int dev, int dist, int dmg, id weapo
 		t->FadeOut();
 		t->SetObjectBlitMode(GFX_BLIT_Additive);
 	}
-	
+
 	var self = this;
 	if(!hit_object)
 	{
 		var hit = GBackSolid(Sin(angle, 2, 100), -Cos(angle, 2, 100));
-		
+
 		if(hit)
 			Hit();
 	}
@@ -167,10 +167,10 @@ public func HitObject(object obj, bool remove, proplist effect)
 		damage = (3 * damage) / 2;
 		this.crit = true;
 	}
-	
+
 	//DoDmg(damage, nil, obj, nil, nil, this, from_ID);
 	CreateImpactEffect(Max(5, damage*2/3));
-	
+
 	if (remove) RemoveObject();
 	if (effect) effect.registered_hit = FrameCounter();
 }

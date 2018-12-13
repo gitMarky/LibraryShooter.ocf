@@ -2,9 +2,9 @@
 	Draws a trail to any object. That object should fly straight or so fast
 	that it looks like it because the trail itself is only drawn straight.
 	Any projectile can use the trail by calling (after creating it):
-	
+
 	Set(int width, int length, object projectile)
-	
+
 	while width is the width of the trail, length the length of the trail and
 	projectile itself. The trail will be removed when the projectile is gone.
 	The color is always a light-grey. However each frame, ~TrailColor(int time)
@@ -50,9 +50,9 @@ local fade_speed_add = 0;
 public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_dir, int y_dir, int x_end, int y_end)
 {
 	projectile = shot;
-	
+
 	// collect data, set local variables
-	
+
 	if (projectile != nil)
 	{
 		if (x_dir == nil) x_dir = projectile->GetXDir(precision);
@@ -61,7 +61,7 @@ public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_
 		if (y_pos == nil) y_pos = projectile->GetY();
 		if (x_end == nil) x_end = projectile->GetX();
 		if (y_end == nil) y_end = projectile->GetY();
-		
+
 		AddEffect("IntProjectile", this, 1, 1, this);
 	}
 	else
@@ -69,20 +69,20 @@ public func Set(object shot, int width, int length, int x_pos, int y_pos, int x_
 		if (x_end == nil) x_end = GetX();
 		if (y_end == nil) y_end = GetY();
 	}
-	
+
 	if (x_pos == nil) x_pos = GetX();
 	if (y_pos == nil) y_pos = GetY();
-	
+
 	w = precision * width / ActMap.Travel.Wdt;
 	l = precision * length / ActMap.Travel.Hgt;
-	
+
 	r = Angle(0, 0, x_dir, y_dir);
 	x = GetX();
 	y = GetY();
-	
+
 	move_speed = Sqrt(x_dir * x_dir/ precision + y_dir * y_dir / precision);
 	SetFadeSpeed(fade_speed_factor);
-	
+
 	// do the magic!
 
 	SetPosition(x_end, y_end);
@@ -114,16 +114,16 @@ public func Travelling()
 {
 	// The shot is gone -> remove
 	if (!do_fade && !projectile) Remove();
-	
+
 	// on the borders
 	if (GetX() <= 0 && GetXDir() < 0 || GetX() >= LandscapeWidth() && GetXDir() > 0 || GetY() <= 0 && GetYDir() < 0 || GetY() >= LandscapeHeight() && GetYDir() > 0)
 		Remove();
-		
+
 	DrawColorModulation();	
 	DrawTransform();
-	
+
 	// Destroy
-	
+
 	if (l == 0)
 		RemoveObject();
 }
@@ -134,7 +134,7 @@ public func ProjectileUpdate()
 	{
 		SetPosition(projectile->GetX(), projectile->GetY());
 		r = projectile->GetR();
-		
+
 	}
 }
 
@@ -146,7 +146,7 @@ func Hit()
 func Remove()
 {
 	l = Min(l, GetRelativeLength());
-	
+
 	do_fade = true;
 	projectile = nil;
 	move_speed = 0;
@@ -162,10 +162,10 @@ func GetRelativeLength()
 func DrawColorModulation()
 {
 	var trail_color;
-	
+
 	if (projectile != nil) trail_color = projectile->~TrailColor(GetActTime());
 	if (trail_color == nil) trail_color = TrailColor(GetActTime());
-	
+
 	if (trail_color != nil)
 	{
 		SetClrModulation(trail_color);
@@ -175,10 +175,10 @@ func DrawColorModulation()
 func DrawTransform()
 {
 	var relative_length = GetRelativeLength();
-	
+
 	// stretch <->
 	var h = Max(0, Min(l + move_speed - fade_speed, relative_length));
-	
+
 	if (do_fade)
 	{
 		l = Min(l, h);
@@ -187,20 +187,20 @@ func DrawTransform()
 	{
 		l = Max(l, h);
 	}
-	
+
 	var fsin = -Sin(r, precision), fcos = Cos(r, precision);
-	
+
 	var xoff = -(ActMap.Travel.Wdt * w / precision) / 2;
 	var yoff = 0;
-	
+
 	var width = +fcos * w / precision;
 	var height = +fcos * h / precision;
 	var xskew = +fsin * h / precision;
 	var yskew = -fsin * w / precision;
-	
+
 	var xadjust = +fcos * xoff + fsin * yoff;
 	var yadjust = -fsin * xoff + fcos * yoff;
-	
+
 	// set matrix values
 	SetObjDrawTransform(width, xskew, xadjust, yskew, height, yadjust);
 }
@@ -254,7 +254,7 @@ func FxIntProjectileTimer(object target, proplist effect, int time)
 	{
 		FatalError("This should be used internally only, target and calling object are different.");
 	}
-	
+
 	ProjectileUpdate();
 }
 

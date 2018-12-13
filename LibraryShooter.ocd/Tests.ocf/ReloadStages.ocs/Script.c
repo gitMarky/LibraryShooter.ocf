@@ -2,10 +2,10 @@ func InitializePlayer(int plr)
 {
 	// Set zoom to full map size.
 	SetPlayerZoomByViewRange(plr, 300, nil, PLRZOOM_Direct);
-	
+
 	// No FoW to see everything happening.
 	SetFoW(false, plr);
-		
+
 	// Start!
 	LaunchTest(1);
 	return;
@@ -32,7 +32,7 @@ static const IntReloadTestControl = new IntTestControl
 	{
 		return !!Test_Data(this->GetIndex());
 	},
-	
+
 	ExecuteTest = func ()
 	{
 		if (this.initialized)
@@ -63,7 +63,7 @@ global func Test_Init()
 {
 	var test = CurrentTest();
 	var data = Test_Data(test->GetIndex());
-	
+
 	// Basic initialization
 
 	Log("%s [%s]", data.Title, data.Item.Description);
@@ -73,16 +73,16 @@ global func Test_Init()
 	test.weapon = test.user->CreateContents(data.Item);
 	test.initialized = true;
 	test.states = [];
-	
+
 	// Specifics
-	
+
 	SetupAmmo(data.User_Ammo.Initial, data.Weapon_Ammo.Initial);
-	
+
 	if (data.State_Initial)
 	{
 		test.weapon->SetReloadState(test.weapon->GetFiremode(), data.State_Initial);
 	}
-	
+
 	if (data.AmmoChamberEmpty || data.Weapon_Ammo.Initial == 0)
 	{
 		test.weapon->~AmmoChamberEject(Dummy);
@@ -106,7 +106,7 @@ global func Test_ReloadSequence()
 {
 	var test = CurrentTest();
 	var data = Test_Data(test->GetIndex());
-	
+
 	doTestTransitions(data.States); // Check the transitions
 	doTestAmmo("Final", data.User_Ammo.Final, data.Weapon_Ammo.Final); // Check the remaining ammo
 	return Evaluate();

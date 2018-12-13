@@ -21,7 +21,7 @@ func ProjectileColor(int time)
 {
 	var progress = 100 * time / lifetime;
 	var value = Max(0, 255 - progress * 2);
-	
+
 	return RGBa(255, value, value, value);
 }
 
@@ -29,6 +29,6 @@ func TrailColor(int time)
 {
 	var progress = 100 * time / lifetime;
 	var value = Max(0, 255 - progress * 2);
-	
+
 	return RGBa(255, value, value, value);
 }
