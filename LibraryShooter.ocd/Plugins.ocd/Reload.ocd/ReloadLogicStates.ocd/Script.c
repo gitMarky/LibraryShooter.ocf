@@ -277,6 +277,11 @@ local IntReloadStagesEffect = new Effect
 			this.Target->OnProgressReload(this.user, this.x, this.y, this.firemode, this.percentage, this.progress);
 			this.percent_old = this.progress;
 		}
+		
+		// Generic Callback
+		{
+			this.Target->~OnReloading(this.user, this.x, this.y, this.firemode, state);
+		}
 
 		// Check if there should be an event callback
 		if (state.Event > 0 && time > state.Event && !this.state_event)
