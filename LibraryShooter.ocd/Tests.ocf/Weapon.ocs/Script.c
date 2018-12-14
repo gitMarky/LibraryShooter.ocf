@@ -1,3 +1,12 @@
+
+func Initialize()
+{
+	ClearFreeRect(0, 0, LandscapeWidth(), 180);
+	DrawMaterialQuad("Brick", 0, 160, LandscapeWidth(), 160, LandscapeWidth(), LandscapeHeight(), 0, LandscapeHeight());
+	DrawMaterialQuad("Brick", 600, 160, LandscapeWidth(), 160, LandscapeWidth(), 0, 600, 0);
+	DrawMaterialQuad("Brick", 0, 160, 100, 160, 100, 0, 0, 0);
+}
+
 func InitializePlayer(int plr)
 {
 	// Set zoom to full map size.
@@ -30,8 +39,6 @@ global func Test_Init()
 
 
 // --------------------------------------------------------------------------------------------------------
-
-
 global func Test1_OnStart()
 {
 	Log("Test for Weapon: Aiming works correctly");
@@ -61,4 +68,43 @@ global func Test1_Execute()
 	}
 
 	return Evaluate();
+}
+
+
+// --------------------------------------------------------------------------------------------------------
+global func Test2_OnStart()
+{
+	Log("Test for Weapon: Fire a bullet in single fire mode");
+	Test_Init();
+	return true;
+}
+
+global func Test2_Execute()
+{
+	if (CurrentTest().test2_started)
+	{
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test2_started = true;
+		var delay = 10;
+		var user = CurrentTest().user;
+		var weapon = CurrentTest().weapon;
+		var aim_x = 1000;
+		var aim_y = -50;
+		PressControlUse(delay, user, weapon, aim_x, aim_y);
+		return Wait(delay + 2);
+	}
+}
+
+
+global func PressControlUse(int hold_frames, object user, object weapon, int aim_x, int aim_y)
+{
+	ScheduleCall(weapon, weapon.ControlUseStart, 1, nil, user, aim_x, aim_y);
+	for (var delay = 2; delay < hold_frames; ++delay)
+	{
+		ScheduleCall(weapon, weapon.ControlUseHolding, delay, nil, user, aim_x, aim_y);
+	}
+	ScheduleCall(weapon, weapon.ControlUseStop, hold_frames, nil, user, aim_x, aim_y);
 }

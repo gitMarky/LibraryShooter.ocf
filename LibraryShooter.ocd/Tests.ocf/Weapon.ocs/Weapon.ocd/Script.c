@@ -1,12 +1,9 @@
 #include Library_Firearm
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// properties
+/* --- Properties --- */
 
 local Name = "$Name$";
 local Description = "$Description$";
-
 
 public func GetCarryMode(object user) {    return CARRY_Hand; }
 public func GetCarrySpecial(object user) { return "pos_hand2"; }
@@ -16,66 +13,43 @@ public func GetCarryTransform()
 	return Trans_Rotate(90, 1, 0, 0);
 }
 
-
 public func Initialize()
 {
 	_inherited(...);
 	ClearFiremodes();
-	firemode_default = new firemode_default {};
+	var firemode_default = DefaultFiremode();
 	AddFiremode(firemode_default);
 	SetFiremode(firemode_default->GetIndex());
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Fire modes
+/* --- Fire modes --- */
 
 local Collectible = 1;
 
-local firemode_default = 
+func DefaultFiremode()
 {
-	Prototype = Library_Firearm_Firemode,
+	var mode = new Library_Firearm_Firemode {};
 
-	name = 				"Standard", // string - menu caption
-	icon = 				nil, // id - menu icon
-	condition = 		nil, // string - callback for a condition
+	mode->SetName("Standard");
+	mode->SetAmmoID(Dummy);
+	mode->SetRecoveryDelay(50);
+	mode->SetReloadDelay(100);
+	mode->SetMode(WEAPON_FM_Single);
+	mode->SetProjectileID(Bullet);
+	mode->SetProjectileSpeed(50);
+	mode->SetProjectileRange(1000);
+	mode->SetProjectileDistance(10);
+	mode->SetYOffset(-2);
+	mode->SetProjectileSpread(0);
 
-	ammo_id = 			Dummy,
-	ammo_usage =          1, // int - this many units of ammo
-	ammo_rate =           1, // int - per this many shots fired
-
-	delay_charge  =       0, // int, frames - time that the button must be held before the shot is fired
-	delay_recover =      10, // int, frames - time between consecutive shots
-	delay_cooldown =      0, // int, frames - time of cooldown after the last shot is fired
-	delay_reload =	    100, // int, frames - time to reload
-
-	mode = WEAPON_FM_Single,
-
-	damage =              0, 
-	damage_type = 		nil,	
-
-	projectile_id = 	Bullet,
-	projectile_speed = 	1000,
-	projectile_range =  1000,
-	projectile_distance = 10,
-	projectile_offset_y = -10,
-	projectile_number =    1,
-	projectile_spread = {angle = 0, precision = 100}, // default inaccuracy of a single projectile
-
-	spread = {angle = 0, precision = 100},			  // inaccuracy from prolonged firing
-
-	burst = 0, // number of projectiles fired in a burst
-};
-
+	return mode;
+}
 
 local weapon_properties = 
 {
 		gfx_distance = 6,
 		gfx_offset_y = 0,
 };
-
-
 
 func Hit()
 {
@@ -92,14 +66,20 @@ public func GetAmmoContainer()
 	return Contained();
 }
 
+public func Setting_AimOnUseStart()
+{
+	return this.AimOnUseStart;
+}
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Effects
+local AimOnUseStart = false;
+
+/* --- Effects --- */
 
 
 public func FireSound(object user, proplist firemode)
 {
+	// Gun blast sound.
+	Sound("Objects::Weapons::Blunderbuss::GunShoot?");
 }
 
 public func OnFireProjectile(object user, object projectile, proplist firemode)
@@ -108,4 +88,12 @@ public func OnFireProjectile(object user, object projectile, proplist firemode)
 
 public func FireEffect(object user, int angle, proplist firemode)
 {
+	// Muzzle Flash & gun smoke.
+	var off_x = +Sin(angle, firemode->GetProjectileDistance() / 2);
+	var off_y = -Cos(angle, firemode->GetProjectileDistance() / 2) +  + firemode->GetYOffset();
+	var x = Sin(angle, 20);
+	var y = -Cos(angle, 20);
+	CreateParticle("Smoke", off_x, off_y, PV_Random(x - 20, x + 20), PV_Random(y - 20, y + 20), PV_Random(40, 60), Particles_Smoke(), 20);
+	user->CreateMuzzleFlash(off_x, off_y, angle, 20);
+	CreateParticle("Flash", 0, 0, 0, 0, 8, Particles_Flash());
 }
