@@ -173,13 +173,8 @@ func Initialize()
  */
 public func ControlUseStart(object user, int x, int y)
 {
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
-
+	AssertNotNil(user);
 	this->OnPressUse(user, x, y);
-
 	return true;
 }
 
@@ -196,13 +191,8 @@ public func ControlUseStart(object user, int x, int y)
  */
 public func ControlUseAltStart(object user, int x, int y)
 {
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
-
+	AssertNotNil(user);
 	this->OnPressUseAlt(user, x, y);
-
 	return true;
 }
 
@@ -221,9 +211,13 @@ public func ControlUseAltStart(object user, int x, int y)
 public func ControlUseHolding(object user, int x, int y)
 {
 	if (this->OnHoldingUse(user, x, y))
+	{
 		return true;
-
-	return ControlFireHolding(user, x, y);
+	}
+	else
+	{
+		return ControlFireHolding(user, x, y);
+	}
 }
 
 
@@ -241,10 +235,7 @@ public func ControlUseHolding(object user, int x, int y)
  */
 public func ControlFireHolding(object user, int x, int y)
 {
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
+	AssertNotNil(user);
 
 	if (this->~RejectUse(user))
 	{
@@ -253,10 +244,11 @@ public func ControlFireHolding(object user, int x, int y)
 	}
 
 	if (Setting_AimOnUseStart() && !user->~IsAiming())
+	{
 		user->~StartAim(this);
+	}
 
 	DoFireCycle(user, x, y, true);
-
 	return true;
 }
 
@@ -274,7 +266,6 @@ public func ControlFireHolding(object user, int x, int y)
 public func ControlUseAltHolding(object user, int x, int y)
 {
 	this->OnHoldingUseAlt(user, x, y);
-
 	return true;
 }
 
@@ -297,16 +288,17 @@ public func ControlUseAltHolding(object user, int x, int y)
  */
 public func ControlUseStop(object user, int x, int y)
 {
-	if(user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
+	AssertNotNil(user);
 
 	if (this->OnUseStop(user, x, y))
+	{
 		return true;
+	}
 
 	if (FireOnStopping() || Setting_AimOnUseStart())
+	{
 		user->~StopAim();
+	}
 
 	if (FireOnHolding())
 	{
@@ -338,7 +330,6 @@ public func ControlUseStop(object user, int x, int y)
 public func ControlUseAltStop(object user, int x, int y)
 {
 	this->OnUseAltStop(user, x, y);
-
 	return true;
 }
 
@@ -357,9 +348,13 @@ public func ControlUseAltStop(object user, int x, int y)
 public func ControlUseCancel(object user, int x, int y)
 {
 	if (this->OnUseCancel(user, x, y))
+	{
 		return true;
-
-	return ControlUseStop(user, x, y);
+	}
+	else
+	{
+		return ControlUseStop(user, x, y);
+	}
 }
 
 
@@ -376,7 +371,6 @@ public func ControlUseCancel(object user, int x, int y)
 public func ControlUseAltCancel(object user, int x, int y)
 {
 	this->OnUseAltCancel(user, x, y);
-
 	return true;
 }
 
@@ -558,11 +552,7 @@ public func OnUseAltCancel(object user, int x, int y)
 func StartCharge(object user, int x, int y)
 {
 	var firemode = GetFiremode();
-
-	if (firemode == nil)
-	{
-		FatalError("Fire mode 'nil' not supported");
-	}
+	AssertNotNil(firemode);
 
 	if (!is_using || firemode->GetChargeDelay() < 1 || !NeedsCharge(user, firemode)) return false;
 
@@ -819,7 +809,9 @@ func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 	user->~SetAimPosition(angle);
 
 	if (is_pressing_trigger)
+	{
 		is_using = true;
+	}
 
 	if (IsReadyToFire())
 		if (!StartReload(user, x, y))
@@ -838,17 +830,14 @@ func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 */
 func FinishedAiming(object user, int angle)
 {
-	if (!FireOnStopping())
-		return;
-	if (!is_using)
-		return;
-	if (!IsReadyToFire())
-		return;
-
-	var x = +Sin(angle, 1000);
-	var y = -Cos(angle, 1000);
-
-	Fire(user, x, y);
+	if (FireOnStopping() && is_using && IsReadyToFire())
+	{
+		var x = +Sin(angle, 1000);
+		var y = -Cos(angle, 1000);
+	
+		Fire(user, x, y);
+	}
+	_inherited(user, angle, ...);
 }
 
 
@@ -907,16 +896,10 @@ func GetFireAngle(int x, int y, proplist firemode)
  */
 func Fire(object user, int x, int y)
 {
-	if (user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
+	AssertNotNil(user);
 
 	var firemode = GetFiremode();
-	if (firemode == nil)
-	{
-		FatalError("No firemode selected");
-	}
+	AssertNotNil(firemode);
 
 	if (this->~IsReloading())
 	{
@@ -953,14 +936,8 @@ func Fire(object user, int x, int y)
 */
 func FireProjectiles(object user, int angle, proplist firemode)
 {
-	if (user == nil)
-	{
-		FatalError("The function expects a user that is not nil");
-	}
-	if (firemode == nil)
-	{
-		FatalError("The function expects a fire mode that is not nil");
-	}
+	AssertNotNil(user);
+	AssertNotNil(firemode);
 
 	var user_x = user->~GetWeaponX(this); if (user_x) user_x -= GetX();
 	var user_y = user->~GetWeaponY(this); if (user_y) user_y -= GetY();
@@ -1066,10 +1043,7 @@ public func OnFireProjectile(object user, object projectile, proplist firemode)
 
 func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool sparks, bool light, int color, string particle)
 {
-	if (user == nil)
-	{
-		FatalError("This function expects a user that is not nil");
-	}
+	AssertNotNil(user);
 
 	particle = particle ?? "MuzzleFlash";
 
@@ -1434,13 +1408,12 @@ local IntCooldownEffect = new Effect
 func StartReload(object user, int x, int y, bool forced)
 {
 	var firemode = GetFiremode();
+	AssertNotNil(firemode);
 
-	if (firemode == nil)
+	if ((!is_using && !forced) || !NeedsReload(user, firemode, forced)) 
 	{
-		FatalError("Fire mode 'nil' not supported");
+		return false;
 	}
-
-	if ((!is_using && !forced) || !NeedsReload(user, firemode, forced)) return false;
 
 	var process = this->~IsReloading();
 
@@ -1827,7 +1800,7 @@ public func ScheduleSetFiremode(int number)
 	}
 	else
 	{
-		var schedule = GetEffect("IntChangeFiremodeEffect", this) ?? CreateEffect(IntChangeFiremodeEffect, 1, 1);
+		var schedule = GetEffect(IntChangeFiremodeEffect.Name, this) ?? CreateEffect(IntChangeFiremodeEffect, 1, 1);
 		schedule.mode = number;
 	}
 }
@@ -1840,7 +1813,7 @@ public func ScheduleSetFiremode(int number)
  */
 public func GetScheduledFiremode()
 {
-	var schedule = GetEffect("IntChangeFiremodeEffect", this);
+	var schedule = GetEffect(IntChangeFiremodeEffect.Name, this);
 
 	if (schedule)
 	{
@@ -1855,7 +1828,7 @@ public func GetScheduledFiremode()
  */
 public func ResetScheduledFiremode()
 {
-	var schedule = GetEffect("IntChangeFiremodeEffect", this);
+	var schedule = GetEffect(IntChangeFiremodeEffect.Name, this);
 	if (schedule)
 	{
 		schedule.mode = nil;
@@ -1865,6 +1838,7 @@ public func ResetScheduledFiremode()
 
 local IntChangeFiremodeEffect = new Effect
 {
+	Name = "IntChangeFiremodeEffect",
 	Timer = func ()
 	{
 		// Stop if there is no mode
@@ -1965,9 +1939,13 @@ public func LockWeapon(int lock_time)
 {
 	var locked = IsWeaponLocked();
 	if (locked == nil)
+	{
 		AddEffect("IntWeaponLocked", this, 1, lock_time, this, nil);
+	}
 	else
+	{
 		locked.Interval = lock_time;
+	}
 }
 
 
