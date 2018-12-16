@@ -26,15 +26,34 @@ func InitializePlayer(int plr)
 global func Test_Init()
 {
 	var test = CurrentTest();
-	if (!test.initialized)
+
+	// Remove all objects except the crew members
+	for (var obj in FindObjects(Find_Not(Find_OCF(OCF_CrewMember))))
 	{
-		test.user = GetHiRank(test.player);
-		test.user->SetPosition(LandscapeWidth() / 2, test.user->GetY());		
-		test.target = CreateObject(Clonk, LandscapeWidth() / 4, test.user->GetY(), NO_OWNER);
-		test.target->SetColor(RGB(255, 0, 255));
-		test.weapon = test.user->CreateContents(Weapon);
-		test.initialized = true;
+		obj->RemoveObject();
 	}
+	if (test.target)
+	{
+		test.target->RemoveObject();
+	}
+
+	test.user = GetHiRank(test.player);
+	test.user->SetPosition(LandscapeWidth() / 2, test.user->GetY());		
+	test.target = CreateObject(Clonk, LandscapeWidth() / 4, test.user->GetY(), NO_OWNER);
+	test.target->SetColor(RGB(255, 0, 255));
+	test.weapon = test.user->CreateContents(Weapon);
+	test.data = new DataContainer {};
+}
+
+
+global func PressControlUse(int hold_frames, object user, object weapon, int aim_x, int aim_y)
+{
+	ScheduleCall(weapon, weapon.ControlUseStart, 1, nil, user, aim_x, aim_y);
+	for (var delay = 2; delay < hold_frames; ++delay)
+	{
+		ScheduleCall(weapon, weapon.ControlUseHolding, delay, nil, user, aim_x, aim_y);
+	}
+	ScheduleCall(weapon, weapon.ControlUseStop, hold_frames, nil, user, aim_x, aim_y);
 }
 
 
@@ -83,6 +102,7 @@ global func Test2_Execute()
 {
 	if (CurrentTest().test2_started)
 	{
+		doTest("Weapon fired %d projectiles, should be %d.", CurrentTest().data.projectiles_fired, 1);
 		return Evaluate();
 	}
 	else
@@ -96,15 +116,4 @@ global func Test2_Execute()
 		PressControlUse(delay, user, weapon, aim_x, aim_y);
 		return Wait(delay + 2);
 	}
-}
-
-
-global func PressControlUse(int hold_frames, object user, object weapon, int aim_x, int aim_y)
-{
-	ScheduleCall(weapon, weapon.ControlUseStart, 1, nil, user, aim_x, aim_y);
-	for (var delay = 2; delay < hold_frames; ++delay)
-	{
-		ScheduleCall(weapon, weapon.ControlUseHolding, delay, nil, user, aim_x, aim_y);
-	}
-	ScheduleCall(weapon, weapon.ControlUseStop, hold_frames, nil, user, aim_x, aim_y);
 }

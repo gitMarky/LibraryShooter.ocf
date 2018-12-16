@@ -84,6 +84,7 @@ public func FireSound(object user, proplist firemode)
 
 public func OnFireProjectile(object user, object projectile, proplist firemode)
 {
+	CurrentTest().data.projectiles_fired += 1;
 }
 
 public func FireEffect(object user, int angle, proplist firemode)
