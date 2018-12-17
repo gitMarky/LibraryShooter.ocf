@@ -42,6 +42,7 @@ global func Test_Init()
 	test.target = CreateObject(Clonk, LandscapeWidth() / 4, test.user->GetY(), NO_OWNER);
 	test.target->SetColor(RGB(255, 0, 255));
 	test.weapon = test.user->CreateContents(Weapon);
+	test.weapon->CreateEffect(test.weapon.FxDebugPositions, 1, 1);
 	test.data = new DataContainer {};
 }
 

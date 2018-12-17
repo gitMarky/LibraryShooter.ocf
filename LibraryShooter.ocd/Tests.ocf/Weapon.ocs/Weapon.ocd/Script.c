@@ -20,6 +20,17 @@ public func Initialize()
 	var firemode_default = DefaultFiremode();
 	AddFiremode(firemode_default);
 	SetFiremode(firemode_default->GetIndex());
+	
+	position_hand = new PositionOffsetAnimation {};
+	position_hand->DefineOffsetForward(0, -3)
+	             ->DefineOffsetUp(-1, -7)
+	             ->DefineOffsetDown(-3, -1);
+
+	position_weapon = {};
+	position_weapon.Fuse = new PositionOffsetRotation {};
+	position_weapon.Fuse->DefineOffset(+2, -3);
+	position_weapon.Muzzle = new PositionOffsetRotation {};
+	position_weapon.Muzzle->DefineOffset(+12, -2);
 }
 
 /* --- Fire modes --- */
@@ -73,8 +84,12 @@ public func Setting_AimOnUseStart()
 
 local AimOnUseStart = false;
 
-/* --- Effects --- */
+public func Selection (object user)
+{
+	user->StartAim(this);
+}
 
+/* --- Effects --- */
 
 public func FireSound(object user, proplist firemode)
 {
@@ -84,17 +99,73 @@ public func FireSound(object user, proplist firemode)
 
 public func OnFireProjectile(object user, object projectile, proplist firemode)
 {
-	CurrentTest().data.projectiles_fired += 1;
+	var test = CurrentTest();
+	if (test && test.data)
+	{
+		test.data.projectiles_fired += 1;
+	}
 }
 
 public func FireEffect(object user, int angle, proplist firemode)
 {
 	// Muzzle Flash & gun smoke.
-	var off_x = +Sin(angle, firemode->GetProjectileDistance() / 2);
-	var off_y = -Cos(angle, firemode->GetProjectileDistance() / 2) +  + firemode->GetYOffset();
+	//var off_x = +Sin(angle, firemode->GetProjectileDistance() / 2);
+	//var off_y = -Cos(angle, firemode->GetProjectileDistance() / 2) +  + firemode->GetYOffset();
+	var off = GetPositionWeapon("Muzzle", angle);
+	var off_x = off.X;
+	var off_y = off.Y;
+
 	var x = Sin(angle, 20);
 	var y = -Cos(angle, 20);
 	CreateParticle("Smoke", off_x, off_y, PV_Random(x - 20, x + 20), PV_Random(y - 20, y + 20), PV_Random(40, 60), Particles_Smoke(), 20);
 	user->CreateMuzzleFlash(off_x, off_y, angle, 20);
 	CreateParticle("Flash", 0, 0, 0, 0, 8, Particles_Flash());
 }
+
+/* --- Aim position --- */
+
+local position_hand;
+
+func GetPositionHand(int angle, int precision)
+{
+	return position_hand->GetPosition(angle, precision);
+}
+
+local position_weapon;
+
+func GetPositionWeapon(string name, int angle, int precision)
+{
+	var hand = GetPositionHand(angle, precision);
+	var weapon = position_weapon[name]->GetPosition(angle, precision);
+	return { X = hand.X + weapon.X, Y = hand.Y + weapon.Y, DebugColor = weapon.DebugColor };
+}
+
+/* --- Debugging --- */
+
+local FxDebugPositions = new Effect
+{
+	Timer = func ()
+	{
+		var user = this.Target->Contained();
+		if (!user || !user->~IsAiming()) return;
+		
+		var angle = user->GetAimPosition();
+		
+		var debug_positions = 
+		[
+			this.Target->GetPositionHand(angle),
+			this.Target->GetPositionWeapon("Fuse", angle),
+			this.Target->GetPositionWeapon("Muzzle", angle)
+		];
+		
+		for (var position in debug_positions)
+		{
+			var color = SplitRGBaValue(position.DebugColor);
+			user->CreateParticle("SphereSpark", position.X, position.Y, 0, 0, this.Interval,
+			{
+				Size = 1, R = color.R, G = color.G, B = color.B,
+				Attach = ATTACH_Front | ATTACH_MoveRelative,
+			});
+		}
+	},
+};
