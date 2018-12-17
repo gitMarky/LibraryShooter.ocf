@@ -36,16 +36,17 @@ static const PositionOffsetRotation = new Global
 		precision_angle = precision_angle ?? 1;
 		precision_position = precision_position ?? 1;
 		angle = Normalize(angle, -180 * precision_angle, precision_angle);
-
-		var offx_x = +Sin(angle, offset.X, precision_angle);
-		var offx_y = -Cos(angle, offset.X, precision_angle);
-		var offy_x = +Cos(angle, offset.Y, precision_angle);
-		var offy_y = +Sin(Abs(angle), offset.Y, precision_angle);
+		
+		var factor_y = 1;
+		if (angle < 0)
+		{
+			factor_y = -1;
+		}
 
 		return 
 		{
-			X = (offx_x + offy_x) * precision_position / offset.Precision,
-			Y = (offx_y + offy_y) * precision_position / offset.Precision,
+			X = (+Sin(angle, offset.X) + factor_y * Cos(angle, offset.Y)) * precision_position / offset.Precision,
+			Y = (-Cos(angle, offset.X) + factor_y * Sin(angle, offset.Y)) * precision_position / offset.Precision,
 			DebugColor = this.DebugColor,
 		};
 	},
@@ -69,33 +70,34 @@ static const PositionOffsetAnimation = new Global
 	aim_offset_up = nil,
 	aim_offset_down = nil,
 
-	DefineOffsetForward = func (int x, int y, int precision)
+	DefineOffsetForward = func (int x, int y, int precision, int dir0_shift_x)
 	{
-		aim_offset_forward = {X = x, Y = y, Precision = precision ?? 1};
+		aim_offset_forward = {X = x, Y = y, Precision = precision ?? 1, X_left = dir0_shift_x};
 		return this;
 	},
 
-	DefineOffsetUp = func (int x, int y, int precision)
+	DefineOffsetUp = func (int x, int y, int precision, int dir0_shift_x)
 	{
-		aim_offset_up = {X = x, Y = y, Precision = precision ?? 1};
+		aim_offset_up = {X = x, Y = y, Precision = precision ?? 1, X_left = dir0_shift_x};
 		return this;
 	},
 
-	DefineOffsetDown = func (int x, int y, int precision)
+	DefineOffsetDown = func (int x, int y, int precision, int dir0_shift_x)
 	{
-		aim_offset_down = {X = x, Y = y, Precision = precision ?? 1};
+		aim_offset_down = {X = x, Y = y, Precision = precision ?? 1, X_left = dir0_shift_x};
 		return this;
 	},
-	
+
 	GetOffset = func (proplist offset, int precision)
 	{
 		if (nil == offset)
 		{
-			return {X = 0, Y = 0,};
+			return {X = 0, Y = 0, X_left = 0, };
 		}
 		return {
 			X = offset.X * precision / offset.Precision,
 			Y = offset.Y * precision / offset.Precision,
+			X_left = offset.X_left * precision / offset.Precision,
 		};
 	},
 
@@ -107,11 +109,6 @@ static const PositionOffsetAnimation = new Global
 
 		var angle_forward = 90 * precision_angle;
 		var angle_down = 180 * precision_angle;
-		var factor_x = +1;
-		if (angle < 0)
-		{
-			factor_x = -1; // Not sign here, because that turns 0 if the angle is 0!
-		}
 
 		var offset_up      = GetOffset(aim_offset_up, precision_position);
 		var offset_forward = GetOffset(aim_offset_forward, precision_position);
@@ -119,6 +116,13 @@ static const PositionOffsetAnimation = new Global
 
 		var x = InterpolateLinear(Abs(angle), 0, offset_up.X, angle_forward, offset_forward.X, angle_down, offset_down.X);
 		var y = InterpolateLinear(Abs(angle), 0, offset_up.Y, angle_forward, offset_forward.Y, angle_down, offset_down.Y);
+
+		if (angle < 0)
+		{
+			// Apply additional offset in case that the animation is not mirrored evenly
+			x += InterpolateLinear(Abs(angle), 0, offset_up.X_left, angle_forward, offset_forward.X_left, angle_down, offset_down.X_left);
+		}
+
 		return { X = x, Y = y, DebugColor = this.DebugColor, };
 	},
 

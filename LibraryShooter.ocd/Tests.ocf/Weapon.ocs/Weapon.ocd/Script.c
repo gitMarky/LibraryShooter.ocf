@@ -20,10 +20,10 @@ public func Initialize()
 	var firemode_default = DefaultFiremode();
 	AddFiremode(firemode_default);
 	SetFiremode(firemode_default->GetIndex());
-	
+
 	position_hand = new PositionOffsetAnimation {};
-	position_hand->DefineOffsetForward(0, -3)
-	             ->DefineOffsetUp(-1, -7)
+	position_hand->DefineOffsetForward(0, -3, nil, -3)
+	             ->DefineOffsetUp(-1, -7, nil, -3)
 	             ->DefineOffsetDown(-3, -1);
 
 	position_weapon = {};
