@@ -10,7 +10,7 @@ public func GetCarrySpecial(object user) { return "pos_hand2"; }
 public func GetCarryBone() { return "main"; }
 public func GetCarryTransform()
 {
-	return Trans_Rotate(90, 1, 0, 0);
+	return Trans_Mul(Trans_Rotate(90, 1, 0, 0), Trans_Rotate(4, 0, 0, 1));
 }
 
 public func Initialize()
@@ -28,9 +28,9 @@ public func Initialize()
 
 	position_weapon = {};
 	position_weapon.Fuse = new PositionOffsetRotation {};
-	position_weapon.Fuse->DefineOffset(+2, -3);
+	position_weapon.Fuse->DefineOffset(+2, -2);
 	position_weapon.Muzzle = new PositionOffsetRotation {};
-	position_weapon.Muzzle->DefineOffset(+12, -2);
+	position_weapon.Muzzle->DefineOffset(+12, -1);
 }
 
 /* --- Fire modes --- */
