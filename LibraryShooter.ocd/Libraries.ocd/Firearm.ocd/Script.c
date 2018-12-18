@@ -38,8 +38,6 @@ static const WEAPON_POS_Muzzle = "Muzzle";
 static const WEAPON_POS_Chamber = "Chamber";
 static const WEAPON_POS_Magazine = "Magazine";
 
-local fire_modes = [];
-
 local weapon_properties = nil;
 
 local animation_set = {
@@ -122,6 +120,7 @@ func Initialize()
 	weapon_properties.weapon_offset = weapon_properties.weapon_offset ?? {};
 	weapon_properties.shot_counter = [];
 	weapon_properties.firemode_selected = 0;
+	weapon_properties.firemodes = [];
 	
 	// Editor properties
 	this.EditorProps = this.EditorProps ?? {};
@@ -1624,8 +1623,8 @@ public func CreateFiremode(bool add)
 */
 public func MakeFiremodeWritable(int number)
 {
-	AssertArrayBounds(fire_modes, number);
-	fire_modes[number] = { Prototype = fire_modes[number] };
+	AssertValidFiremode(weapon_properties.firemodes, number);
+	weapon_properties.firemodes[number] = { Prototype = weapon_properties.firemodes[number] };
 }
 
 
@@ -1639,11 +1638,7 @@ public func MakeFiremodeWritable(int number)
 */
 public func SetFiremode(int number, bool force)
 {
-	if (number < 0 || number >= GetLength(fire_modes))
-	{
-		FatalError(Format("The new fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
-		return;
-	}
+	AssertValidFiremode(number);
 
 	if (force || CanChangeFiremode() || GetFiremode(number)->IsAvailable())
 	{
@@ -1668,12 +1663,8 @@ public func SetFiremode(int number, bool force)
 public func GetFiremode(int number)
 {
 	number = number ?? weapon_properties.firemode_selected;
-	if (number < 0 || number >= GetLength(fire_modes))
-	{
-		FatalError(Format("The fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
-		return;
-	}
-	return fire_modes[number];
+	AssertValidFiremode(number);
+	return weapon_properties.firemodes[number];
 }
 
 
@@ -1706,12 +1697,12 @@ public func GetFiremodeIndex(proplist firemode, bool available)
 */
 public func GetFiremodes()
 {
-	if (!fire_modes)
+	if (!weapon_properties.firemodes)
 	{
 		FatalError("Fire modes is somehow empty??");
 	}
 
-	return fire_modes;
+	return weapon_properties.firemodes;
 }
 
 
@@ -1724,7 +1715,7 @@ public func GetAvailableFiremodes()
 {
 	var available = [];
 
-	for (var i = 0; i < GetLength(GetFiremodes()); ++i) // firemode in GetFiremodes())
+	for (var i = 0; i < GetLength(GetFiremodes()); ++i)
 	{
 		var firemode = GetFiremode(i);
 		if (firemode->IsAvailable())
@@ -1742,7 +1733,7 @@ public func GetAvailableFiremodes()
 */
 public func ClearFiremodes()
 {
-	fire_modes = [];
+	weapon_properties.firemodes = [];
 }
 
 
@@ -1753,8 +1744,8 @@ public func ClearFiremodes()
 */
 public func AddFiremode(proplist firemode)
 {
-	var index = GetLength(fire_modes);
-	PushBack(fire_modes, firemode);
+	var index = GetLength(weapon_properties.firemodes);
+	PushBack(weapon_properties.firemodes, firemode);
 	firemode->SetIndex(index);
 }
 
@@ -1839,6 +1830,15 @@ local IntChangeFiremodeEffect = new Effect
 		return FX_OK;
 	},
 };
+
+
+func AssertValidFiremode(int number)
+{
+	if (number < 0 || number >= GetLength(weapon_properties.firemodes))
+	{
+		FatalError(Format("The fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(weapon_properties.firemodes)));
+	}
+}
 
 /* --- Ammo --- */
 
