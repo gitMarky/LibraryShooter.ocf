@@ -42,8 +42,6 @@ local fire_modes = [];
 
 local weapon_properties = nil;
 
-local selected_firemode; // int
-
 local animation_set = {
 	AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
 	AnimationAim   = "MusketAimArms",
@@ -119,11 +117,11 @@ public func Setting_WithAmmoLogic()
 */
 func Initialize()
 {
-	selected_firemode = 0;
 	// Initialize custom property namespace
 	weapon_properties = weapon_properties ?? {};
 	weapon_properties.weapon_offset = weapon_properties.weapon_offset ?? {};
 	weapon_properties.shot_counter = [];
+	weapon_properties.firemode_selected = 0;
 	
 	// Editor properties
 	this.EditorProps = this.EditorProps ?? {};
@@ -1649,7 +1647,7 @@ public func SetFiremode(int number, bool force)
 
 	if (force || CanChangeFiremode() || GetFiremode(number)->IsAvailable())
 	{
-		selected_firemode = number;
+		weapon_properties.firemode_selected = number;
 		return true;
 	}
 	else
@@ -1669,7 +1667,7 @@ public func SetFiremode(int number, bool force)
  */
 public func GetFiremode(int number)
 {
-	number = number ?? selected_firemode;
+	number = number ?? weapon_properties.firemode_selected;
 	if (number < 0 || number >= GetLength(fire_modes))
 	{
 		FatalError(Format("The fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
