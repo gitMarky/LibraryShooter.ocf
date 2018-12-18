@@ -66,11 +66,25 @@ local Description = "$Description$";
 	If set to false, the weapon itself will not make the user aim and it must be initiated elsewhere, e.g. a clonk can always aim when the weapon is selected.@br
 	You can use the Mouse1Move key assignment to continuously forward cursor updates to the script.@br
 
-	@return {@c true} by default.
+	@return {@code true} by default.
 */
 public func Setting_AimOnUseStart()
 {
 	return true;
+}
+
+
+/**
+	An important general setting that should be decided on for as a whole in an implementation and best not be mixed throughout a pack.
+	@br
+	If returns a definition other than 'nil' the weapon will use this definition as an aim manager interface,
+	instead of relying on the "Library_AimManager" from Objects.ocd.
+
+	@return {@code nil} by default.
+*/
+public func Setting_CustomAimManager()
+{
+	return nil;
 }
 
 
@@ -226,12 +240,8 @@ public func ControlFireHolding(object user, int x, int y)
 		ControlUseStop(user, x, y);
 		return false;
 	}
-
-	if (Setting_AimOnUseStart() && !user->~IsAiming())
-	{
-		user->~StartAim(this);
-	}
-
+	
+	DoStartAiming(user);
 	DoFireCycle(user, x, y, true);
 	return true;
 }
@@ -279,10 +289,7 @@ public func ControlUseStop(object user, int x, int y)
 		return true;
 	}
 
-	if (FireOnStopping() || Setting_AimOnUseStart())
-	{
-		user->~StopAim();
-	}
+	DoStopAiming(user);
 
 	if (FireOnHolding())
 	{
@@ -818,7 +825,7 @@ func FinishedAiming(object user, int angle)
 	{
 		var x = +Sin(angle, 1000);
 		var y = -Cos(angle, 1000);
-	
+
 		Fire(user, x, y);
 	}
 	_inherited(user, angle, ...);
@@ -2106,3 +2113,36 @@ local FxEditorPropsDebug = new Effect
 		}
 	},
 };
+
+/* --- Aiming --- */
+
+func DoStartAiming(object user)
+{
+	if (Setting_CustomAimManager() == nil)
+	{
+		if (Setting_AimOnUseStart() && !user->~IsAiming())
+		{
+			user->~StartAim(this);
+		}
+	}
+	else
+	{
+		FatalError("Custom aim manager not supported yet");
+	}
+}
+
+func DoStopAiming(object user)
+{
+	if (Setting_CustomAimManager() == nil)
+	{
+		if (FireOnStopping() || Setting_AimOnUseStart())
+		{
+			user->~StopAim();
+		}
+	}
+	else
+	{
+		FatalError("Custom aim manager not supported yet");
+	}
+}
+
