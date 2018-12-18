@@ -19,9 +19,9 @@
 	<li>
 	</ul>
 
-	@author Marky
+	@author Marky, Clonkonaut
 
-	@credits Hazard Team, Zapper
+	@credits Hazard Team and CMC developer team, Zapper for Caedes, each for inspirations on the architecture and requirements.
 */
 
 /*-- Important Library Properties --*/
