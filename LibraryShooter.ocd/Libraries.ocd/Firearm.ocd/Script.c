@@ -40,17 +40,6 @@ static const WEAPON_POS_Magazine = "Magazine";
 
 local weapon_properties = nil;
 
-local animation_set = {
-	AimMode        = AIM_Position, // The aiming animation is done by adjusting the animation position to fit the angle
-	AnimationAim   = "MusketAimArms",
-	AnimationLoad  = "MusketLoadArms",
-	LoadTime       = 80,
-	AnimationShoot = nil,
-	ShootTime      = 20,
-	WalkSpeed      = nil,
-	WalkBack       = nil,
-};
-
 /* --- Properties --- */
 
 local Name = "$Name$";
