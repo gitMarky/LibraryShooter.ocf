@@ -38,41 +38,7 @@ static const WEAPON_POS_Muzzle = "Muzzle";
 static const WEAPON_POS_Chamber = "Chamber";
 static const WEAPON_POS_Magazine = "Magazine";
 
-local fire_modes = [fire_mode_default];
-
-local fire_mode_default = 
-{
-	mode =                WEAPON_FM_Single,
-	name =                "$DefaultFireMode$", // string - menu caption
-	icon =                nil, // id - menu icon
-	condition =           nil, // string - callback for a condition
-	ammo_id =             nil,
-	ammo_usage =          1, // int - this many units of ammo
-	ammo_rate =           1, // int - per this many shots fired
-	delay_charge =        0, // int, frames - time that the button must be held before the shot is fired
-	delay_recover =       1, // int, frames - time between consecutive shots
-	delay_cooldown =      0, // int, frames - time of cooldown after the last shot is fired
-	delay_reload =        0, // int, frames - time to reload
-	damage =              10,
-	damage_type =         nil,
-	projectile_id =       NormalBullet,
-	projectile_speed =    100,
-	projectile_range =    600,
-	projectile_distance = 10,
-	projectile_offset_y = -6,
-	projectile_number =   1,
-	projectile_spread =   0, // default inaccuracy of a single projectile
-	spread =              1, // inaccuracy from prolonged firing
-	burst =               0, // number of projectiles fired in a burst
-	auto_reload =         false, // the weapon should "reload itself", i.e not require the user to hold the button when it reloads
-	anim_shoot_name =     nil, // for animation set: shoot animation
-	anim_load_name =      nil, // for animation set: reload animation
-	walk_speed_front =    nil, // for animation set: relative walk speed
-	walk_speed_back =     nil, // for animation set: relative walk speed
-
-	// Getters and Setters
-	Prototype = Library_Firearm_Firemode,
-};
+local fire_modes = [];
 
 local weapon_properties = nil;
 
@@ -1633,8 +1599,10 @@ public func OnCancelReload(object user, int x, int y, proplist firemode, bool re
 
 /**
 	Create a new, writable fire mode.@br
-	With this function, fire modes can be created during runtime. However, this should not be used to create all fire modes of a weapon, if it is not intended to ever write new values into these. In that case, fire modes should be defined as static (read-only) proplists in the definition.@br
-	The newly created fire mode will inherit all information from fire_mode_default.@br
+	With this function, fire modes can be created during runtime. However, this should not be used to create all fire modes of a weapon, 
+	if it is not intended to ever write new values into these.
+	In that case, fire modes should be defined as static (read-only) proplists in the definition.@br
+	The newly created fire mode will inherit all information from {@link Library_Firearm_Firemode}.@br
 
 	@par add A boolean, if true the fire mode will be added to the weapon ({@link Library_Firearm#AddFiremode}).
 
@@ -1642,10 +1610,12 @@ public func OnCancelReload(object user, int x, int y, proplist firemode, bool re
 */
 public func CreateFiremode(bool add)
 {
-	var new_mode = { Prototype = fire_mode_default };
+	var new_mode = new Library_Firearm_Firemode {};
 	if (add)
+	{
 		AddFiremode(new_mode);
-	return add;
+	}
+	return new_mode;
 }
 
 
@@ -1656,12 +1626,7 @@ public func CreateFiremode(bool add)
 */
 public func MakeFiremodeWritable(int number)
 {
-	if (number < 0 || number >= GetLength(fire_modes))
-	{
-		FatalError(Format("The fire mode (%v) is out of range of all configured fire modes (%v)", number, GetLength(fire_modes)));
-		return;
-	}
-
+	AssertArrayBounds(fire_modes, number);
 	fire_modes[number] = { Prototype = fire_modes[number] };
 }
 
