@@ -28,9 +28,15 @@
 
 local is_using = false;    // bool: is the user holding the fire button
 
+// Constants for distinguishing the fire behaviour
 static const WEAPON_FM_Single = 1;
 static const WEAPON_FM_Burst  = 2;
 static const WEAPON_FM_Auto   = 3;
+
+// Constants for distinguishing positions and FX positions
+static const WEAPON_POS_Muzzle = "Muzzle";
+static const WEAPON_POS_Chamber = "Chamber";
+static const WEAPON_POS_Magazine = "Magazine";
 
 local fire_modes = [fire_mode_default];
 
@@ -68,11 +74,7 @@ local fire_mode_default =
 	Prototype = Library_Firearm_Firemode,
 };
 
-local weapon_properties = 
-{
-	gfx_distance = 6,
-	gfx_offset_y = -6,
-};
+local weapon_properties = nil;
 
 local shot_counter; // proplist
 local selected_firemode; // int
@@ -145,7 +147,7 @@ public func Setting_WithAmmoLogic()
 }
 
 
-/*-- Engine Callbacks --*/
+/* --- Engine Callbacks --- */
 
 /**
 	Make sure to call this via _inherited();
@@ -154,12 +156,14 @@ func Initialize()
 {
 	shot_counter = [];
 	selected_firemode = 0;
+	weapon_properties = weapon_properties ?? {};
+	weapon_properties.weapon_offset = weapon_properties.weapon_offset ?? {};
 
 	_inherited();
 }
 
 
-/*-- Controls --*/
+/* --- Controls --- */
 
 /**
 	This is executed each time the user presses the fire button.@br@br
@@ -851,7 +855,7 @@ func FinishedAiming(object user, int angle)
  */
 func GetAngle(int x, int y)
 {
-	var angle = Angle(0, weapon_properties.gfx_offset_y, x, y);
+	var angle = Angle(0, 0, x, y);
 		angle = Normalize(angle, -180);
 
 	return angle;
@@ -859,7 +863,7 @@ func GetAngle(int x, int y)
 
 
 /**
-	Converts coordinates to a firing angle for the weapon, respecting the projectile_offset_y from the fire mode.@br
+	Converts coordinates to a firing angle for the weapon, respecting the {@link Library_Firearm_Firemode#GetProjectileOffset} from the fire mode.@br
 
 	@par x The x coordinate, local.
 	@par y The y coordinate, local.
@@ -941,13 +945,13 @@ func FireProjectiles(object user, int angle, proplist firemode)
 	AssertNotNil(user);
 	AssertNotNil(firemode);
 
-	var user_x = user->~GetWeaponX(this); if (user_x) user_x -= GetX();
-	var user_y = user->~GetWeaponY(this); if (user_y) user_y -= GetY();
+	var weapon_offset = GetWeaponPosition(user, WEAPON_POS_Muzzle, angle);
+	var firemode_offset = firemode->GetProjectileOffset(angle);
 
-	var x = +Sin(angle, firemode->GetProjectileDistance()) + user_x;
-	var y = -Cos(angle, firemode->GetProjectileDistance()) + user_y + firemode->GetYOffset();
+	var x = weapon_offset.X + firemode_offset.X;
+	var y = weapon_offset.Y + firemode_offset.Y;
 
-	// launch the single projectiles
+	// Launch the single projectiles
 	for (var i = 0; i < Max(1, firemode->GetProjectileAmount()); i++)
 	{
 		var projectile = CreateObject(firemode->GetProjectileID(), x, y, user->GetController());
@@ -1078,7 +1082,7 @@ func EffectMuzzleFlash(object user, int x, int y, int angle, int size, bool spar
 }
 
 
-/*-- Recovering --*/
+/* --- Recovering --- */
 
 /**
 	Will start the recovery process if the weapon needs recovering.@br@br
@@ -1856,7 +1860,7 @@ local IntChangeFiremodeEffect = new Effect
 	},
 };
 
-/*-- Ammo --*/
+/* --- Ammo --- */
 
 /**
 	Changes the amount of ammunition that the object currently has.
@@ -2024,4 +2028,43 @@ func GetEffectProgress(proplist process)
 	{
 		return process->GetProgress();
 	}
+}
+
+/* --- Position calculations --- */
+
+/**
+	Defines an offset for various effects.
+
+	@par name the name of the offset/position, so that it can be referenced later.
+	@par x    the offset from the user hand to the position on the weapon,
+	          assuming that the barrel is facing "right".
+	@par y    the offset from the user hand to the position on the weapon,
+	          assuming that the barrel is facing "right".
+ */
+public func DefineWeaponOffset(string name, int x, int y, int precision)
+{
+	weapon_properties.weapon_offset[name] = new PositionOffsetRotation {};
+	weapon_properties.weapon_offset[name]->DefineOffset(x, y);
+}
+
+public func GetWeaponOffset(string name, int angle, int precision)
+{
+	return weapon_properties.weapon_offset[name]->GetPosition(angle, precision);
+}
+
+public func GetWeaponPosition(object user, string name, int angle, int precision)
+{
+	if (nil == user)
+	{
+		return GetWeaponOffset(name, angle, precision);
+	}
+
+	var user_offset = user->~GetAimAnimationOffset(this, angle) ?? {X = 0, Y = 0,};
+	var weapon_offset = GetWeaponOffset(name, angle, precision);
+	return
+	{
+		X = user_offset.X + weapon_offset.X,
+		Y = user_offset.Y + weapon_offset.Y,
+		DebugColor = weapon_offset.DebugColor
+	};
 }

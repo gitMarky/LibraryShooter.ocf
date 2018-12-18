@@ -23,8 +23,7 @@
 	projectile_id: A definition of the actual projectile that is being fired. These are created on the fly and must therefore not be created beforehand (default: NormalBullet).@br
 	projectile_speed: Integer. Firing speed of a projectile (default: 100).@br
 	projectile_range: Integer. Maximum range a projectile flies (default: 600).@br
-	projectile_distance: Integer. Distance the projectile is being created away from the shooting object (default: 10).@br
-	projectile_offset_y: Integer. Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center (default: -6).@br
+	projectile_offset: Proplist, PositionOffsetRotation. Defines an X/Y offset when creating a projectile in case the barrel of the gun is not perfectly aligned to the firing object's center (default: 0/0).@br
 	projectile_number: Integer. How many projectiles are fired in a single shot (default: 1).@br
 	projectile_spread: Integer. Deviation of the projectiles. Default: 0@br
 	spread: Integer. Deviation of the fire mode. Default: 0@br
@@ -266,24 +265,21 @@ public func GetProjectileRange()
 
 
 /**
-	Get the projectile distance of this fire mode.
+	Gets the offset from the muzzle position.
+	The projectiles are launched from this position
 
 	@return An integer.
 */
-public func GetProjectileDistance()
+public func GetProjectileOffset(int angle, int precision)
 {
-	return this.projectile_distance;
-}
-
-
-/**
-	Get the Y offset of this fire mode.
-
-	@return An integer.
-*/
-public func GetYOffset()
-{
-	return this.projectile_offset_y;
+	if (this.projectile_offset)
+	{
+		return this.projectile_offset->GetPosition(angle, precision);
+	}
+	else
+	{
+		return { X = 0, Y = 0};
+	}
 }
 
 
@@ -743,33 +739,16 @@ public func SetProjectileRange(value)
 
 
 /**
-	Set the projectile distance of this fire mode.
+	Sets the offset from the muzzle position,
+	assuming that the muzzle points "right" (=90°).
+	The projectiles are launched from this position.
 
-	@par value Distance the projectile is being created away from the shooting object.
-
-	@return proplist Returns the fire mode, so that 
-	                 further function calls can be issued.
+	@return An integer.
 */
-public func SetProjectileDistance(int value)
+public func SetProjectileOffset(int x, int y, int precision)
 {
-	this.projectile_distance = value;
-	return this;
-}
-
-
-/**
-	Set the Y offset of this fire mode.
-
-	@par value Y offset when creating a projectile in case
-               the barrel of the gun is not perfectly aligned
-               to the firing object's center.
-
-	@return proplist Returns the fire mode, so that 
-	                 further function calls can be issued.
-*/
-public func SetYOffset(int value)
-{
-	this.projectile_offset_y = value;
+	this.projectile_offset = new PositionOffsetRotation {};
+	this.projectile_offset->DefineOffset(x, y, precision);
 	return this;
 }
 
