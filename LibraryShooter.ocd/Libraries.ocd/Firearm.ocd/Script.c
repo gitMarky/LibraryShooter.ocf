@@ -42,7 +42,6 @@ local fire_modes = [];
 
 local weapon_properties = nil;
 
-local shot_counter; // proplist
 local selected_firemode; // int
 
 local animation_set = {
@@ -120,10 +119,11 @@ public func Setting_WithAmmoLogic()
 */
 func Initialize()
 {
-	shot_counter = [];
 	selected_firemode = 0;
+	// Initialize custom property namespace
 	weapon_properties = weapon_properties ?? {};
 	weapon_properties.weapon_offset = weapon_properties.weapon_offset ?? {};
+	weapon_properties.shot_counter = [];
 	
 	// Editor properties
 	this.EditorProps = this.EditorProps ?? {};
@@ -950,7 +950,7 @@ func FireProjectiles(object user, int angle, proplist firemode)
 		projectile->Launch(angle, ComposeSpread(user, firemode));
 	}
 
-	shot_counter[firemode->GetIndex()]++;
+	weapon_properties.shot_counter[firemode->GetIndex()]++;
 
 	HandleAmmoUsage(firemode);
 }
@@ -1169,9 +1169,9 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode->GetBurstAmount(), firemode->GetMode()));
 		}
 
-		if (shot_counter[firemode->GetIndex()] >= firemode->GetBurstAmount())
+		if (weapon_properties.shot_counter[firemode->GetIndex()] >= firemode->GetBurstAmount())
 		{
-			shot_counter[firemode->GetIndex()] = 0;
+			weapon_properties.shot_counter[firemode->GetIndex()] = 0;
 		}
 		else
 		{
