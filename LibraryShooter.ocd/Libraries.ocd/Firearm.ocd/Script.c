@@ -869,10 +869,12 @@ func GetAngle(int x, int y)
 */
 func GetFireAngle(int x, int y, proplist firemode)
 {
-	var angle = Angle(0, firemode->GetYOffset(), x, y);
-		angle = Normalize(angle, -180);
-
-	return angle;
+	//var angle = Angle(0, firemode->GetYOffset(), x, y);
+	//	angle = Normalize(angle, -180);
+	// Note:
+	// It turned out, that it is actually more accurate
+	// to NOT incorporate the offset into the angle
+	return GetAngle(x, y);
 }
 
 
