@@ -2,3 +2,6 @@ Name=Weapon
 Description=A weapon.
 
 DefaultFireMode=Standard
+
+EditorDebugWeaponPosName=Debug Offsets
+EditorDebugWeaponPosHelp=Enables or disabled debugging the weapon offsets. While debugging is enabled the offsets that were defined with DefineWeaponOffset() get displayed on the weapon as long as you are aiming with it. The values can be edited within the internal object properties in the property 'weapon_properties.weapon_offset'.

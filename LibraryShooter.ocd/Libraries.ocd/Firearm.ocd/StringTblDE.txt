@@ -2,3 +2,6 @@
 Description=Eine Waffe.
 
 DefaultFireMode=Standard
+
+EditorDebugWeaponPosName=Offsets debuggen
+EditorDebugWeaponPosHelp=Schaltet das Debuggen von Waffen-Offsets an oder aus. Bei eingeschaltetem Debugging werden die über DefineWeaponOffset() definierten Positionen farbig dargestellt, solange mit der Waffe gezielt wird. Die Werte können über die Property 'weapon_properties.weapon_offset' in den internen Objekteigenschaften geändert werden.

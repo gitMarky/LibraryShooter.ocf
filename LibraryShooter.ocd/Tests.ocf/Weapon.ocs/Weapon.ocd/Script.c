@@ -25,8 +25,6 @@ public func Initialize()
 	DefineWeaponOffset("Fuse", +2, -2);
 	DefineWeaponOffset(WEAPON_POS_Muzzle, +12, -1);
 	DefineWeaponOffset("AimPoint", +500, -1);
-	
-	Log("Weapon properties: %v", this.weapon_properties);
 }
 
 /* --- Fire modes --- */
@@ -107,35 +105,3 @@ public func FireEffect(object user, int angle, proplist firemode)
 	user->CreateMuzzleFlash(off.X, off.Y, angle, 20);
 	CreateParticle("Flash", 0, 0, 0, 0, 8, Particles_Flash());
 }
-
-/* --- Debugging --- */
-
-local FxDebugPositions = new Effect
-{
-	Timer = func ()
-	{
-		var user = this.Target->Contained();
-		if (!user || !user->~IsAiming()) return;
-		
-		var angle = user->GetAimPosition();
-		
-		var debug_positions = 
-		[
-			user->~GetAimAnimationOffset(this.Target, angle),
-			this.Target->GetWeaponPosition(user, "Fuse", angle),
-			this.Target->GetWeaponPosition(user, WEAPON_POS_Muzzle, angle)
-		];
-		
-		for (var position in debug_positions)
-		{
-			if (!position) continue;
-
-			var color = SplitRGBaValue(position.DebugColor);
-			user->CreateParticle("SphereSpark", position.X, position.Y, 0, 0, this.Interval,
-			{
-				Size = 1, R = color.R, G = color.G, B = color.B,
-				Attach = ATTACH_Front | ATTACH_MoveRelative,
-			});
-		}
-	},
-};

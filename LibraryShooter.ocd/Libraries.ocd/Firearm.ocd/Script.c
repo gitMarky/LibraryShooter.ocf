@@ -1,4 +1,4 @@
-﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿/**
 	Shared functions between all firearms.
 
 	@note Basic workings
@@ -158,7 +158,24 @@ func Initialize()
 	selected_firemode = 0;
 	weapon_properties = weapon_properties ?? {};
 	weapon_properties.weapon_offset = weapon_properties.weapon_offset ?? {};
+	
+	// Editor properties
+	this.EditorProps = this.EditorProps ?? {};
+	this.EditorProps.DebugWeaponPositions = 
+	{
+		Type = "bool",
+		Name = "$EditorDebugWeaponPosName$",
+		EditorHelp = "$EditorDebugWeaponPosHelp$",
+		AsyncGet = "EditorProps_GetDebugEnabled",
+		Set = "EditorProps_SetDebugEnabled",
+	};
+	
+	if (EditorProps_GetDebugEnabled())
+	{
+		CreateEffect(FxEditorPropsDebug, 1, 1);
+	}
 
+	// Default values
 	_inherited();
 }
 
@@ -2068,3 +2085,61 @@ public func GetWeaponPosition(object user, string name, int angle, int precision
 		DebugColor = weapon_offset.DebugColor
 	};
 }
+
+/* --- Editor actions & properties --- */
+
+
+func EditorProps_GetDebugEnabled()
+{
+	return Scenario.Library_Firearm_DebugWeaponPositions;
+}
+
+func EditorProps_SetDebugEnabled(bool enabled)
+{
+	Scenario.Library_Firearm_DebugWeaponPositions = enabled;
+	
+	for (var weapon in FindObjects(Find_Property("weapon_properties")))
+	{
+		RemoveEffect(FxEditorPropsDebug.Name, weapon);
+		if (enabled)
+		{
+			weapon->CreateEffect(weapon.FxEditorPropsDebug, 1, 1);
+		}
+	}
+}
+
+
+local FxEditorPropsDebug = new Effect
+{
+	Name = "FxEditorPropsDebug",
+
+	Timer = func ()
+	{
+		var user = this.Target->Contained();
+		if (!user || !user->~IsAiming()) return;
+
+		var angle = user->GetAimPosition();
+
+		var debug_positions = [];
+		if (user.GetAimAnimationOffset)
+		{
+			PushBack(debug_positions, user->GetAimAnimationOffset(this.Target, angle));
+		}
+		for (var name in GetProperties(this.Target.weapon_properties.weapon_offset))
+		{
+			PushBack(debug_positions, this.Target->GetWeaponPosition(user, name, angle));
+		}
+
+		for (var position in debug_positions)
+		{
+			if (!position) continue;
+
+			var color = SplitRGBaValue(position.DebugColor);
+			user->CreateParticle("SphereSpark", position.X, position.Y, 0, 0, this.Interval,
+			{
+				Size = 1, R = color.R, G = color.G, B = color.B,
+				Attach = ATTACH_Front | ATTACH_MoveRelative,
+			});
+		}
+	},
+};
