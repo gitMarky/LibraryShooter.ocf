@@ -1623,7 +1623,7 @@ public func CreateFiremode(bool add)
 */
 public func MakeFiremodeWritable(int number)
 {
-	AssertValidFiremode(weapon_properties.firemodes, number);
+	AssertValidFiremode(number);
 	weapon_properties.firemodes[number] = { Prototype = weapon_properties.firemodes[number] };
 }
 
