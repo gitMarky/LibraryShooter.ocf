@@ -31,6 +31,8 @@ public func Initialize()
 	position_weapon.Fuse->DefineOffset(+2, -2);
 	position_weapon.Muzzle = new PositionOffsetRotation {};
 	position_weapon.Muzzle->DefineOffset(+12, -1);
+	position_weapon.AimPoint = new PositionOffsetRotation {};
+	position_weapon.AimPoint->DefineOffset(+500, -1);
 }
 
 /* --- Fire modes --- */
@@ -138,6 +140,52 @@ func GetPositionWeapon(string name, int angle, int precision)
 	var hand = GetPositionHand(angle, precision);
 	var weapon = position_weapon[name]->GetPosition(angle, precision);
 	return { X = hand.X + weapon.X, Y = hand.Y + weapon.Y, DebugColor = weapon.DebugColor };
+}
+
+/**
+	The actual firing function.@br@br
+
+	The function will create new bullet objects, as many as the firemode defines. Since no actual ammo objects are taken or consumed, this should be handled in {@link Library_Firearm#HandleAmmoUsage}.@br
+	Each time a single projectile is fired, {@link Library_Firearm#OnFireProjectile} is called.@br
+	{@link Library_Firearm#GetProjectileAmount} and {@link Library_Firearm#GetSpread} can be used for custom behaviour.@br
+
+	@par user The object that is using the weapon.
+	@par angle The firing angle.
+	@par firemode A proplist containing the fire mode information.
+*/
+func FireProjectiles(object user, int angle, proplist firemode)
+{
+	AssertNotNil(user);
+	AssertNotNil(firemode);
+
+	var user_x = user->~GetWeaponX(this); if (user_x) user_x -= GetX();
+	var user_y = user->~GetWeaponY(this); if (user_y) user_y -= GetY();
+
+	//var x = +Sin(angle, firemode->GetProjectileDistance()) + user_x;
+	//var y = -Cos(angle, firemode->GetProjectileDistance()) + user_y + firemode->GetYOffset();
+	var launch_position = GetPositionWeapon("Muzzle", angle);
+	var x = launch_position.X;
+	var y = launch_position.Y;
+
+	// launch the single projectiles
+	for (var i = 0; i < Max(1, firemode->GetProjectileAmount()); i++)
+	{
+		var projectile = CreateObject(firemode->GetProjectileID(), x, y, user->GetController());
+
+		projectile->Shooter(user)
+		          ->Weapon(this)
+		          ->DamageAmount(firemode->GetDamage())
+		          ->DamageType(firemode->GetDamageType())
+		          ->Velocity(Library_Random->SampleValue(firemode->GetProjectileSpeed()))
+		          ->Range(Library_Random->SampleValue(firemode->GetProjectileRange()));
+
+		this->OnFireProjectile(user, projectile, firemode);
+		projectile->Launch(angle, ComposeSpread(user, firemode));
+	}
+
+	shot_counter[firemode->GetIndex()]++;
+
+	HandleAmmoUsage(firemode);
 }
 
 /* --- Debugging --- */
