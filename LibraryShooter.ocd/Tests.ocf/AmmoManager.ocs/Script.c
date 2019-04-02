@@ -23,6 +23,25 @@ global func DoAmmoTest(object manager, id ammo, int amount_initial, int set_ammo
 	doTest(Format("GetAmmo(%i)     - %s", ammo,           expect_int), amount_after_do,  manager->GetAmmo(ammo));
 }
 
+global func DoAmmoTestContainer(object container, id ammo, int container_start, int container_end, object manager, int amount_initial, int change_ammo, int change_result, int amount_after_change, bool set_else_do)
+{
+	var expect_int = "should be %03d, is %03d";
+
+	    doTest(Format("M#GetAmmo(%i)     - %s", ammo,              expect_int), amount_initial,  manager->GetAmmo(ammo));
+	    doTest(Format("C#GetAmmo(%i)     - %s", ammo,              expect_int), container_start, container->GetAmmo(ammo));
+	if (set_else_do)
+	{
+		doTest(Format("M#SetAmmo(%i, %d) - %s", ammo, change_ammo, expect_int), change_result,       manager->SetAmmo(ammo, change_ammo));
+		doTest(Format("M#GetAmmo(%i)     - %s", ammo,              expect_int), amount_after_change, manager->GetAmmo(ammo));
+	}
+	else
+	{
+		doTest(Format("M#DoAmmo(%i, %d)  - %s", ammo, change_ammo, expect_int), change_result,       manager->DoAmmo(ammo, change_ammo));
+		doTest(Format("M#GetAmmo(%i)     - %s", ammo,              expect_int), amount_after_change, manager->GetAmmo(ammo));
+	}
+	    doTest(Format("C#GetAmmo(%i)     - %s", ammo,              expect_int), container_end,       container->GetAmmo(ammo));
+}
+
 
 /* --- The actual tests --- */
 
@@ -43,15 +62,20 @@ global func Test1_Execute()
 	// Tests inside bounds
 	// For ammo without limits the ammo manager starts with 1
 
-	DoAmmoTest(manager, Rock, 1, 10, 10, 1, +5, +5, 1); // Set to 10, do +5 = 15
-	DoAmmoTest(manager, Wood, 1, 20, 20, 1, -7, -7, 1); // Set to 20, do -7 = 13
+	DoAmmoTest(manager, Rock,  1, 
+	                          10, 10, 1,  // Set to 10
+	                           5,  5, 1); // Do +5 = 15
+	DoAmmoTest(manager, Wood,  1,
+	                          20, 20, 1,  // Set to 20
+                              -7, -7, 1); // Do -7 = 13
 
 	// Test outside bounds
 	// For ammo with limits the ammo manager starts at the limit
 	// Takes as much ammo as is requested
-	var exceeding_limit = TEST_AMMO_LIMIT + 1;
 	
-	DoAmmoTest(manager, Test_AmmoLimited, TEST_AMMO_LIMIT, exceeding_limit, exceeding_limit, TEST_AMMO_LIMIT, -exceeding_limit, -exceeding_limit, TEST_AMMO_LIMIT);
+	DoAmmoTest(manager, Test_AmmoLimited, TEST_AMMO_LIMIT,
+	                                      OVER_AMMO_LIMIT,  OVER_AMMO_LIMIT, TEST_AMMO_LIMIT,
+	                                     -OVER_AMMO_LIMIT, -OVER_AMMO_LIMIT, TEST_AMMO_LIMIT);
 
 	return Evaluate();
 }
@@ -70,17 +94,62 @@ global func Test2_Execute()
 	manager.Test_AmmoSource = AMMO_Source_Local;
 
 	// Tests inside bounds
-	// For ammo without limits the ammo manager starts with 1
+	// For ammo without limits the ammo manager starts with 0
 
-	DoAmmoTest(manager, Rock, 0, 10, 10, 10, +5, +5, 15); // Set to 10, do +5 = 15
-	DoAmmoTest(manager, Wood, 0, 20, 20, 20, -7, -7, 13); // Set to 20, do -7 = 13
+	DoAmmoTest(manager, Rock,  0, 
+	                          10, 10, 10,  // Set to 10
+	                           5,  5, 15); // Do +5 = 15
+	DoAmmoTest(manager, Wood,  0,
+	                           20, 20, 20,  // Set to 20
+	                           -7, -7, 13); // Do -7 = 13
 
 	// Test outside bounds
 	// For ammo with limits the ammo manager starts at the limit
 	// Takes as much ammo as is requested
-	var exceeding_limit = TEST_AMMO_LIMIT + 1;
 	
-	DoAmmoTest(manager, Test_AmmoLimited, 0, exceeding_limit, TEST_AMMO_LIMIT, TEST_AMMO_LIMIT, -exceeding_limit, -TEST_AMMO_LIMIT, 0);
+	DoAmmoTest(manager, Test_AmmoLimited, 0,
+	                                      OVER_AMMO_LIMIT,  TEST_AMMO_LIMIT, TEST_AMMO_LIMIT,
+	                                     -OVER_AMMO_LIMIT, -TEST_AMMO_LIMIT, 0);
+
+	return Evaluate();
+}
+
+// --------------------------------------------------------------------------------------------------------
+
+global func Test3_OnStart()
+{
+	Log("Ammo Manager with container ammo source");
+	return true;
+}
+
+global func Test3_Execute()
+{
+	// This one is a bit tricky:
+	// Every manipulation that you do with the manager
+	// is applied directly to the container
+
+	var container = CreateObject(Test_AmmoManager, 0, 0, NO_OWNER);
+	container.Test_AmmoSource = AMMO_Source_Local;
+	container->SetAmmo(Rock, 11);
+	container->SetAmmo(Wood, 0);
+	container->SetAmmo(Test_AmmoLimited, UNDER_AMMO_LIMIT);
+
+	var manager = CreateObject(Test_AmmoManager, 0, 0, NO_OWNER);
+	manager.Test_AmmoSource = AMMO_Source_Container;
+	manager.Test_AmmoContainer = container;
+
+	// Tests inside bounds
+
+	DoAmmoTestContainer(container, Rock, 11, 10, manager, 11, 10, 10, 10, true);  // Set to 10
+	DoAmmoTestContainer(container, Rock, 10, 15, manager, 10,  5,  5, 15, false); // Do +5
+
+	DoAmmoTestContainer(container, Wood,  0, 20, manager,  0, 20, 20, 20, true);  // Set to 20
+	DoAmmoTestContainer(container, Wood, 20, 13, manager, 20, -7, -7, 13, false); // Do -7
+
+	// Test outside bounds
+	
+	DoAmmoTestContainer(container, Test_AmmoLimited, UNDER_AMMO_LIMIT, TEST_AMMO_LIMIT, manager,  UNDER_AMMO_LIMIT, OVER_AMMO_LIMIT, TEST_AMMO_LIMIT, TEST_AMMO_LIMIT, true); // Exceed limit by set
+	DoAmmoTestContainer(container, Test_AmmoLimited, TEST_AMMO_LIMIT, 0, manager, TEST_AMMO_LIMIT, -OVER_AMMO_LIMIT, -TEST_AMMO_LIMIT, 0, false); // Do -7
 
 	return Evaluate();
 }
