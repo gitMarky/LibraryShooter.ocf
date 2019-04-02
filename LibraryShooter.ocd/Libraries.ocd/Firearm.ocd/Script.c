@@ -2075,7 +2075,17 @@ local FxEditorPropsDebug = new Effect
 	Timer = func ()
 	{
 		var user = this.Target->Contained();
-		if (!user || !user->~IsAiming()) return;
+		DebugAimPositions(user);
+	}
+	
+	DebugAimPositions = func (object user)
+	{
+		if (!user
+		||  !user->~IsAiming()
+		||   user->~GetHandItem() != this.Target)
+		{
+			return;
+		}
 
 		var angle = user->GetAimPosition();
 
