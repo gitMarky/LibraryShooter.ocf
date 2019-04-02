@@ -9,11 +9,11 @@
 /* --- Global functions and constants --- */
 
 // These are numbers and should not be used as bits
-static const AMMO_Source_Local = 1;	// ammo is saved as numbers
-static const AMMO_Source_Items = 2; // ammo is saved from collected items, such as arrow packs
+static const AMMO_Source_Local = 1;	// Ammo is saved as numbers
+static const AMMO_Source_Items = 2; // Ammo is saved from collected items, such as arrow packs
 
-static const AMMO_Source_Container = 3;	// ammo is saved in the carrier of the weapon (as in arcade games)
-static const AMMO_Source_Infinite = 4;	// ammo is unlimited - yay for cheats
+static const AMMO_Source_Container = 3;	// Ammo is saved in the carrier of the weapon (as in arcade games)
+static const AMMO_Source_Infinite = 4;	// Ammo is unlimited - yay for cheats
 
 /* --- Properties --- */
 
@@ -189,7 +189,7 @@ public func SetAmmo(id ammo, int new_value)
 /**
 
 	@return an ammunition manager object that handles the ammunition counting
-         if {@link Library_AmmoManager#GetAmmoSource} is {@c AMMO_Source_Container}
+            if {@link Library_AmmoManager#GetAmmoSource} is {@c AMMO_Source_Container}
  */
 public func GetAmmoContainer()
 {

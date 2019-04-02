@@ -1,0 +1,8 @@
+[Head]
+Title=AmmoManager
+
+[Definitions]
+Definition2=LibraryShooter.ocd
+
+[Landscape]
+NoScan=1
