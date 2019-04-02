@@ -13,9 +13,9 @@ local lib_aim_manager_shooter;
 func Construction(object by)
 {
 	lib_aim_manager_shooter = lib_aim_manager_shooter ?? {};
-	
+
 	// Currently defines the offsets for the musket aiming animation only
-	// Has to be changed to 
+	// Has to be changed to depend on the animation.
 	if (!lib_aim_manager_shooter.position_hand)
 	{
 		lib_aim_manager_shooter.position_hand = new PositionOffsetAnimation {};
@@ -39,6 +39,6 @@ func GetAimAnimationOffset(object weapon, int angle, int precision)
 	}
 	else
 	{
-		return {X = 0, Y = 0,};
+		return { X = 0, Y = 0, };
 	}
 }

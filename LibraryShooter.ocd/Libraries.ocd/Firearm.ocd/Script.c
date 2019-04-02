@@ -2076,7 +2076,7 @@ local FxEditorPropsDebug = new Effect
 	{
 		var user = this.Target->Contained();
 		DebugAimPositions(user);
-	}
+	},
 	
 	DebugAimPositions = func (object user)
 	{
