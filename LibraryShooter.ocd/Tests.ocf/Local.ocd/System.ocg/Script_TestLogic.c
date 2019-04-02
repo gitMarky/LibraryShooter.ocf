@@ -160,7 +160,7 @@ static const IntTestControl = new Effect
 };
 
 
-global func doTest(description, returned, expected)
+global func doTest(description, expected, returned)
 {
 	var test;
 
@@ -176,7 +176,7 @@ global func doTest(description, returned, expected)
 	var predicate = "[Fail]";
 	if (test) predicate = "[Pass]";
 
-	Log(Format("%s %s", predicate, description), returned, expected);
+	Log(Format("%s %s", predicate, description), expected, returned);
 
 	CurrentTest().current_check &= test;
 	return test;
