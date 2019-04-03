@@ -534,7 +534,7 @@ func StartCharge(object user, int x, int y)
 	var firemode = GetFiremode();
 	AssertNotNil(firemode);
 
-	if (!is_using || firemode->GetChargeDelay() < 1 || !NeedsCharge(user, firemode)) return false;
+	if (!is_using || firemode->GetChargeDelay() < 1 || !this->NeedsCharge(user, firemode)) return false;
 
 	var charge_process = IsCharging();
 

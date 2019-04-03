@@ -16,7 +16,7 @@ func InitializePlayer(int plr)
 	SetFoW(false, plr);
 
 	// Start!
-	LaunchTest(1);
+	LaunchTest(5);
 	return;
 }
 
@@ -65,6 +65,17 @@ global func testFiredProjectiles(int expected_amount)
 {
 	return doTest("Weapon should fire %d projectiles, was %d.", expected_amount, CurrentTest().data.projectiles_fired);
 }
+
+global func DebugOnProgressCharge(object user, int x, int y, proplist firemode, int current_percent, int change_percent)
+{
+	if (change_percent != 0)
+	{
+		Log("Charging: %d%%", current_percent);
+	}
+}
+
+global func AlwaysTrue() { return true; }
+global func AlwaysFalse() { return false; }
 
 // --------------------------------------------------------------------------------------------------------
 global func Test1_OnStart()
@@ -159,22 +170,51 @@ global func Test4_OnStart()
 	Log("Two bullets should be fired if the button is pressed again after the recovery delay");
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetRecoveryDelay(30);
-	CurrentTest().test3_pressed = 0;
+	CurrentTest().test4_pressed = 0;
 	return true;
 }
 
 global func Test4_Execute()
 {
-	if (CurrentTest().test3_pressed >= 2)
+	if (CurrentTest().test4_pressed >= 2)
 	{
 		testFiredProjectiles(2);
 		return Evaluate();
 	}
 	else
 	{
-		CurrentTest().test3_pressed += 1;
+		CurrentTest().test4_pressed += 1;
 		var hold_button = 15;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 20);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test5_OnStart()
+{
+	Log("Single fire mode:");
+	Log("No bullet fired if button released before charge delay finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetChargeDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.NeedsCharge = Global.AlwaysTrue;
+	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
+	CurrentTest().test5_pressed = 0;
+	return true;
+}
+
+global func Test5_Execute()
+{
+	if (CurrentTest().test5_pressed >= 2)
+	{
+		testFiredProjectiles(0);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test5_pressed += 1;
+		var hold_button = 20;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 22);
 	}
 }
