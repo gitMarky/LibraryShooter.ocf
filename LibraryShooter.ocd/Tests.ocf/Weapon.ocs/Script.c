@@ -48,6 +48,10 @@ global func Test_Init()
 
 global func PressControlUse(int hold_frames, object user, object weapon, int aim_x, int aim_y)
 {
+	user = user ?? CurrentTest().user;
+	weapon = weapon ?? CurrentTest().weapon;
+	aim_x = aim_x ?? 1000;
+	aim_y = aim_y ?? -50;
 	ScheduleCall(weapon, weapon.ControlUseStart, 1, nil, user, aim_x, aim_y);
 	for (var delay = 2; delay < hold_frames; ++delay)
 	{
@@ -82,8 +86,8 @@ global func Test1_Execute()
 		var expected_aim_angle = Angle(0, 0, coordinates[0], coordinates[1]);
 		var expected_fire_angle = Angle(0, -5, coordinates[0], coordinates[1]);
 
-		doTest("Aiming angle is %d, should be %d", aim_angle, expected_aim_angle);
-		doTest("Firing angle is %d, should be %d", fire_angle, expected_fire_angle);
+		doTest("Aiming angle should be %d, was %d", expected_aim_angle, aim_angle);
+		doTest("Firing angle should be %d, was %d", expected_fire_angle, fire_angle);
 	}
 
 	return Evaluate();
@@ -102,18 +106,15 @@ global func Test2_Execute()
 {
 	if (CurrentTest().test2_started)
 	{
-		doTest("Weapon fired %d projectiles, should be %d.", CurrentTest().data.projectiles_fired, 1);
+		doTest("Weapon should fire %d projectiles, was %d.", 1, CurrentTest().data.projectiles_fired);
 		return Evaluate();
 	}
 	else
 	{
 		CurrentTest().test2_started = true;
-		var delay = 10;
-		var user = CurrentTest().user;
-		var weapon = CurrentTest().weapon;
-		var aim_x = 1000;
-		var aim_y = -50;
-		PressControlUse(delay, user, weapon, aim_x, aim_y);
-		return Wait(delay + 2);
+		CurrentTest().weapon->GetFiremode()->SetRecoveryDelay(5);
+		var hold_button = 20;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
 	}
 }
