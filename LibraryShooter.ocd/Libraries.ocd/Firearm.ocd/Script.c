@@ -534,7 +534,12 @@ func StartCharge(object user, int x, int y)
 	var firemode = GetFiremode();
 	AssertNotNil(firemode);
 
-	if (!is_using || firemode->GetChargeDelay() < 1 || !this->NeedsCharge(user, firemode)) return false;
+	if (!is_using                           // No charge necessary if we are in burst mode
+	||  firemode->GetChargeDelay() < 1      // Charging does not make sense?
+	||  !this->NeedsCharge(user, firemode)) // Charging necessary? By default this is the same condition as above, but someone may define a custom condition; Callback via "this->" for runtime overload
+	{
+		return false; // Do not charge then
+	}
 
 	var charge_process = IsCharging();
 
@@ -544,18 +549,18 @@ func StartCharge(object user, int x, int y)
 		{
 			if (charge_process.has_charged)
 			{
-				return false; // fire away
+				return false; // Fire away
 			}
 			else if (charge_process.is_charged)
 			{
 				charge_process.has_charged = true;
 				if (DoCharge(user, x, y, firemode))
 				{
-					return false; // fire away
+					return false; // Fire away
 				}
 				else
 				{
-					return true; // keep charging, because someone overrode DoCharge()
+					return true; // Keep charging, because someone overrides DoCharge()
 				}
 			}
 			else
@@ -565,7 +570,7 @@ func StartCharge(object user, int x, int y)
 					this->OnProgressCharge(user, x, y, firemode, charge_process.percentage, charge_process.progress);
 					charge_process.percent_old = charge_process.percentage;
 				}
-				return true; // keep charging
+				return true; // Keep charging
 			}
 		}
 		else
@@ -576,7 +581,7 @@ func StartCharge(object user, int x, int y)
 
 	CreateEffect(IntChargeEffect, 1, 1, user, firemode);
 	this->OnStartCharge(user, x, y, firemode);
-	return true; // keep charging
+	return true; // Keep charging
 }
 
 
@@ -650,10 +655,15 @@ public func GetChargeProgress()
 	@par user The object that is using the weapon.
 	@par firemode A proplist containing the fire mode information.
 
-	@return {@c false} by default. Overload this function for a custom condition.
+	@return default: {@c true}, if the {@link Library_Firearm_Firemode#GetChargeDelay} is > 0.
+	                 Overload this function for a custom condition.
  */
 public func NeedsCharge(object user, proplist firemode)
 {
+	if (firemode)
+	{
+		return firemode->GetChargeDelay() > 0;
+	}
 	return false;
 }
 

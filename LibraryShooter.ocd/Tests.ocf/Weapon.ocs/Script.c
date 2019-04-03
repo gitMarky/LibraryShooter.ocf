@@ -197,7 +197,7 @@ global func Test5_OnStart()
 	Log("No bullet fired if button released before charge delay finishes");
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetChargeDelay(30)->SetRecoveryDelay(10);
-	CurrentTest().weapon.NeedsCharge = Global.AlwaysTrue;
+	//CurrentTest().weapon.NeedsCharge = Global.AlwaysTrue;
 	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
 	CurrentTest().test5_pressed = 0;
 	return true;
