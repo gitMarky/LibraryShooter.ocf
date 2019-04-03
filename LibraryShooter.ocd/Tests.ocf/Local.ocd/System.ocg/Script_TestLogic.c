@@ -183,9 +183,22 @@ global func doTest(string description, expected, returned)
 }
 
 
-global func testCall(expected, function_name)
+global func testCall(expected, call)
 {
-	return doTest(Format("%v->%v(%s) %s", this, function_name, FormatAllPars(...), "should be %v, is %v"), expected, Call(function_name, ...));
+	var name;
+	if (GetType(call) == C4V_Function)
+	{
+		name = GetFunctionName(call);
+	}
+	else if (GetType(call) == C4V_String)
+	{
+		name = call;
+	}
+	else
+	{
+		FatalError("Parameter 'call' must be C4V_Function or C4V_String, is %v", GetType(call));
+	}
+	return doTest(Format("%v->%s(%s) %s", this, name, FormatAllPars(...), "should be %v, is %v"), expected, Call(call, ...));
 }
 
 
