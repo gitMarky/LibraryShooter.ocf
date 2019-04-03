@@ -1262,7 +1262,7 @@ func CheckCooldown(object user, proplist firemode)
 */
 func StartCooldown(object user, proplist firemode)
 {
-	if (firemode->GetCooldownDelay() < 1 || !NeedsCooldown(user, firemode))
+	if (firemode->GetCooldownDelay() < 1 || !this->NeedsCooldown(user, firemode))
 	{
 		this->OnSkipCooldown(user, firemode);
 		return;
@@ -1316,11 +1316,16 @@ func IsCoolingDown()
 	@par user The object that is using the weapon.
 	@par firemode A proplist containing the fire mode information.
 
-	@return {@c true} by default. Overload this function for a custom condition.
+	@return default: {@c true}, if the {@link Library_Firearm_Firemode#GetCooldownDelay} is > 0.
+	                 Overload this function for a custom condition.
  */
 public func NeedsCooldown(object user, proplist firemode)
 {
-	return true;
+	if (firemode)
+	{
+		return firemode->GetCooldownDelay() > 0;
+	}
+	return false;
 }
 
 
