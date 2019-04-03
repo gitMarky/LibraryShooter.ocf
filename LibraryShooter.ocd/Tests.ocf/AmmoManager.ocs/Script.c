@@ -15,31 +15,29 @@ func InitializePlayer(int plr)
 
 global func DoAmmoTest(object manager, id ammo, int amount_initial, int set_ammo, int set_result, int amount_after_set, int do_ammo, int do_result, int amount_after_do)
 {
-	var expect_int = "should be %03d, is %03d";
-	doTest(Format("GetAmmo(%i)     - %s", ammo,           expect_int), amount_initial,   manager->GetAmmo(ammo));
-	doTest(Format("SetAmmo(%i, %d) - %s", ammo, set_ammo, expect_int), set_result,       manager->SetAmmo(ammo, set_ammo));
-	doTest(Format("GetAmmo(%i)     - %s", ammo,           expect_int), amount_after_set, manager->GetAmmo(ammo));
-	doTest(Format("DoAmmo(%i, %d)  - %s", ammo, do_ammo,  expect_int), do_result,        manager->DoAmmo(ammo, do_ammo));
-	doTest(Format("GetAmmo(%i)     - %s", ammo,           expect_int), amount_after_do,  manager->GetAmmo(ammo));
+	manager->testCall(amount_initial, manager.GetAmmo, ammo);
+	manager->testCall(set_result, manager.SetAmmo, ammo, set_ammo);
+	manager->testCall(amount_after_set, manager.GetAmmo, ammo);
+	manager->testCall(do_result, manager.DoAmmo, ammo, do_ammo);
+	manager->testCall(amount_after_do, manager.GetAmmo, ammo);
 }
 
 global func DoAmmoTestContainer(object container, id ammo, int container_start, int container_end, object manager, int amount_initial, int change_ammo, int change_result, int amount_after_change, bool set_else_do)
 {
-	var expect_int = "should be %03d, is %03d";
-
-	    doTest(Format("M#GetAmmo(%i)     - %s", ammo,              expect_int), amount_initial,  manager->GetAmmo(ammo));
-	    doTest(Format("C#GetAmmo(%i)     - %s", ammo,              expect_int), container_start, container->GetAmmo(ammo));
+    manager->testCall(amount_initial, manager.GetAmmo, ammo);
+    container->testCall(container_start, container.GetAmmo, ammo);
+	    
 	if (set_else_do)
 	{
-		doTest(Format("M#SetAmmo(%i, %d) - %s", ammo, change_ammo, expect_int), change_result,       manager->SetAmmo(ammo, change_ammo));
-		doTest(Format("M#GetAmmo(%i)     - %s", ammo,              expect_int), amount_after_change, manager->GetAmmo(ammo));
+	    manager->testCall(change_result, manager.SetAmmo, ammo, change_ammo);
+	    manager->testCall(amount_after_change, manager.GetAmmo, ammo);
 	}
 	else
 	{
-		doTest(Format("M#DoAmmo(%i, %d)  - %s", ammo, change_ammo, expect_int), change_result,       manager->DoAmmo(ammo, change_ammo));
-		doTest(Format("M#GetAmmo(%i)     - %s", ammo,              expect_int), amount_after_change, manager->GetAmmo(ammo));
+	    manager->testCall(change_result, manager.DoAmmo, ammo, change_ammo);
+	    manager->testCall(amount_after_change, manager.GetAmmo, ammo);
 	}
-	    doTest(Format("C#GetAmmo(%i)     - %s", ammo,              expect_int), container_end,       container->GetAmmo(ammo));
+    container->testCall(container_end, container.GetAmmo, ammo);
 }
 
 

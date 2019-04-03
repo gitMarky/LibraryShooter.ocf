@@ -160,7 +160,7 @@ static const IntTestControl = new Effect
 };
 
 
-global func doTest(description, expected, returned)
+global func doTest(string description, expected, returned)
 {
 	var test;
 
@@ -180,6 +180,29 @@ global func doTest(description, expected, returned)
 
 	CurrentTest().current_check &= test;
 	return test;
+}
+
+
+global func testCall(expected, function_name)
+{
+	return doTest(Format("%v->%v(%s) %s", this, function_name, FormatAllPars(...), "should be %v, is %v"), expected, Call(function_name, ...));
+}
+
+
+global func FormatAllPars(par0, par1, par2, par3, par4, par5, par6, par7, par8, par9)
+{
+	if (par1 || par2 || par3 || par4 || par5 || par6 || par7 || par8 || par9)
+	{
+		return Format("%v, %s", par0, FormatAllPars(par1, par2, par3, par4, par5, par6, par7, par8, par9));
+	}
+	else if (par0)
+	{
+		return Format("%v", par0);
+	}
+	else
+	{
+		return "";
+	}
 }
 
 
