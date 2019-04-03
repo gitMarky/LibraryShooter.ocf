@@ -43,6 +43,7 @@ global func Test_Init()
 	test.target->SetColor(RGB(255, 0, 255));
 	test.weapon = test.user->CreateContents(Weapon);
 	test.data = new DataContainer {};
+	return true;
 }
 
 
@@ -60,6 +61,10 @@ global func PressControlUse(int hold_frames, object user, object weapon, int aim
 	ScheduleCall(weapon, weapon.ControlUseStop, hold_frames, nil, user, aim_x, aim_y);
 }
 
+global func testFiredProjectiles(int expected_amount)
+{
+	return doTest("Weapon should fire %d projectiles, was %d.", expected_amount, CurrentTest().data.projectiles_fired);
+}
 
 // --------------------------------------------------------------------------------------------------------
 global func Test1_OnStart()
@@ -97,8 +102,10 @@ global func Test1_Execute()
 // --------------------------------------------------------------------------------------------------------
 global func Test2_OnStart()
 {
-	Log("Test for Weapon: Fire a bullet in single fire mode");
+	Log("Single fire mode:");
+	Log("Only one bullet should be fired if the button is pressed longer than recovery delay");
 	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetRecoveryDelay(5);
 	return true;
 }
 
@@ -106,15 +113,68 @@ global func Test2_Execute()
 {
 	if (CurrentTest().test2_started)
 	{
-		doTest("Weapon should fire %d projectiles, was %d.", 1, CurrentTest().data.projectiles_fired);
+		testFiredProjectiles(1);
 		return Evaluate();
 	}
 	else
 	{
 		CurrentTest().test2_started = true;
-		CurrentTest().weapon->GetFiremode()->SetRecoveryDelay(5);
 		var hold_button = 20;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test3_OnStart()
+{
+	Log("Single fire mode:");
+	Log("Only one bullet should be fired if the button is pressed twice within recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetRecoveryDelay(50);
+	CurrentTest().test3_pressed = 0;
+	return true;
+}
+
+global func Test3_Execute()
+{
+	if (CurrentTest().test3_pressed >= 2)
+	{
+		testFiredProjectiles(1);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test3_pressed += 1;
+		var hold_button = 10;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test4_OnStart()
+{
+	Log("Single fire mode:");
+	Log("Two bullets should be fired if the button is pressed again after the recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetRecoveryDelay(30);
+	CurrentTest().test3_pressed = 0;
+	return true;
+}
+
+global func Test4_Execute()
+{
+	if (CurrentTest().test3_pressed >= 2)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test3_pressed += 1;
+		var hold_button = 15;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 20);
 	}
 }

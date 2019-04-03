@@ -66,8 +66,18 @@ static const IntTestControl = new Effect
 		// Launch new test if needed.
 		if (!this.launched)
 		{
+			Log("=====================================");
 			// Start the test if available, otherwise finish test sequence.
-			if (!this->HasNextTest())
+			if (this->HasNextTest())
+			{
+				// Log test start.
+				Log("Test %d started:", this.testnr);
+				this.launched = true;
+				this.count_total++;
+				this.current_result = false;
+				this.current_check = true;
+			}
+			else
 			{
 				Log("Test %d not available, the previous test was the last test.", this.testnr);
 				Log("=====================================");
@@ -86,13 +96,6 @@ static const IntTestControl = new Effect
 				}
 				return FX_Execute_Kill;
 			}
-			// Log test start.
-			Log("=====================================");
-			Log("Test %d started:", this.testnr);
-			this.launched = true;
-			this.count_total++;
-			this.current_result = false;
-			this.current_check = true;
 		}
 
 		// waiting
