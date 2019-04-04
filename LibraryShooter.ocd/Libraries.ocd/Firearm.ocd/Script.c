@@ -186,7 +186,7 @@ public func ControlUseAltStart(object user, int x, int y)
 
 	The function does the following:@br
  	- call {@link Library_Firearm#OnHoldingUse}@br
-	- call {@link Library_Firearm#ControlFireHolding}@br
+	- call {@link Library_Firearm#StartFireCycle}@br
 
 	@par user The object that is using the weapon.
 	@par x The x coordinate the user is aiming at. Relative to the user.
@@ -200,7 +200,7 @@ public func ControlUseHolding(object user, int x, int y)
 	}
 	else
 	{
-		return ControlFireHolding(user, x, y);
+		return StartFireCycle(user, x, y);
 	}
 }
 
@@ -217,13 +217,13 @@ public func ControlUseHolding(object user, int x, int y)
 	@par x The x coordinate the user is aiming at. Relative to the user.
 	@par y The y coordinate the user is aiming at. Relative to the user.
  */
-public func ControlFireHolding(object user, int x, int y)
+public func StartFireCycle(object user, int x, int y)
 {
 	AssertNotNil(user);
 
 	if (this->~RejectUse(user))
 	{
-		ControlUseStop(user, x, y);
+		CancelFireCycle(user, x, y);
 		return false;
 	}
 	
