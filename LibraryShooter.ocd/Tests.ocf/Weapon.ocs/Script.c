@@ -43,6 +43,8 @@ global func Test_Init()
 	test.target->SetColor(RGB(255, 0, 255));
 	test.weapon = test.user->CreateContents(Weapon);
 	test.data = new DataContainer {};
+	test.test_pressed = 0;
+	test.test_started = false;
 	return true;
 }
 
@@ -114,6 +116,7 @@ global func Test1_Execute()
 	return Evaluate();
 }
 
+// ########################################################################################################
 
 // --------------------------------------------------------------------------------------------------------
 global func Test2_OnStart()
@@ -127,14 +130,14 @@ global func Test2_OnStart()
 
 global func Test2_Execute()
 {
-	if (CurrentTest().test2_started)
+	if (CurrentTest().test_started)
 	{
 		testFiredProjectiles(1);
 		return Evaluate();
 	}
 	else
 	{
-		CurrentTest().test2_started = true;
+		CurrentTest().test_started = true;
 		var hold_button = 20;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2);
@@ -148,20 +151,19 @@ global func Test3_OnStart()
 	Log("Only one bullet should be fired if the button is pressed twice within recovery delay");
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetRecoveryDelay(50);
-	CurrentTest().test3_pressed = 0;
 	return true;
 }
 
 global func Test3_Execute()
 {
-	if (CurrentTest().test3_pressed >= 2)
+	if (CurrentTest().test_pressed >= 2)
 	{
 		testFiredProjectiles(1);
 		return Evaluate();
 	}
 	else
 	{
-		CurrentTest().test3_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 10;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2);
@@ -175,20 +177,19 @@ global func Test4_OnStart()
 	Log("Two bullets should be fired if the button is pressed again after the recovery delay");
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetRecoveryDelay(30);
-	CurrentTest().test4_pressed = 0;
 	return true;
 }
 
 global func Test4_Execute()
 {
-	if (CurrentTest().test4_pressed >= 2)
+	if (CurrentTest().test_pressed >= 2)
 	{
 		testFiredProjectiles(2);
 		return Evaluate();
 	}
 	else
 	{
-		CurrentTest().test4_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 15;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 20);
@@ -203,20 +204,19 @@ global func Test5_OnStart()
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetChargeDelay(30)->SetRecoveryDelay(10);
 	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
-	CurrentTest().test5_pressed = 0;
 	return true;
 }
 
 global func Test5_Execute()
 {
-	if (CurrentTest().test5_pressed >= 2)
+	if (CurrentTest().test_pressed >= 2)
 	{
 		testFiredProjectiles(0);
 		return Evaluate();
 	}
 	else
 	{
-		CurrentTest().test5_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 20;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 22);
@@ -231,20 +231,20 @@ global func Test6_OnStart()
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetChargeDelay(30)->SetRecoveryDelay(10);
 	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
-	CurrentTest().test6_pressed = false;
+	CurrentTest().test_pressed = false;
 	return true;
 }
 
 global func Test6_Execute()
 {
-	if (CurrentTest().test6_pressed)
+	if (CurrentTest().test_pressed)
 	{
 		testFiredProjectiles(1);
 		return Evaluate();
 	}
 	else
 	{
-		CurrentTest().test6_pressed = true;
+		CurrentTest().test_pressed = true;
 		var hold_button = 35;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2);
@@ -259,20 +259,19 @@ global func Test7_OnStart()
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetChargeDelay(30)->SetRecoveryDelay(10);
 	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
-	CurrentTest().test7_pressed = 0;
 	return true;
 }
 
 global func Test7_Execute()
 {
-	if (CurrentTest().test7_pressed >= 2)
+	if (CurrentTest().test_pressed >= 2)
 	{
 		testFiredProjectiles(2);
 		return Evaluate();
 	}
 	else
 	{
-		CurrentTest().test7_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 35;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 10);
@@ -288,27 +287,26 @@ global func Test8_OnStart()
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetCooldownDelay(30)->SetRecoveryDelay(10);
 	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
-	CurrentTest().test8_pressed = 0;
 	return true;
 }
 
 global func Test8_Execute()
 {
-	if (CurrentTest().test8_pressed >= 2)
+	if (CurrentTest().test_pressed >= 2)
 	{
 		testFiredProjectiles(1);
 		return Evaluate();
 	}
-	else if (CurrentTest().test8_pressed == 1)
+	else if (CurrentTest().test_pressed == 1)
 	{
-		CurrentTest().test8_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 5;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2);
 	}
 	else
 	{
-		CurrentTest().test8_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 20; // 10 from recovery, then abort cooldown at 10/30
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2); // Press again before cooldown should end
@@ -323,27 +321,26 @@ global func Test9_OnStart()
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetCooldownDelay(30)->SetRecoveryDelay(10);
 	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
-	CurrentTest().test9_pressed = 0;
 	return true;
 }
 
 global func Test9_Execute()
 {
-	if (CurrentTest().test9_pressed >= 2)
+	if (CurrentTest().test_pressed >= 2)
 	{
 		testFiredProjectiles(2);
 		return Evaluate();
 	}
-	else if (CurrentTest().test9_pressed == 1)
+	else if (CurrentTest().test_pressed == 1)
 	{
-		CurrentTest().test9_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 5;
 		PressControlUse(hold_button); // Second bullet should fire, or third if the implementation is incorrect
 		return Wait(hold_button + 2);
 	}
 	else
 	{
-		CurrentTest().test9_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 45; // Recovery + cooldown, and enough time to fire an unwanted bullet (correct is: bullet fired only after releasing the trigger)
 		PressControlUse(hold_button);
 		return Wait(hold_button + 50); // Wait long enough for second cooldown to finish, if an unwanted bullet was fired
@@ -358,29 +355,617 @@ global func Test10_OnStart()
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Single)->SetCooldownDelay(30)->SetRecoveryDelay(20);
 	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
-	CurrentTest().test9_pressed = 0;
 	return true;
 }
 
 global func Test10_Execute()
 {
-	if (CurrentTest().test10_pressed >= 2)
+	if (CurrentTest().test_pressed >= 2)
 	{
 		testFiredProjectiles(1);
 		return Evaluate();
 	}
-	else if (CurrentTest().test10_pressed == 1)
+	else if (CurrentTest().test_pressed == 1)
 	{
-		CurrentTest().test10_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 5;
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2);
 	}
 	else
 	{
-		CurrentTest().test10_pressed += 1;
+		CurrentTest().test_pressed += 1;
 		var hold_button = 35; // Enough to finish cooldown, but not enough to finish recovery
 		PressControlUse(hold_button);
 		return Wait(hold_button + 2); // Press again before recovery/cooldown finishes
+	}
+}
+
+
+// ########################################################################################################
+
+// --------------------------------------------------------------------------------------------------------
+global func Test11_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("Only the burst amount (1) should be fired if the button is pressed longer than recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetRecoveryDelay(5);
+	return true;
+}
+
+global func Test11_Execute()
+{
+	if (CurrentTest().test_started)
+	{
+		testFiredProjectiles(1);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_started = true;
+		var hold_button = 20;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test12_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("Only burst amount (3) bullets should be fired if the button is pressed twice within recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetBurstAmount(3)->SetRecoveryDelay(20);
+	CurrentTest().test_started = FrameCounter();
+	return true;
+}
+
+global func Test12_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		// It takes some time to finish the burst, wait more than is necessary to catch faulty behaviour
+		if (FrameCounter() > CurrentTest().test_started + 70)
+		{
+			testFiredProjectiles(3);
+			return Evaluate();
+		}
+		else
+		{
+			return Wait();
+		}
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test13_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("Two bullets should be fired if the button is pressed again after the recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetRecoveryDelay(30);
+	return true;
+}
+
+global func Test13_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 20);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test14_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("No bullet fired if button released before charge delay finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetChargeDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
+	return true;
+}
+
+global func Test14_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(0);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 20;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 22);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test15_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("One bullet fired if button released after charge delay finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetChargeDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
+	CurrentTest().test_pressed = false;
+	return true;
+}
+
+global func Test15_Execute()
+{
+	if (CurrentTest().test_pressed)
+	{
+		testFiredProjectiles(1);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed = true;
+		var hold_button = 35;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test16_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("One bullet fired if button released after charge delay finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetChargeDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
+	return true;
+}
+
+global func Test16_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 35;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 10);
+	}
+}
+
+
+// --------------------------------------------------------------------------------------------------------
+global func Test17_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("No additional bullet fired if button released before cooldown finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetCooldownDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	return true;
+}
+
+global func Test17_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(1);
+		return Evaluate();
+	}
+	else if (CurrentTest().test_pressed == 1)
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 5;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 20; // 10 from recovery, then abort cooldown at 10/30
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2); // Press again before cooldown should end
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test18_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("Additional bullet fired if button released/pressed after cooldown finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetCooldownDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	return true;
+}
+
+global func Test18_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else if (CurrentTest().test_pressed == 1)
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 5;
+		PressControlUse(hold_button); // Second bullet should fire, or third if the implementation is incorrect
+		return Wait(hold_button + 2);
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 45; // Recovery + cooldown, and enough time to fire an unwanted bullet (correct is: bullet fired only after releasing the trigger)
+		PressControlUse(hold_button);
+		return Wait(hold_button + 50); // Wait long enough for second cooldown to finish, if an unwanted bullet was fired
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test19_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("Recovery is done, even if there is a cooldown");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetCooldownDelay(30)->SetRecoveryDelay(20);
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	return true;
+}
+
+global func Test19_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(1);
+		return Evaluate();
+	}
+	else if (CurrentTest().test_pressed == 1)
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 5;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 35; // Enough to finish cooldown, but not enough to finish recovery
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2); // Press again before recovery/cooldown finishes
+	}
+}
+
+
+// ########################################################################################################
+
+// --------------------------------------------------------------------------------------------------------
+global func Test20_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("Bullets should be fired as long as the button is pressed, with recovery delay in between");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetRecoveryDelay(15);
+	return true;
+}
+
+global func Test20_Execute()
+{
+	if (CurrentTest().test_started)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_started = true;
+		var hold_button = 20;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test21_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("Only one bullet should be fired if the button is pressed twice within recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetRecoveryDelay(50);
+	return true;
+}
+
+global func Test21_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(1);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 10;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test22_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("Two bullets should be fired if the button is pressed again after the recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetRecoveryDelay(30);
+	return true;
+}
+
+global func Test22_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 20);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test23_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("No bullet fired if button released before charge delay finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetChargeDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
+	return true;
+}
+
+global func Test23_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(0);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 20;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 22);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test24_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("One bullet fired if button released after charge delay finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetChargeDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
+	CurrentTest().test_pressed = false;
+	return true;
+}
+
+global func Test24_Execute()
+{
+	if (CurrentTest().test_pressed)
+	{
+		testFiredProjectiles(1);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed = true;
+		var hold_button = 35;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test25_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("One bullet fired if button released after charge delay finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetChargeDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnProgressCharge = Global.DebugOnProgressCharge;
+	return true;
+}
+
+global func Test25_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 35;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 10);
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test26_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("Recovery is done and has higher priority than cooldown");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetCooldownDelay(30)->SetRecoveryDelay(20);
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	CurrentTest().test_started = FrameCounter();
+	return true;
+}
+
+global func Test26_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		if (FrameCounter() > CurrentTest().test_started + 90) // Wait more than is necessary: 2x recovery delay + 1x cooldown delay
+		{
+			testFiredProjectiles(2);
+			return Evaluate();
+		}
+		return Wait();
+	}
+	else if (CurrentTest().test_pressed == 1)
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15; // Release within recovery
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15; // Release within recovery
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2); // Press again before recovery finishes
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test27_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("Additional bullet fired if button pressed after cooldown finishes");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetCooldownDelay(30)->SetRecoveryDelay(10);
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	return true;
+}
+
+global func Test27_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		testFiredProjectiles(2);
+		return Evaluate();
+	}
+	else if (CurrentTest().test_pressed == 1)
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 5;
+		PressControlUse(hold_button); // Finish within recovery, so that cooldown can start
+		return Wait(hold_button + 42);// Wait long enough for cooldown to finish
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 5; // Finish within recovery, so that cooldown can start
+		PressControlUse(hold_button);
+		return Wait(hold_button + 37); // Wait long enough for cooldown to finish
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test28_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("Recovery is done, cannot fire during cooldown (this is probably a duplicate test)");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetCooldownDelay(30)->SetRecoveryDelay(20);
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	CurrentTest().test_started = FrameCounter();
+	return true;
+}
+
+global func Test28_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		if (FrameCounter() > CurrentTest().test_started + 90) // Wait more than is necessary: 2x recovery delay + 1x cooldown delay
+		{
+			testFiredProjectiles(1);
+			return Evaluate();
+		}
+		return Wait();
+	}
+	else if (CurrentTest().test_pressed == 1)
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15; // Release within recovery/cooldown
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15; // Release within recovery
+		PressControlUse(hold_button);
+		return Wait(hold_button + 7); // Press again after recovery finishes
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------
+global func Test29_OnStart()
+{
+	Log("Auto fire mode:");
+	Log("Recovery is done, continue holding fire during cooldown, weapon starts firing after cooldown");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetCooldownDelay(30)->SetRecoveryDelay(20);
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	CurrentTest().test_started = FrameCounter();
+	return true;
+}
+
+global func Test29_Execute()
+{
+	if (CurrentTest().test_pressed >= 2)
+	{
+		if (FrameCounter() > CurrentTest().test_started + 90) // Wait more than is necessary: 2x recovery delay + 1x cooldown delay
+		{
+			testFiredProjectiles(2);
+			return Evaluate();
+		}
+		return Wait();
+	}
+	else if (CurrentTest().test_pressed == 1)
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 40; // Release after cooldown, but within recovery
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+	else
+	{
+		CurrentTest().test_pressed += 1;
+		var hold_button = 15; // Release within recovery
+		PressControlUse(hold_button);
+		return Wait(hold_button + 7); // Press again after recovery finishes
 	}
 }

@@ -1169,7 +1169,7 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 	{
 		if (firemode->GetMode() != WEAPON_FM_Burst)
 		{
-			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPN_FM_Burst (value: %d)", firemode->GetBurstAmount(), firemode->GetMode()));
+			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPON_FM_Burst (value: %d)", firemode->GetBurstAmount(), firemode->GetMode()));
 		}
 
 		if (weapon_properties.shot_counter[firemode->GetIndex()] >= firemode->GetBurstAmount())
@@ -1184,7 +1184,7 @@ func DoRecovery(object user, int x, int y, proplist firemode)
 				DoFireCycle(user, x, y, false);
 			}
 
-			return; // prevent cooldown
+			return; // Prevent cooldown
 		}
 	}
 
