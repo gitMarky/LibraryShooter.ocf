@@ -38,12 +38,9 @@ static const WEAPON_POS_Muzzle = "Muzzle";
 static const WEAPON_POS_Chamber = "Chamber";
 static const WEAPON_POS_Magazine = "Magazine";
 
-local weapon_properties = nil;
-
 /* --- Properties --- */
 
-local Name = "$Name$";
-local Description = "$Description$";
+local weapon_properties = nil;
 
 /* --- Settings --- */
 
@@ -257,13 +254,8 @@ public func ControlUseAltHolding(object user, int x, int y)
 	This is executed when the user stops holding the fire button.@br@br
 
 	The function does the following:@br
-	- call {@link Library_Firearm#OnUseStop}@br
-	- check {@link Library_Firearm#FireOnStopping} and if true, stop aiming, leave the rest to {@link Library_Firearm#FinishedAiming}, otherwise do the following:@br
-	- still stop aiming if {@link Library_Firearm#Setting_AimOnUseStart} is true.@br
-	- call {@link Library_Firearm#CancelUsing}@br
-	- call {@link Library_Firearm#CancelCharge}@br
-	- call {@link Library_Firearm#CancelReload}@br
-	- check if the weapon is not {@link Library_Firearm#IsRecovering} and if not, call {@link Library_Firearm#CheckCooldown}@br
+	- call {@link Library_Firearm#OnUseStop}, if that returns {@code true} abort here@br
+	- call {@link Library_Firearm#CancelFireCycle}
 
 	@par user The object that is using the weapon.
 	@par x The x coordinate the user is aiming at. Relative to the user.
@@ -278,6 +270,29 @@ public func ControlUseStop(object user, int x, int y)
 		return true;
 	}
 
+	CancelFireCycle(user, x, y);
+	return true;
+}
+
+
+/**
+	This is executed when the user stops the fire cycle, holding the fire button.@br@br
+
+	The function does the following:@br
+	- call {@link Library_Firearm#DoStopAiming}
+	- check {@link Library_Firearm#FireOnHolding} and if {@code true} do the following:@br
+	- call {@link Library_Firearm#CancelUsing}@br
+	- call {@link Library_Firearm#CancelCharge}@br
+	- call {@link Library_Firearm#CancelReload}@br
+	- check if the weapon is not {@link Library_Firearm#IsRecovering} and if not, call {@link Library_Firearm#CheckCooldown}@br
+
+	@par user The object that is using the weapon.
+	@par x The x coordinate the user is aiming at. Relative to the user.
+	@par y The y coordinate the user is aimint at. Relative to the user.
+ */
+public func CancelFireCycle(object user, int x, int y)
+{
+	AssertNotNil(user);
 	DoStopAiming(user);
 
 	if (FireOnHolding())
@@ -292,8 +307,6 @@ public func ControlUseStop(object user, int x, int y)
 			CheckCooldown(user, GetFiremode());
 		}
 	}
-
-	return true;
 }
 
 
