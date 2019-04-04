@@ -23,6 +23,6 @@ local ReloadStateMap =
 {
 	Container_Prepare = 
 	{
-		StartCall  = "MyCoolCustomCall",
+		StartCall  = "~MyCoolCustomCall",
 	},
 };
