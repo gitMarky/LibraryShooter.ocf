@@ -205,37 +205,6 @@ public func ControlUseHolding(object user, int x, int y)
 
 
 /**
-	This should be executed while the user is holding the fire button.@br@br
-
-	The function does the following:@br
-	- check if the {@link Library_Firearm#RejectUse} is true, if it is, {@link Library_Firearm#ControlUseStop} is called@br
-	- start aiming if {@link Library_Firearm#Setting_AimOnUseStart} is set.@br
-	- call {@link Library_Firearm#DoFireCycle}@br
-
-	@par user The object that is using the weapon.
-	@par x The x coordinate the user is aiming at. Relative to the user.
-	@par y The y coordinate the user is aiming at. Relative to the user.
- */
-public func StartFireCycle(object user, int x, int y)
-{
-	AssertNotNil(user);
-
-	if (this->~RejectUse(user))
-	{
-		CancelFireCycle(user, x, y);
-		return false;
-	}
-	
-	if (CanSendFireRequest())
-	{
-		DoStartAiming(user);
-		DoFireCycle(user, x, y);
-	}
-	return true;
-}
-
-
-/**
 	This is executed regularly while the user is holding the alternative use button (must be defined, not standard in OpenClonk).@br@br
 
 	The function does the following:@br
@@ -274,40 +243,6 @@ public func ControlUseStop(object user, int x, int y)
 
 	CancelFireCycle(user, x, y);
 	return true;
-}
-
-
-/**
-	This is executed when the user stops the fire cycle, holding the fire button.@br@br
-
-	The function does the following:@br
-	- call {@link Library_Firearm#DoStopAiming}
-	- check {@link Library_Firearm#FireOnHolding} and if {@code true} do the following:@br
-	- call {@link Library_Firearm#CancelCharge}@br
-	- call {@link Library_Firearm#CancelReload}@br
-	- check if the weapon is not {@link Library_Firearm#IsRecovering} and if not, call {@link Library_Firearm#CheckCooldown}@br
-
-	@par user The object that is using the weapon.
-	@par x The x coordinate the user is aiming at. Relative to the user.
-	@par y The y coordinate the user is aimint at. Relative to the user.
- */
-public func CancelFireCycle(object user, int x, int y)
-{
-	AssertNotNil(user);
-	DoStopAiming(user);
-
-	if (FireOnHolding())
-	{
-		CancelCharge(user, x, y, GetFiremode(), true);
-		CancelReload(user, x, y, GetFiremode(), true);
-
-		if (!IsRecovering())
-		{
-			CheckCooldown(user, GetFiremode());
-		}
-	}
-	
-	AllowFireRequest();
 }
 
 
@@ -821,6 +756,37 @@ func BlockFireRequest()
 
 
 /**
+	This should be executed while the user is holding the fire button.@br@br
+
+	The function does the following:@br
+	- check if the {@link Library_Firearm#RejectUse} is true, if it is, {@link Library_Firearm#ControlUseStop} is called@br
+	- start aiming if {@link Library_Firearm#Setting_AimOnUseStart} is set.@br
+	- call {@link Library_Firearm#DoFireCycle}@br
+
+	@par user The object that is using the weapon.
+	@par x The x coordinate the user is aiming at. Relative to the user.
+	@par y The y coordinate the user is aiming at. Relative to the user.
+ */
+public func StartFireCycle(object user, int x, int y)
+{
+	AssertNotNil(user);
+
+	if (this->~RejectUse(user))
+	{
+		CancelFireCycle(user, x, y);
+		return false;
+	}
+	
+	if (CanSendFireRequest())
+	{
+		DoStartAiming(user);
+		DoFireCycle(user, x, y);
+	}
+	return true;
+}
+
+
+/**
 	This function will go through the fire cycle: reloading, charging, firing and recovering, checking for cooldown.@br@br
 
 	This function does the following:@br
@@ -854,6 +820,40 @@ func DoFireCycle(object user, int x, int y)
 	{
 		BlockFireRequest();
 	}
+}
+
+
+/**
+	This is executed when the user stops the fire cycle, holding the fire button.@br@br
+
+	The function does the following:@br
+	- call {@link Library_Firearm#DoStopAiming}
+	- check {@link Library_Firearm#FireOnHolding} and if {@code true} do the following:@br
+	- call {@link Library_Firearm#CancelCharge}@br
+	- call {@link Library_Firearm#CancelReload}@br
+	- check if the weapon is not {@link Library_Firearm#IsRecovering} and if not, call {@link Library_Firearm#CheckCooldown}@br
+
+	@par user The object that is using the weapon.
+	@par x The x coordinate the user is aiming at. Relative to the user.
+	@par y The y coordinate the user is aimint at. Relative to the user.
+ */
+public func CancelFireCycle(object user, int x, int y)
+{
+	AssertNotNil(user);
+	DoStopAiming(user);
+
+	if (FireOnHolding())
+	{
+		CancelCharge(user, x, y, GetFiremode(), true);
+		CancelReload(user, x, y, GetFiremode(), true);
+
+		if (!IsRecovering())
+		{
+			CheckCooldown(user, GetFiremode());
+		}
+	}
+	
+	AllowFireRequest();
 }
 
 
