@@ -403,9 +403,9 @@ global func Test10_Execute()
 global func Test11_OnStart()
 {
 	Log("Burst fire mode:");
-	Log("Only the burst amount (1) should be fired if the button is pressed longer than recovery delay");
+	Log("The burst amount (1) should be fired if the button is pressed longer than recovery delay");
 	Test_Init();
-	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetRecoveryDelay(5);
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetBurstAmount(2)->SetRecoveryDelay(5);
 	return true;
 }
 
@@ -413,20 +413,53 @@ global func Test11_Execute()
 {
 	if (CurrentTest().test_started)
 	{
-		testFiredProjectiles(1);
+		testFiredProjectiles(2);
 		return Evaluate();
 	}
 	else
 	{
 		CurrentTest().test_started = true;
-		var hold_button = 20;
+		var hold_button = 30;
 		PressControlUse(hold_button);
-		return Wait(hold_button + 2);
+		return Wait(hold_button + 20);
 	}
 }
 
 // --------------------------------------------------------------------------------------------------------
 global func Test12_OnStart()
+{
+	Log("Burst fire mode:");
+	Log("The burst amount (3) should be fired if the button is pressed less than recovery delay");
+	Test_Init();
+	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Burst)->SetBurstAmount(3)->SetRecoveryDelay(10);
+	CurrentTest().test_pressed = FrameCounter();
+	return true;
+}
+
+global func Test12_Execute()
+{
+	if (CurrentTest().test_started)
+	{
+		if (FrameCounter() > CurrentTest().test_pressed + 50)
+		{
+			testFiredProjectiles(3);
+			return Evaluate();
+		}
+		else
+		{
+			return Wait();
+		}
+	}
+	else
+	{
+		CurrentTest().test_started = true;
+		var hold_button = 5;
+		PressControlUse(hold_button);
+		return Wait(hold_button + 2);
+	}
+}
+// --------------------------------------------------------------------------------------------------------
+global func Test13_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("Only burst amount (3) bullets should be fired if the button is pressed twice within recovery delay");
@@ -436,7 +469,7 @@ global func Test12_OnStart()
 	return true;
 }
 
-global func Test12_Execute()
+global func Test13_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -461,7 +494,7 @@ global func Test12_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test13_OnStart()
+global func Test14_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("Two bullets should be fired if the button is pressed again after the recovery delay");
@@ -470,7 +503,7 @@ global func Test13_OnStart()
 	return true;
 }
 
-global func Test13_Execute()
+global func Test14_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -487,7 +520,7 @@ global func Test13_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test14_OnStart()
+global func Test15_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("No bullet fired if button released before charge delay finishes");
@@ -497,7 +530,7 @@ global func Test14_OnStart()
 	return true;
 }
 
-global func Test14_Execute()
+global func Test15_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -514,7 +547,7 @@ global func Test14_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test15_OnStart()
+global func Test16_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("One bullet fired if button released after charge delay finishes");
@@ -525,7 +558,7 @@ global func Test15_OnStart()
 	return true;
 }
 
-global func Test15_Execute()
+global func Test16_Execute()
 {
 	if (CurrentTest().test_pressed)
 	{
@@ -542,7 +575,7 @@ global func Test15_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test16_OnStart()
+global func Test17_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("One bullet fired if button released after charge delay finishes");
@@ -552,7 +585,7 @@ global func Test16_OnStart()
 	return true;
 }
 
-global func Test16_Execute()
+global func Test17_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -570,7 +603,7 @@ global func Test16_Execute()
 
 
 // --------------------------------------------------------------------------------------------------------
-global func Test17_OnStart()
+global func Test18_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("No additional bullet fired if button released before cooldown finishes");
@@ -580,7 +613,7 @@ global func Test17_OnStart()
 	return true;
 }
 
-global func Test17_Execute()
+global func Test18_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -604,7 +637,7 @@ global func Test17_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test18_OnStart()
+global func Test19_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("Additional bullet fired if button released/pressed after cooldown finishes");
@@ -614,7 +647,7 @@ global func Test18_OnStart()
 	return true;
 }
 
-global func Test18_Execute()
+global func Test19_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -638,7 +671,7 @@ global func Test18_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test19_OnStart()
+global func Test20_OnStart()
 {
 	Log("Burst fire mode:");
 	Log("Recovery is done, even if there is a cooldown");
@@ -648,7 +681,7 @@ global func Test19_OnStart()
 	return true;
 }
 
-global func Test19_Execute()
+global func Test20_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -675,7 +708,7 @@ global func Test19_Execute()
 // ########################################################################################################
 
 // --------------------------------------------------------------------------------------------------------
-global func Test20_OnStart()
+global func Test21_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("Bullets should be fired as long as the button is pressed, with recovery delay in between");
@@ -684,7 +717,7 @@ global func Test20_OnStart()
 	return true;
 }
 
-global func Test20_Execute()
+global func Test21_Execute()
 {
 	if (CurrentTest().test_started)
 	{
@@ -701,7 +734,7 @@ global func Test20_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test21_OnStart()
+global func Test22_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("Only one bullet should be fired if the button is pressed twice within recovery delay");
@@ -710,7 +743,7 @@ global func Test21_OnStart()
 	return true;
 }
 
-global func Test21_Execute()
+global func Test22_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -727,7 +760,7 @@ global func Test21_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test22_OnStart()
+global func Test23_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("Two bullets should be fired if the button is pressed again after the recovery delay");
@@ -736,7 +769,7 @@ global func Test22_OnStart()
 	return true;
 }
 
-global func Test22_Execute()
+global func Test23_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -753,7 +786,7 @@ global func Test22_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test23_OnStart()
+global func Test24_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("No bullet fired if button released before charge delay finishes");
@@ -763,7 +796,7 @@ global func Test23_OnStart()
 	return true;
 }
 
-global func Test23_Execute()
+global func Test24_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -780,7 +813,7 @@ global func Test23_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test24_OnStart()
+global func Test25_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("One bullet fired if button released after charge delay finishes");
@@ -791,7 +824,7 @@ global func Test24_OnStart()
 	return true;
 }
 
-global func Test24_Execute()
+global func Test25_Execute()
 {
 	if (CurrentTest().test_pressed)
 	{
@@ -808,7 +841,7 @@ global func Test24_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test25_OnStart()
+global func Test26_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("One bullet fired if button released after charge delay finishes");
@@ -818,7 +851,7 @@ global func Test25_OnStart()
 	return true;
 }
 
-global func Test25_Execute()
+global func Test26_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -835,7 +868,7 @@ global func Test25_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test26_OnStart()
+global func Test27_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("Recovery is done and has higher priority than cooldown");
@@ -849,7 +882,7 @@ global func Test26_OnStart()
 	return true;
 }
 
-global func Test26_Execute()
+global func Test27_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -877,7 +910,7 @@ global func Test26_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test27_OnStart()
+global func Test28_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("Additional bullet fired if button pressed after cooldown finishes");
@@ -887,7 +920,7 @@ global func Test27_OnStart()
 	return true;
 }
 
-global func Test27_Execute()
+global func Test28_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -911,7 +944,7 @@ global func Test27_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test28_OnStart()
+global func Test29_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("Recovery is done, cannot fire during cooldown (this is probably a duplicate test)");
@@ -924,7 +957,7 @@ global func Test28_OnStart()
 	return true;
 }
 
-global func Test28_Execute()
+global func Test29_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{
@@ -952,7 +985,7 @@ global func Test28_Execute()
 }
 
 // --------------------------------------------------------------------------------------------------------
-global func Test29_OnStart()
+global func Test30_OnStart()
 {
 	Log("Auto fire mode:");
 	Log("Recovery is done, continue holding fire during cooldown, weapon starts firing after cooldown");
@@ -963,7 +996,7 @@ global func Test29_OnStart()
 	return true;
 }
 
-global func Test29_Execute()
+global func Test30_Execute()
 {
 	if (CurrentTest().test_pressed >= 2)
 	{

@@ -474,8 +474,7 @@ func StartCharge(object user, int x, int y)
 	var firemode = GetFiremode();
 	AssertNotNil(firemode);
 
-	if (/*!is_using                           // No charge necessary if we are in burst mode
-	||*/  firemode->GetChargeDelay() < 1      // Charging does not make sense?
+	if (firemode->GetChargeDelay() < 1      // Charging does not make sense?
 	||  !this->NeedsCharge(user, firemode)) // Charging necessary? By default this is the same condition as above, but someone may define a custom condition; Callback via "this->" for runtime overload
 	{
 		return false; // Do not charge then
@@ -738,7 +737,6 @@ func CanSendFireRequest()
  */
 func AllowFireRequest()
 {
-		DebugLog("[%06d] Allow fire request", FrameCounter());
 	weapon_properties.allow_fire_request = true;
 }
 
