@@ -26,8 +26,6 @@
 
 /*-- Important Library Properties --*/
 
-local is_using = false;    // bool: is the user holding the fire button
-
 // Constants for distinguishing the fire behaviour
 static const WEAPON_FM_Single = 1;
 static const WEAPON_FM_Burst  = 2;
@@ -121,6 +119,7 @@ func Initialize()
 	weapon_properties.shot_counter = [];
 	weapon_properties.firemode_selected = 0;
 	weapon_properties.firemodes = [];
+	AllowFireRequest();
 	
 	// Editor properties
 	this.EditorProps = this.EditorProps ?? {};
@@ -227,8 +226,11 @@ public func StartFireCycle(object user, int x, int y)
 		return false;
 	}
 	
-	DoStartAiming(user);
-	DoFireCycle(user, x, y, true);
+	if (CanSendFireRequest())
+	{
+		DoStartAiming(user);
+		DoFireCycle(user, x, y);
+	}
 	return true;
 }
 
@@ -281,7 +283,6 @@ public func ControlUseStop(object user, int x, int y)
 	The function does the following:@br
 	- call {@link Library_Firearm#DoStopAiming}
 	- check {@link Library_Firearm#FireOnHolding} and if {@code true} do the following:@br
-	- call {@link Library_Firearm#CancelUsing}@br
 	- call {@link Library_Firearm#CancelCharge}@br
 	- call {@link Library_Firearm#CancelReload}@br
 	- check if the weapon is not {@link Library_Firearm#IsRecovering} and if not, call {@link Library_Firearm#CheckCooldown}@br
@@ -297,8 +298,6 @@ public func CancelFireCycle(object user, int x, int y)
 
 	if (FireOnHolding())
 	{
-		CancelUsing();
-
 		CancelCharge(user, x, y, GetFiremode(), true);
 		CancelReload(user, x, y, GetFiremode(), true);
 
@@ -307,6 +306,8 @@ public func CancelFireCycle(object user, int x, int y)
 			CheckCooldown(user, GetFiremode());
 		}
 	}
+	
+	AllowFireRequest();
 }
 
 
@@ -365,15 +366,6 @@ public func ControlUseAltCancel(object user, int x, int y)
 {
 	this->OnUseAltCancel(user, x, y);
 	return true;
-}
-
-
-/**
-	Sets is_using to false.
-*/
-public func CancelUsing()
-{
-	is_using = false;
 }
 
 
@@ -547,8 +539,8 @@ func StartCharge(object user, int x, int y)
 	var firemode = GetFiremode();
 	AssertNotNil(firemode);
 
-	if (!is_using                           // No charge necessary if we are in burst mode
-	||  firemode->GetChargeDelay() < 1      // Charging does not make sense?
+	if (/*!is_using                           // No charge necessary if we are in burst mode
+	||*/  firemode->GetChargeDelay() < 1      // Charging does not make sense?
 	||  !this->NeedsCharge(user, firemode)) // Charging necessary? By default this is the same condition as above, but someone may define a custom condition; Callback via "this->" for runtime overload
 	{
 		return false; // Do not charge then
@@ -789,6 +781,44 @@ func IsReadyToFire()
 	    && !IsWeaponLocked();
 }
 
+/**
+	Tells, whether fire requests from {@link Library_Firearm#StartFireCycle}
+	are passed on to {@link Library_Firearm#DoFireCycle}.@br
+	Fire request are block with {@link Library_Firearm#BlockFireRequest}
+	in {@link Library_Firearm#Fire}, so that reloading and charging in one
+	button press is OK, but after that another fire request has to be
+	allowed manually again.@br
+	Only the automatic mode allows another fire request by itself when the
+	weapon recovers in {@link Library_Firearm#DoRecovery}.
+ */
+func CanSendFireRequest()
+{
+	return weapon_properties.allow_fire_request;
+}
+
+
+/**
+	Allows a fire request, so that {@link Library_Firearm#StartFireCycle}
+	passes the request to {@link Library_Firearm#DoFireCycle}.
+ */
+func AllowFireRequest()
+{
+		DebugLog("[%06d] Allow fire request", FrameCounter());
+	weapon_properties.allow_fire_request = true;
+}
+
+
+/**
+	Blocks a fire request, which means that further calls to
+	{@link Library_Firearm#StartFireCycle} do not call {@link Library_Firearm#DoFireCycle}.@br
+	Note that separate calls to {@link Library_Firearm#DoFireCycle} still have to work normally,
+	so that e.g. burst fire works as intended.
+ */
+func BlockFireRequest()
+{
+	weapon_properties.allow_fire_request = false;
+}
+
 
 /**
 	This function will go through the fire cycle: reloading, charging, firing and recovering, checking for cooldown.@br@br
@@ -804,23 +834,26 @@ func IsReadyToFire()
 	@par user The object that is using the weapon.
 	@par x The x coordinate the user is aiming at. Relative to the user.
 	@par y The y coordinate the user is aimint at. Relative to the user.
-	@par is_pressing_trigger Should be true if the fire button is held to indicate the is_using state.
 */
-func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
+func DoFireCycle(object user, int x, int y)
 {
 	var angle = GetAngle(x, y);
 	user->~SetAimPosition(angle);
 
-	if (is_pressing_trigger)
-	{
-		is_using = true;
-	}
-
 	if (IsReadyToFire())
+	{
 		if (!StartReload(user, x, y))
 			if (!StartCharge(user, x, y))
-				if (FireOnHolding() || !is_pressing_trigger)
+				if (FireOnHolding())
 					Fire(user, x, y);
+	}
+	// In auto-fire, prevent cooldown if during recovery you release the button and press it again.
+	// This is for user convenience, because you have no idea when recovery ends, but you'd expect
+	// the weapon to continue firing if you press again before the cooldown happens.
+	else if (IsRecovering() && GetFiremode()->GetMode() == WEAPON_FM_Auto)
+	{
+		BlockFireRequest();
+	}
 }
 
 
@@ -833,7 +866,7 @@ func DoFireCycle(object user, int x, int y, bool is_pressing_trigger)
 */
 func FinishedAiming(object user, int angle)
 {
-	if (FireOnStopping() && is_using && IsReadyToFire())
+	if (FireOnStopping() && CanSendFireRequest() && IsReadyToFire())
 	{
 		var x = +Sin(angle, 1000);
 		var y = -Cos(angle, 1000);
@@ -925,6 +958,9 @@ func Fire(object user, int x, int y)
 	{
 		this->OnNoAmmo(user, firemode);
 	}
+
+	// The user can do only one fire request at a time
+	BlockFireRequest();
 }
 
 
@@ -1175,33 +1211,43 @@ func IsRecovering()
 func DoRecovery(object user, int x, int y, proplist firemode)
 {
 	if (firemode == nil) return;
+	
+	var mode = firemode->GetMode();
 
 	this->OnRecovery(user, firemode);
 
 	if (firemode->GetBurstAmount())
 	{
-		if (firemode->GetMode() != WEAPON_FM_Burst)
+		// Alternatively you could use the burst amount only if the mode is burst,
+		// but that means that you hide configuration errors from the scripter.
+		if (mode != WEAPON_FM_Burst)
 		{
 			FatalError(Format("This fire mode has a burst value of %d, but the mode is not burst mode WEAPON_FM_Burst (value: %d)", firemode->GetBurstAmount(), firemode->GetMode()));
 		}
 
+		// When enough shots were fired the burst ends
+		// TODO: Has to be reset on other occasions, too, for example when you run out of ammo, etc.
 		if (weapon_properties.shot_counter[firemode->GetIndex()] >= firemode->GetBurstAmount())
 		{
 			weapon_properties.shot_counter[firemode->GetIndex()] = 0;
+			// Proceed with cooldown
 		}
 		else
 		{
-			if (!is_using)
-			{
-				CancelRecovery();
-				DoFireCycle(user, x, y, false);
-			}
+			CancelRecovery();
+			DoFireCycle(user, x, y);
 
 			return; // Prevent cooldown
 		}
 	}
 
 	CheckCooldown(user, firemode);
+
+	// Full auto weapons allow another fire request after recovery (== no need to release the trigger)
+	if (mode == WEAPON_FM_Auto)
+	{
+		AllowFireRequest();
+	}
 }
 
 
@@ -1252,10 +1298,16 @@ func CheckCooldown(object user, proplist firemode)
 {
 	if (!HasAmmo(firemode) || RejectUse(user))
 	{
-		CancelUsing();
+		AllowFireRequest();
 	}
 
-	if ((firemode->GetMode() != WEAPON_FM_Auto) || (firemode->GetMode() == WEAPON_FM_Auto && !is_using))
+	// Mode == AUTO:
+	// - button already released => can send fire request, needs to cool down
+	// - button still pressed => cannot send fire request do not cool down
+	// else
+	// - button already released => can send fire request, needs to cool down
+	// - button still pressed => fire request blocked, still needs to cool down
+	if (firemode->GetMode() != WEAPON_FM_Auto || CanSendFireRequest())
 	{
 		StartCooldown(user, firemode);
 	}
@@ -1420,7 +1472,7 @@ func StartReload(object user, int x, int y, bool forced)
 	var firemode = GetFiremode();
 	AssertNotNil(firemode);
 
-	if ((!is_using && !forced) || !NeedsReload(user, firemode, forced)) 
+	if (!forced || !NeedsReload(user, firemode, forced)) 
 	{
 		return false;
 	}

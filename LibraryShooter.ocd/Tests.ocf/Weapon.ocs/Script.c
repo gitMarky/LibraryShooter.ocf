@@ -20,7 +20,6 @@ func InitializePlayer(int plr)
 	return;
 }
 
-
 /* --- The actual tests --- */
 
 global func Test_Init()
@@ -56,11 +55,13 @@ global func PressControlUse(int hold_frames, object user, object weapon, int aim
 	aim_x = aim_x ?? 1000;
 	aim_y = aim_y ?? -50;
 	ScheduleCall(weapon, weapon.ControlUseStart, 1, nil, user, aim_x, aim_y);
+	ScheduleCall(nil, Scenario.LogFrame, 1, nil, "Start firing");
 	for (var delay = 2; delay < hold_frames; ++delay)
 	{
 		ScheduleCall(weapon, weapon.ControlUseHolding, delay, nil, user, aim_x, aim_y);
 	}
 	ScheduleCall(weapon, weapon.ControlUseStop, hold_frames, nil, user, aim_x, aim_y);
+	ScheduleCall(nil, Scenario.LogFrame, hold_frames, nil, "Stop firing");
 }
 
 global func testFiredProjectiles(int expected_amount)
@@ -76,13 +77,27 @@ global func DebugOnProgressCharge(object user, int x, int y, proplist firemode, 
 	}
 }
 
+global func DebugOnRecovery(object user, proplist firemode)
+{
+	LogFrame("Finished recovery");
+}
+
+global func DebugOnStartCooldown(object user, proplist firemode)
+{
+	LogFrame("Start cooldown");
+}
 global func DebugOnFinishCooldown(object user, proplist firemode)
 {
-	Log("Finished cooldown");
+	LogFrame("Finished cooldown");
 }
 
 global func AlwaysTrue() { return true; }
 global func AlwaysFalse() { return false; }
+
+global func LogFrame(string message, ...)
+{
+	Log("[%06d] %s", FrameCounter(), Format(message, ...));
+}
 
 // --------------------------------------------------------------------------------------------------------
 global func Test1_OnStart()
@@ -827,6 +842,9 @@ global func Test26_OnStart()
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetCooldownDelay(30)->SetRecoveryDelay(20);
 	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
+	CurrentTest().weapon.OnRecovery = Global.DebugOnRecovery;
+	CurrentTest().weapon.OnStartCooldown = Global.DebugOnStartCooldown;
+	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
 	CurrentTest().test_started = FrameCounter();
 	return true;
 }
@@ -899,6 +917,8 @@ global func Test28_OnStart()
 	Log("Recovery is done, cannot fire during cooldown (this is probably a duplicate test)");
 	Test_Init();
 	CurrentTest().weapon->GetFiremode()->SetMode(WEAPON_FM_Auto)->SetCooldownDelay(30)->SetRecoveryDelay(20);
+	CurrentTest().weapon.OnRecovery = Global.DebugOnRecovery;
+	CurrentTest().weapon.OnStartCooldown = Global.DebugOnStartCooldown;
 	CurrentTest().weapon.OnFinishCooldown = Global.DebugOnFinishCooldown;
 	CurrentTest().test_started = FrameCounter();
 	return true;
