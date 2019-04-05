@@ -576,10 +576,12 @@ public func StartFireCycle(object user, int x, int y)
 		CancelFireCycle(user, x, y);
 		return false;
 	}
+
+	DoStartAiming(user);
+	DoUpdateAiming(user, x, y);
 	
 	if (CanSendFireRequest())
 	{
-		DoStartAiming(user);
 		DoFireCycle(user, x, y);
 	}
 	return true;
@@ -587,31 +589,26 @@ public func StartFireCycle(object user, int x, int y)
 
 
 /**
-	This function will go through the fire cycle: reloading, charging, firing and recovering, checking for cooldown.@br@br
+	This function will do the preparations for the fire cycle: reloading, charging.@br@br
 
 	This function does the following:@br
 	- set the aiming angle for the user@br
 	- check {@link Library_Firearm#IsReadyToFire}@br
-	- check {@link Library_Firearm#IsReadyToFire}@br
 	- check {@link Library_Firearm#StartCharge}@br
-	- check {@link Library_Firearm#FireOnHolding}@br
 	- if all of the above check out, call {@link Library_Firearm#Fire}@br
 
 	@par user The object that is using the weapon.
 	@par x The x coordinate the user is aiming at. Relative to the user.
 	@par y The y coordinate the user is aimint at. Relative to the user.
+	@return bool {@code true}, if all the above conditions are {@code true};
 */
-func DoFireCycle(object user, int x, int y)
+func DoFireCyclePreparations(object user, int x, int y)
 {
-	var angle = GetAngle(x, y);
-	user->~SetAimPosition(angle);
-
 	if (IsReadyToFire())
 	{
 		if (!StartReload(user, x, y))
 			if (!StartCharge(user, x, y))
-				/* if (FireOnHolding()) */
-					Fire(user, x, y);
+					return true;
 	}
 	// In auto-fire, prevent cooldown if during recovery you release the button and press it again.
 	// This is for user convenience, because you have no idea when recovery ends, but you'd expect
@@ -619,6 +616,25 @@ func DoFireCycle(object user, int x, int y)
 	else if (IsRecovering() && GetFiremode()->GetMode() == WEAPON_FM_Auto)
 	{
 		BlockFireRequest();
+	}
+	return false;
+}
+
+
+/**
+	This function will go through the fire cycle:@br@br
+	- reloading, charging: {@link Library_Firearm#DoFireCyclePreparations}.@br
+	- firing and recovering, checking for cooldown: {@link Library_Firearm#Fire}.@br@br
+
+	@par user The object that is using the weapon.
+	@par x The x coordinate the user is aiming at. Relative to the user.
+	@par y The y coordinate the user is aimint at. Relative to the user.
+*/
+func DoFireCycle(object user, int x, int y)
+{
+	if (DoFireCyclePreparations(user, x, y))
+	{
+		Fire(user, x, y);
 	}
 }
 
@@ -654,27 +670,6 @@ public func CancelFireCycle(object user, int x, int y)
 	}
 	
 	AllowFireRequest();
-}
-
-
-/**
-	Called by the clonk (Aim Manager) when aiming is stopped. Fires a shot if ready.@br
-	Checks: {@link Library_Firearm#IsReadyToFire}.@br
-
-	@par user The object that is using the weapon.
-	@par angle The firing angle the user is aiming at.
-*/
-// TODO: This has to be part of the control
-func FinishedAiming(object user, int angle)
-{
-	if (/*FireOnStopping() &&*/ CanSendFireRequest() && IsReadyToFire())
-	{
-		var x = +Sin(angle, 1000);
-		var y = -Cos(angle, 1000);
-
-		Fire(user, x, y);
-	}
-	_inherited(user, angle, ...);
 }
 
 
@@ -2000,7 +1995,7 @@ func DoStartAiming(object user) // TODO: Move this to a separate class/interface
 {
 	if (Setting_CustomAimManager() == nil)
 	{
-		if (this->Setting_AimOnUseStart() && !user->~IsAiming())
+		if (this->~Setting_AimOnUseStart() && !user->~IsAiming())
 		{
 			user->~StartAim(this);
 		}
@@ -2011,11 +2006,17 @@ func DoStartAiming(object user) // TODO: Move this to a separate class/interface
 	}
 }
 
+func DoUpdateAiming(object user, int x, int y)
+{
+	var angle = GetAngle(x, y);
+	user->~SetAimPosition(angle);
+}
+
 func DoStopAiming(object user) // TODO: Move this to a separate class/interface sort of thing
 {
 	if (Setting_CustomAimManager() == nil)
 	{
-		if (this->FireOnStopping() || this->Setting_AimOnUseStart())
+		if (this->~FireOnStopping() || this->~Setting_AimOnUseStart())
 		{
 			user->~StopAim();
 		}
