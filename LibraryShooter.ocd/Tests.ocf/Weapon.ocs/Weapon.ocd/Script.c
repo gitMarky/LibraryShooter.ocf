@@ -1,4 +1,5 @@
 #include Library_Firearm
+#include Plugin_Firearm_ControlScheme_Legacy
 
 /* --- Properties --- */
 
