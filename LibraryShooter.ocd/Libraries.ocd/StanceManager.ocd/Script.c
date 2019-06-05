@@ -12,6 +12,8 @@
 
 local lib_stance_manager;
 
+local StanceMap; // "ActMap" for Stances
+
 /* --- Engine Callbacks --- */
 
 func Construction(object by)
@@ -73,7 +75,18 @@ func GetStanceChannel(any channel)
  */
 func GetStanceDefinition(any stance)
 {
-	return GetPropertyByAttribute(stance, this.StanceMap, "Name", "StanceMap");
+	if (GetType(stance) == C4V_PropList)
+	{
+		return stance;
+	}
+	else if (GetType(stance) == C4V_String)
+	{
+		return GetPropertyByAttribute(stance, this.StanceMap, "Name", "StanceMap");
+	}
+	else
+	{
+		FatalError("Stance type %v not supported; Value was %v", GetType(stance), stance);
+	}
 }
 
 /* --- Data Structure --- */
@@ -99,7 +112,7 @@ static const StanceDefinition = new Global
 		{
 			this.Transitions = [];
 		}
-		if (!HasTransitionTo(this.Transitions, to_stance))
+		if (!HasTransitionTo(to_stance))
 		{
 			PushBack(this.Transitions, to_stance);
 		}

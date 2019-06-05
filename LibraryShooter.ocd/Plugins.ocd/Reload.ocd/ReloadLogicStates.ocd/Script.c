@@ -17,7 +17,7 @@
 
 local firearm_reload;
 
-local ReloadStateMap; // ActMap for ReloadStates
+local ReloadStateMap; // "ActMap" for ReloadStates
 
 /* --- Engine callbacks --- */
 

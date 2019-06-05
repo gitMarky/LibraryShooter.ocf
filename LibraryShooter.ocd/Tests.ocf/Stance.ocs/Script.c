@@ -45,6 +45,8 @@ global func CreateStanceManager()
 
 	var manager = CreateObject(Library_StanceManager);
 
+	manager.StanceMap = { weapon_idle = weapon_idle, weapon_ready = weapon_ready, weapon_aiming = weapon_aiming};
+
 	manager->SetStance(standing);
 	manager->SetStance(weapon_idle, 1);
 	
