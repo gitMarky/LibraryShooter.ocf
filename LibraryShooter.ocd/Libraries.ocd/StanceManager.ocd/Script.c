@@ -1,6 +1,6 @@
 /**
 	Stance manager.
-	
+
 	You can save known stances in a local property StanceMap.
 	Originally, the library was designed without a StanceMap,
 	but it makes handling the stances easier.
@@ -26,11 +26,74 @@ func Construction(object by)
 
 /* --- Interface --- */
 
+/**
+	Adds one or more stances to the stance map.
+	This is useful if you define stances dynamically in a script.
+	
+	@par stance This stance will be added. Optionally, you can provide
+	            additional stances as second, third, ... parameter.
+	            These will be added in order, until the parameter is nil
+	            (you do not have to pass nil explicitely).
+	            
+	@return object Returns this object, so that further function calls
+	               can be issued.
+ */
+public func AddStance(proplist stance)
+{
+	if (stance)
+	{
+		// Init proplist if necessary
+		if (StanceMap == nil)
+		{
+			StanceMap = {};
+		}
+
+		// Add the current stance.
+		// If it has a name, use that as the property name,
+		// otherwise provide a name.
+		var name = stance.Name ?? Format("stance%06d", GetLength(GetProperties(StanceMap)));
+		StanceMap[name] = stance;
+		
+		// Keep adding
+		AddStance(...);
+	}
+	return this;
+}
+
+
+/**
+	Gets the stance that is currently active for the given channel.
+	
+	@par channel The stance channel.
+	
+	@return proplist Returns the stance that is active, or {@code nil}
+	                 if there is no active stance.
+ */
 public func GetStance(any channel)
 {
 	return lib_stance_manager.current_stance[GetStanceChannel(channel)];
 }
 
+
+/**
+	Changes the active stance for the given channel.
+	
+	@par stance Can be a proplist or the stance name.
+	            This stance wil be active.
+	            Must not be {@code nil}.
+
+	@par channel The stance channel.
+	
+	@par force (optional) By default, the stance is
+	           changed only if there is a valid transition
+	           from the active stance to the new stance.
+	           By providing {@code force = true} the
+	           desired stance is set, even if the transition
+	           is invalid.
+	           
+	@return bool Returns {@code true} if the new stance
+	             is the active stance now.
+ */
 public func SetStance(any stance, any channel, bool force)
 {
 	AssertNotNil(stance);
