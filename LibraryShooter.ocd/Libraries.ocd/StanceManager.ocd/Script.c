@@ -91,8 +91,9 @@ public func GetStance(any channel)
 	           desired stance is set, even if the transition
 	           is invalid.
 	           
-	@return bool Returns {@code true} if the new stance
-	             is the active stance now.
+	@return bool Returns {@code true} if the stance
+	             has been changed, implying that
+	             an animation update is necessary.
  */
 public func SetStance(any stance, any channel, bool force)
 {

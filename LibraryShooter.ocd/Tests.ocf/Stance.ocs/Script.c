@@ -68,9 +68,9 @@ global func doTestTransition(object manager, any channel, string from, string to
 		final = from;
 	}
 
-	doTest(Format("%s%s", desc, "Initial stance should be \"%s\", got \"%s\""), from, manager->GetStance().Name);
-	doTest(Format("%s%s", desc, "Transition should return %v, got %v"), result, manager->SetStance(to));
-	doTest(Format("%s%s", desc, "Final stance should be \"%s\", got \"%s\""), final, manager->GetStance().Name);
+	doTest(Format("%s%s", desc, "Initial stance should be \"%s\", got \"%s\""), from, manager->GetStance(channel).Name);
+	doTest(Format("%s%s", desc, "Transition should return %v, got %v"), result, manager->SetStance(to, channel));
+	doTest(Format("%s%s", desc, "Final stance should be \"%s\", got \"%s\""), final, manager->GetStance(channel).Name);
 }
 
 /* --- The actual tests --- */
@@ -98,25 +98,57 @@ global func Test2_OnStart() { return true; }
 global func Test2_Execute()
 {
 	var manager = CreateStanceManager();
-	
-	Log("SetStance() works correctly for the known transitions");
+	var channel = 0;
+
+	Log("SetStance() works correctly for the known transitions, channel %d", channel);
 
 	// Standing
-	doTestTransition(manager, 0, POSE_STANDING, POSE_STANDING, false);
-	doTestTransition(manager, 0, POSE_STANDING, POSE_PRONE, false);
-	doTestTransition(manager, 0, POSE_STANDING, POSE_CROUCHING, true);
-	
+	doTestTransition(manager, channel, POSE_STANDING, POSE_STANDING, false);
+	doTestTransition(manager, channel, POSE_STANDING, POSE_PRONE, false);
+	doTestTransition(manager, channel, POSE_STANDING, POSE_CROUCHING, true);
+
 	// Crouching
-	doTestTransition(manager, 0, POSE_CROUCHING, POSE_CROUCHING, false);
-	doTestTransition(manager, 0, POSE_CROUCHING, POSE_PRONE, true);
-	
+	doTestTransition(manager, channel, POSE_CROUCHING, POSE_CROUCHING, false);
+	doTestTransition(manager, channel, POSE_CROUCHING, POSE_PRONE, true);
+
 	// Prone
-	doTestTransition(manager, 0, POSE_PRONE, POSE_PRONE, false);
-	doTestTransition(manager, 0, POSE_PRONE, POSE_STANDING, false);
-	
+	doTestTransition(manager, channel, POSE_PRONE, POSE_PRONE, false);
+	doTestTransition(manager, channel, POSE_PRONE, POSE_STANDING, false);
+
 	// Back
-	doTestTransition(manager, 0, POSE_PRONE, POSE_CROUCHING, true);
-	doTestTransition(manager, 0, POSE_CROUCHING, POSE_STANDING, true);
+	doTestTransition(manager, channel, POSE_PRONE, POSE_CROUCHING, true);
+	doTestTransition(manager, channel, POSE_CROUCHING, POSE_STANDING, true);
+
+	return Evaluate();
+}
+
+
+// --------------------------------------------------------------------------------------------------------
+
+global func Test3_OnStart() { return true; }
+global func Test3_Execute()
+{
+	var manager = CreateStanceManager();
+	var channel = 1;
+
+	Log("SetStance() works correctly for the known transitions, channel %d", channel);
+
+	// Idle
+	doTestTransition(manager, channel, WEAPON_IDLE, WEAPON_IDLE, false);
+	doTestTransition(manager, channel, WEAPON_IDLE, WEAPON_AIMING, false);
+	doTestTransition(manager, channel, WEAPON_IDLE, WEAPON_READY, true);
+
+	// Ready
+	doTestTransition(manager, channel, WEAPON_READY, WEAPON_READY, false);
+	doTestTransition(manager, channel, WEAPON_READY, WEAPON_AIMING, true);
+
+	// Aiming
+	doTestTransition(manager, channel, WEAPON_AIMING, WEAPON_AIMING, false);
+	doTestTransition(manager, channel, WEAPON_AIMING, WEAPON_IDLE, false);
+
+	// Back
+	doTestTransition(manager, channel, WEAPON_AIMING, WEAPON_READY, true);
+	doTestTransition(manager, channel, WEAPON_READY, WEAPON_IDLE, true);
 
 	return Evaluate();
 }
