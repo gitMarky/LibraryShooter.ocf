@@ -73,37 +73,7 @@ func GetStanceChannel(any channel)
  */
 func GetStanceDefinition(any stance)
 {
-	if (GetType(stance) == C4V_PropList)
-	{
-		return stance;
-	}
-	if (GetType(stance) == C4V_String)
-	{
-		if (this.StanceMap)
-		{
-			for (var name in GetProperties(this.StanceMap))
-			{
-				var found = GetProperty(name, this.StanceMap);
-				if (found && found.Name == stance)
-				{
-					return found;
-				}
-				else if (name == stance)
-				{
-					return found;
-				}
-			}
-			return nil;
-		}
-		else
-		{
-			FatalError("StanceMap not defined");
-		}
-	}
-	else
-	{
-		FatalError("Unknown stance \"%s\"", stance);
-	}
+	return GetPropertyByAttribute(stance, this.StanceMap, "Name", "StanceMap");
 }
 
 /* --- Data Structure --- */

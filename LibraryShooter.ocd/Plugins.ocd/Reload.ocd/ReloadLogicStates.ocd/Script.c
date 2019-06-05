@@ -64,14 +64,7 @@ func GetReloadState(proplist firemode)
 
 func FindReloadState(string name)
 {
-	for (var prop in GetProperties(ReloadStateMap))
-	{
-		if (ReloadStateMap[prop].Name == name)
-		{
-			return ReloadStateMap[prop];
-		}
-	}
-	return nil;
+	return GetPropertyByAttribute(name, ReloadStateMap, "Name", "ReloadStateMap");
 }
 
 
