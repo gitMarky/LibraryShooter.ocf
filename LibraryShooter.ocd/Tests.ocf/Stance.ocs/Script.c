@@ -44,16 +44,15 @@ global func CreateStanceManager()
 	// Add everything to the stance maanger
 
 	var manager = CreateObject(Library_StanceManager);
-
-	manager.StanceMap = { weapon_idle = weapon_idle, weapon_ready = weapon_ready, weapon_aiming = weapon_aiming};
-
-	manager->SetStance(standing);
-	manager->SetStance(weapon_idle, 1);
 	
 	// So that it can be retrieved via string
 
 	manager.StanceMap = { "pose0" = standing, "pose1" = crouching, "pose2" = prone,
 	                      "weap0" = weapon_idle, "weap1" = weapon_ready, "weap2" = weapon_aiming};
+
+	// Initial state
+	manager->SetStance(standing);
+	manager->SetStance(weapon_idle, 1);
 	return manager;
 }
 
