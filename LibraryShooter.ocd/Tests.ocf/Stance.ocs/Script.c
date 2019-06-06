@@ -54,12 +54,12 @@ global func CreateStanceManager()
 	return manager;
 }
 
-global func doTestTransition(object manager, any channel, string from, string to, bool result)
+global func doTestTransition(object manager, any channel, string from, string to, bool result, bool forced)
 {
 	var desc = Format("[%s => %s](%v): ", from, to, channel);
 
 	var final;
-	if (result)
+	if (result || forced)
 	{
 		final = to;
 	}
@@ -69,9 +69,10 @@ global func doTestTransition(object manager, any channel, string from, string to
 	}
 
 	doTest(Format("%s%s", desc, "Initial stance should be \"%s\", got \"%s\""), from, manager->GetStance(channel).Name);
-	doTest(Format("%s%s", desc, "Transition should return %v, got %v"), result, manager->SetStance(to, channel));
+	doTest(Format("%s%s", desc, "Transition should return %v, got %v"), result, manager->SetStance(to, channel, forced));
 	doTest(Format("%s%s", desc, "Final stance should be \"%s\", got \"%s\""), final, manager->GetStance(channel).Name);
 }
+
 
 /* --- The actual tests --- */
 
@@ -149,6 +150,44 @@ global func Test3_Execute()
 	// Back
 	doTestTransition(manager, channel, WEAPON_AIMING, WEAPON_READY, true);
 	doTestTransition(manager, channel, WEAPON_READY, WEAPON_IDLE, true);
+
+	return Evaluate();
+}
+
+
+// --------------------------------------------------------------------------------------------------------
+
+global func Test4_OnStart() { return true; }
+global func Test4_Execute()
+{
+	var manager = CreateStanceManager();
+	var channel = 1;
+
+	Log("SetStance() does not accept invalid transitions", channel);
+
+	doTestTransition(manager, 0, POSE_STANDING, WEAPON_IDLE, false);
+	doTestTransition(manager, 0, POSE_STANDING, WEAPON_AIMING, false);
+	doTestTransition(manager, 0, POSE_STANDING, WEAPON_READY, false);
+
+	return Evaluate();
+}
+
+
+// --------------------------------------------------------------------------------------------------------
+
+global func Test5_OnStart() { return true; }
+global func Test5_Execute()
+{
+	var manager = CreateStanceManager();
+	var channel = 0;
+
+	Log("SetStance() with forced parameter works for any transitions, channel %d", channel);
+
+	doTestTransition(manager, channel, POSE_STANDING, POSE_STANDING, false, true);
+	doTestTransition(manager, channel, POSE_STANDING, POSE_PRONE, true, true);
+	doTestTransition(manager, channel, POSE_PRONE, POSE_PRONE, false, true);
+	doTestTransition(manager, channel, POSE_PRONE, POSE_STANDING, true, true);
+	doTestTransition(manager, channel, POSE_STANDING, WEAPON_AIMING, true, true);
 
 	return Evaluate();
 }

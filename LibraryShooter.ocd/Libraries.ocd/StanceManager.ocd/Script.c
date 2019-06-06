@@ -102,8 +102,9 @@ public func SetStance(any stance, any channel, bool force)
 	var current = GetStance(channel);
 	if (current == nil || force || current->HasTransitionTo(stance))
 	{
+		var previous = lib_stance_manager.current_stance[GetStanceChannel(channel)];
 		lib_stance_manager.current_stance[GetStanceChannel(channel)] = stance;
-		return true;
+		return stance != previous;
 	}
 	return false;
 }
