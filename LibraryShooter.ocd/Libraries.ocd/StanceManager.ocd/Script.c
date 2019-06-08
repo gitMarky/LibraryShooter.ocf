@@ -94,6 +94,9 @@ public func GetStance(any channel)
 	@return bool Returns {@code true} if the stance
 	             has been changed, implying that
 	             an animation update is necessary.
+	             
+	@note When the stance changes, a callback is issued
+	      to the object: {@code OnStanceChanged(proplist new_stance, any channel, bool force, proplist previous_stance)}
  */
 public func SetStance(any stance, any channel, bool force)
 {
@@ -102,9 +105,15 @@ public func SetStance(any stance, any channel, bool force)
 	var current = GetStance(channel);
 	if (current == nil || force || current->HasTransitionTo(stance))
 	{
-		var previous = lib_stance_manager.current_stance[GetStanceChannel(channel)];
 		lib_stance_manager.current_stance[GetStanceChannel(channel)] = stance;
-		return stance != previous;
+		
+		var has_changed = stance != current;
+		if (has_changed)
+		{
+			this->OnStanceChanged(stance, channel, force, current);
+		}
+		
+		return has_changed;
 	}
 	return false;
 }
@@ -154,14 +163,67 @@ func GetStanceDefinition(any stance)
 	}
 }
 
+func OnStanceChanged(proplist stance, any channel, bool force, proplist previous_stance)
+{
+	if (previous_stance != nil)
+	{
+		for (var behaviour in previous_stance->GetBehaviours())
+		{
+			behaviour->~OnStanceReset(this, channel, force);
+		}
+	}
+
+	if (stance != nil)
+	{
+		for (var behaviour in stance->GetBehaviours())
+		{
+			behaviour->~OnStanceSet(this, channel, force);
+		}
+	}
+}
+
 /* --- Data Structure --- */
 
 static const StanceDefinition = new Global
 {
 	Transitions = nil, // Array, defines stances that you can change to from this stance
+	Behaviours = nil,  // Array, defines the behaviour of the stance
 
 	// --- Interface
-	
+
+	/**
+		Adds a behaviour to this stance.
+
+		@par behaviour This behaviour is added. A behaviour is a proplist
+		               with the following functions:
+		               * OnStanceSet(object user, any channel, bool force)
+		               * OnStanceReset(object user, any channel, bool force)
+		               
+		               Where {@code user} is the object in that the stance
+		               is changed, {@code channel} is the stance channel,
+		               and {@code force} say wether the change was forced.
+		               
+		               For easier reference, it is suggested to name
+		               make a global proplist StanceBehaviour_* that
+		               defines the format of this behaviour and
+		               contains the implementations of both functions.
+		               
+		@return proplist Returns the currenct stance, so that you can 
+		                 add further behaviours to it.
+	 */
+	AddBehaviour = func (proplist behaviour)
+	{
+		if (this.Behaviours == nil)
+		{
+			this.Behaviours = [];
+		}
+		if (!IsValueInArray(this.Behaviours, behaviour))
+		{
+			PushBack(this.Behaviours, behaviour);
+		}
+		return this;
+	},
+
 	/**
 		Adds a valid transition from this stance
 		to another, unidirectional.
@@ -183,7 +245,18 @@ static const StanceDefinition = new Global
 		}
 		return to_stance;
 	},
-	
+
+	/**
+		Gets all behaviours that are defined for this stance.
+		
+		@return array Returns the behaviours, as an array.
+		              Never returns {@code nil}.
+	 */
+	GetBehaviours = func ()
+	{
+		return this.Behaviours ?? [];
+	},
+
 	/**
 		Finds out whether you can transition to the desired stance.
 		
