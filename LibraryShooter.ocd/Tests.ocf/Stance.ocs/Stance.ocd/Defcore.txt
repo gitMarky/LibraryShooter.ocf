@@ -1,4 +1,0 @@
-[DefCore]
-id=Clonk_Stance
-Version=8,0
-Category=C4D_StaticBack
