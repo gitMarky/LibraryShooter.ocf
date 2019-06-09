@@ -44,7 +44,7 @@ public func SetupBowStance()
 			["Stand", "BowStand"],
 			["Jump", "BowJump"],
 			["KneelDown", "BowKneel"]
-		]));
+		]))->AddBehaviour(StanceBehaviour_WalkSpeed->Create(84, 56));
 	return this;
 }
 
