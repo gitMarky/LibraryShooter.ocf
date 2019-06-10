@@ -44,12 +44,24 @@ public func SetupBowStance()
 			["Stand", "BowStand"],
 			["Jump", "BowJump"],
 			["KneelDown", "BowKneel"]
-		]))->AddBehaviour(StanceBehaviour_WalkSpeed->Create(84, 56));
+		]))->AddBehaviour(StanceBehaviour_WalkSpeed->Create(84, 56))
+		   ->AddBehaviour(StanceBehaviour_AimAnimation->Create("BowAimArms"));
 	return this;
 }
 
 public func Test()
 {
+	SetOwner(0);
 	MakeCrewMember(0);
 	SetGraphics(nil, Clonk);
+}
+
+
+public func BowTest()
+{
+	Setup();
+	SetupBowStance();
+	Test();
+	SetCursor(GetOwner(), this);
+	SetStance(POSE_CROUCHING);
 }
