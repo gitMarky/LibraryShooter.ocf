@@ -112,6 +112,8 @@ public func SetStance(any stance, any channel, bool force)
 		{
 			this->OnStanceChanged(stance, channel, force, current);
 		}
+
+		GetStanceMonitor()->AddChannel(channel);
 		
 		return has_changed;
 	}
@@ -163,6 +165,17 @@ func GetStanceDefinition(any stance)
 	}
 }
 
+
+func GetStanceMonitor()
+{
+	if (lib_stance_manager.monitor == nil)
+	{
+		lib_stance_manager.monitor = CreateEffect(FxStanceMonitor, 1, 1);
+	}
+	return lib_stance_manager.monitor;
+}
+
+
 func OnStanceChanged(proplist stance, any channel, bool force, proplist previous_stance)
 {
 	if (previous_stance != nil)
@@ -181,6 +194,39 @@ func OnStanceChanged(proplist stance, any channel, bool force, proplist previous
 		}
 	}
 }
+
+local FxStanceMonitor = new Effect
+{
+	Name = "StanceMonitor",
+	
+	Construction = func ()
+	{
+		this.Channels = [];
+	},
+	
+	Timer = func ()
+	{
+		for (var channel in this.Channels)
+		{
+			var stance = Target->GetStance(channel);
+			if (stance)
+			{
+				for (var behaviour in stance->GetBehaviours())
+				{
+					behaviour->~Timer(Target, channel);
+				}
+			}
+		}
+	},
+	
+	AddChannel = func (any channel)
+	{
+		if (!IsValueInArray(this.Channels, channel))
+		{
+			PushBack(this.Channels, channel);
+		}
+	},
+};
 
 /* --- Data Structure --- */
 
