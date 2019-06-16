@@ -103,31 +103,73 @@ static const StanceBehaviour_AimAnimation = new Global
 {
 	/**
 	 * Constructor function.
+	 *
+	 * @par aim_animation see DefineAnimation
+	 * @par anim_slot The animations are played in this animation slot. Defaults to CLONK_ANIM_SLOT_Arms.
+	 * @return proplist the created behaviour.
 	 */
 	Create = func (any aim_animation, int anim_slot)
 	{
-		if (GetType(aim_animation) == C4V_String)
+		anim_slot = anim_slot ?? CLONK_ANIM_SLOT_Arms;
+		var behaviour = new StanceBehaviour_AimAnimation
 		{
-			aim_animation = [aim_animation];
+			AnimSlot = anim_slot,         // Play animations in this slot
+			AnimAim = aim_animation,      // Define the default aim animation
+			AnimAimStatus = nil,          // Status for the loop animation: integer = start playing in that frame; nil = needs to play; bool = is playing
+		};
+		return behaviour->DefineAnimation(aim_animation);
+	},
+
+	/**
+	 * Sets a conditional function. The animation is played only
+	 * if behaviour->condition(clonk) returns true, or always
+	 * if the condition is nil (default).
+	 *
+	 * @return proplis the behaviour it self, for further configuration calls.
+	 */
+	SetCondition = func (func condition)
+	{
+		this.AnimAimCondition = condition; // Play animation if this is nil (play always), or if the evaluated function condition(clonk) is true.
+		return this;
+	},
+
+	/**
+	 * Defines an animation for the behaviour.
+	 *
+	 * @par animation Either string or an array.
+	 *                In the array you can define up to three animations for blending:
+	 *                1 animation name given: The animation contains the entire range from aiming 0° to 180°
+	 *                2 animation names given: Blend between animation[0] = 0° and animation[1] = 180°
+	 *                3 animation names given: Blend between animation[0] = 90°, animation[1] = 0° and animation[2] = 180°
+	 *                A string is converted to the 1-animation-array for convenience.
+	 * @par name (optional) Specify the animation name, e.g. "Fire" if you want to provide a firing animation.
+	 *           By default, or if nil is passed, this changes the aim animation.
+	 *           Note, that you need to change the aim animation only when you create the behaviour.
+	 *           If you feel the need to do this at runtime, then most likely you should create
+	 *           a new stance for that.
+	 */
+	DefineAnimation = func (any animation, string name)
+	{
+		name = name ?? "AnimAim"; // Default to setting the aim animation
+		if (GetType(animation) == C4V_String)
+		{
+			animation = [animation];
 		}
-		else if (GetType(aim_animation) == C4V_Array)
+		else if (GetType(animation) == C4V_Array)
 		{
 			// Everything OK, leave as is
 		}
 		else
 		{
-			FatalError("Only string or proplist allowed, got %v: %v", GetType(aim_animation), aim_animation);
+			FatalError("Only string or proplist allowed, got %v: %v", GetType(animation), animation);
 		}
-		anim_slot = anim_slot ?? CLONK_ANIM_SLOT_Arms;
-		var behaviour = new StanceBehaviour_AimAnimation
-		{
-			AnimSlot = anim_slot,    // Play animations in this slot
-			AnimAim = aim_animation, // Define the default aim animation
-			AnimAimStatus = nil,     // Status for the loop animation: integer = start playing in that frame; nil = needs to play; bool = is playing
-		};
-		return behaviour;
+		this[name] = animation;
+		return this;
 	},
 
+	/**
+	 * Timer callback, called every frame.
+	 */
 	Timer = func (object clonk, any channel)
 	{
 		if (GetType(this.AnimAimStatus) == C4V_Int)
@@ -140,14 +182,24 @@ static const StanceBehaviour_AimAnimation = new Global
 			// Animation can be resumed
 			this.AnimAimStatus = nil;
 		}
+		var play_animation = !this.AnimAimCondition || this->AnimAimCondition(clonk);
 		if (this.AnimAimStatus == nil)
 		{
-			// TODO: Check status and whether to stop aiming
-			this.AnimAimStatus = PlayAnimLoop(clonk, "AnimAim") != nil;
+			if (play_animation)
+			{
+				this.AnimAimStatus = PlayAnimLoop(clonk, "AnimAim") != nil;
+			}
 		}
 		else // Animation is playing
 		{
-			// TODO: Update aim angle
+			if (play_animation)
+			{
+				// TODO: Update aim angle
+			}
+			else
+			{
+				StopAnim(clonk);
+			}
 		}
 	},
 
@@ -156,6 +208,11 @@ static const StanceBehaviour_AimAnimation = new Global
 	},
 
 	OnStanceReset = func (object clonk, any channel, bool force)
+	{
+		StopAnim(clonk);
+	},
+
+	StopAnim = func (object clonk)
 	{
 		// Stop the  animation
 		clonk->StopAnimation(clonk->GetRootAnimation(this.AnimSlot));
@@ -168,7 +225,7 @@ static const StanceBehaviour_AimAnimation = new Global
 		var slot = this.AnimSlot;
 
 		// Stop the previous animation, if there is any
-		clonk->StopAnimation(clonk->GetRootAnimation(slot));
+		StopAnim(clonk);
 
 		if (animations == nil || GetLength(animations) == 0)
 		{
@@ -203,7 +260,7 @@ static const StanceBehaviour_AimAnimation = new Global
 		var slot = this.AnimSlot;
 
 		// Stop the previous animation, if there is any
-		clonk->StopAnimation(clonk->GetRootAnimation(slot));
+		StopAnim(clonk);
 
 		if (animations == nil || GetLength(animations) == 0)
 		{

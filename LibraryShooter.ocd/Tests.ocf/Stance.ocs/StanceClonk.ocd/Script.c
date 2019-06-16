@@ -37,7 +37,7 @@ public func Setup()
 public func SetupBowStance()
 {
 	var crouching = GetStanceDefinition(POSE_CROUCHING);
-
+	
 	crouching->AddBehaviour(StanceBehaviour_ReplaceAction->Create([
 			["Walk", "BowWalk"],
 			["Walk_Position", 20],
@@ -45,8 +45,13 @@ public func SetupBowStance()
 			["Jump", "BowJump"],
 			["KneelDown", "BowKneel"]
 		]))->AddBehaviour(StanceBehaviour_WalkSpeed->Create(84, 56))
-		   ->AddBehaviour(StanceBehaviour_AimAnimation->Create("BowAimArms"));
+		   ->AddBehaviour(StanceBehaviour_AimAnimation->Create("BowAimArms")->SetCondition(this.BowAimCondition));
 	return this;
+}
+
+public func BowAimCondition (object clonk)
+{
+	return clonk->HasActionProcedure(false);
 }
 
 public func Test()
