@@ -143,7 +143,7 @@ static const StanceBehaviour_AimAnimation = new Global
 		if (this.AnimAimStatus == nil)
 		{
 			// TODO: Check status and whether to stop aiming
-			this.AnimAimStatus = !!PlayAnimLoop(clonk, "AnimAim");
+			this.AnimAimStatus = PlayAnimLoop(clonk, "AnimAim") != nil;
 		}
 		else // Animation is playing
 		{
@@ -163,7 +163,7 @@ static const StanceBehaviour_AimAnimation = new Global
 
 	PlayAnimLoop = func (object clonk, string name)
 	{
-		var animation_index;
+		var animation_index = nil;
 		var animations = this[name];
 		var slot = this.AnimSlot;
 
@@ -198,7 +198,7 @@ static const StanceBehaviour_AimAnimation = new Global
 
 	PlayAnimSingle = func (object clonk, string name, int aim_angle, int duration)
 	{
-		var animation_index;
+		var animation_index = nil;
 		var animations = this[name];
 		var slot = this.AnimSlot;
 
