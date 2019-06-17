@@ -69,4 +69,5 @@ public func BowTest()
 	Test();
 	SetCursor(GetOwner(), this);
 	SetStance(POSE_CROUCHING);
+	SetAimPosition(45);
 }

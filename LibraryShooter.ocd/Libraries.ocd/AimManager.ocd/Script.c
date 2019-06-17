@@ -23,6 +23,10 @@ func Construction(object by)
 		                                     ->DefineOffsetUp(-1, -7, nil, -3)
 		                                     ->DefineOffsetDown(-3, -1);
 	}
+	if (lib_aim_manager_shooter.aim_angle == nil)
+	{
+		lib_aim_manager_shooter.aim_angle = 0;
+	}
 	return _inherited(by, ...);
 }
 
@@ -42,3 +46,15 @@ func GetAimAnimationOffset(object weapon, int angle, int precision)
 		return { X = 0, Y = 0, };
 	}
 }
+
+func GetAimAnimationAngle()
+{
+	return lib_aim_manager_shooter.aim_angle;
+}
+
+func SetAimAnimationAngle(int value)
+{
+	lib_aim_manager_shooter.aim_angle = Normalize(value, -1800, 10);
+}
+
+

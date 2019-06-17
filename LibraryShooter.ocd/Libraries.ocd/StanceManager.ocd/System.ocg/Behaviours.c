@@ -116,6 +116,7 @@ static const StanceBehaviour_AimAnimation = new Global
 			AnimSlot = anim_slot,         // Play animations in this slot
 			AnimAim = aim_animation,      // Define the default aim animation
 			AnimAimStatus = nil,          // Status for the loop animation: integer = start playing in that frame; nil = needs to play; bool = is playing
+			AnimAimIndex = nil,           // Index of aim animation
 		};
 		return behaviour->DefineAnimation(aim_animation);
 	},
@@ -125,7 +126,7 @@ static const StanceBehaviour_AimAnimation = new Global
 	 * if behaviour->condition(clonk) returns true, or always
 	 * if the condition is nil (default).
 	 *
-	 * @return proplis the behaviour it self, for further configuration calls.
+	 * @return proplist the behaviour it self, for further configuration calls.
 	 */
 	SetCondition = func (func condition)
 	{
@@ -147,6 +148,8 @@ static const StanceBehaviour_AimAnimation = new Global
 	 *           Note, that you need to change the aim animation only when you create the behaviour.
 	 *           If you feel the need to do this at runtime, then most likely you should create
 	 *           a new stance for that.
+	 *
+	 * @return proplist the behaviour it self, for further configuration calls.
 	 */
 	DefineAnimation = func (any animation, string name)
 	{
@@ -194,7 +197,7 @@ static const StanceBehaviour_AimAnimation = new Global
 		{
 			if (play_animation)
 			{
-				// TODO: Update aim angle
+				UpdateAnim(clonk);
 			}
 			else
 			{
@@ -250,6 +253,7 @@ static const StanceBehaviour_AimAnimation = new Global
 				clonk->SetAnimationWeight(animation_index, Anim_Const(500));
 			}
 		}
+		this.AnimAimIndex = animation_index;
 		return animation_index;
 	},
 
@@ -307,5 +311,59 @@ static const StanceBehaviour_AimAnimation = new Global
 			}
 		}
 		return animation_index;
+	},
+
+	UpdateAnim = func (object clonk)
+	{
+		var speed = this["AimSpeed"] ?? 50;
+		var aim_animation_index = this.AnimAimIndex;
+		if (aim_animation_index == nil)
+		{
+			return false; // if no animation yet
+		}
+
+		// Determine position to aim at
+		var aim_angle = clonk->~GetAimAnimationAngle();
+		if (aim_angle == nil)
+		{
+			aim_angle = 900 * clonk->~GetCalcDir();
+		}
+		// Update direction
+		if (aim_angle < 0)
+		{
+			clonk->~SetTurnForced(DIR_Left);
+		}
+		else if (aim_angle > 0)
+		{
+			clonk->~SetTurnForced(DIR_Right);
+		}
+
+		// Aim according to  animation type:
+		var animations = this["AnimAim"]; // TODO: Update fire animations, too?
+		var use_anim_position = GetLength(animations) == 1;
+
+		var length, position;
+		if (use_anim_position)
+		{
+			length = clonk->GetAnimationLength(animations[0]);
+			position = clonk->GetAnimationPosition(aim_animation_index);
+		}
+		else
+		{
+			length = 1000;
+			position = clonk->GetAnimationWeight(aim_animation_index);
+		}
+		var angle = position * 1800 / length;
+		var delta_angle = BoundBy(Abs(aim_angle) - angle, -speed, speed);
+		var blend = Anim_Const((angle + delta_angle) * length / 1800);
+		if (use_anim_position)
+		{
+			clonk->~SetAnimationPosition(aim_animation_index, blend);
+		}
+		else
+		{
+			clonk->~SetAnimationWeight(aim_animation_index, blend);
+		}
+		return true;
 	},
 };
