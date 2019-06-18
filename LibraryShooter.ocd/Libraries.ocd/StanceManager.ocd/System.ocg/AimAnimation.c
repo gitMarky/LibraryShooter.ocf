@@ -19,8 +19,34 @@ static const StanceBehaviour_AimAnimation = new Global
 			AnimAim = aim_animation,      // Define the default aim animation
 			AnimAimStatus = nil,          // Status for the loop animation: integer = start playing in that frame; nil = needs to play; bool = is playing
 			AnimAimIndex = nil,           // Index of aim animation
+			AnimAimSpeed = 1800,          // The aim angle can change by this many degrees * 0.1; default is 180 degrees = instant change
 		};
 		return behaviour->DefineAnimation(aim_animation);
+	},
+
+
+	/**
+	 * Sets the speed at which the current aim angle can change,
+	 * in 10ths of degrees per frame.
+	 * A value of 0 or nil resets the speed to its default value:
+	 * Instant change of aim angle.
+	 *
+	 * A value of 50 is quite fast already, but lags a bit behind the cursor.
+	 *
+	 * @return proplist the behaviour it self, for further configuration calls.
+	 */
+	SetAimSpeed = func (int speed)
+	{
+		if (speed < 0)
+		{
+			FatalError("Must provide a positive speed value, or 0/nil for default");
+		}
+		else if (speed == 0)
+		{
+			speed = nil;
+		}
+		this.AnimAimSpeed = speed ?? 1800;
+		return this;
 	},
 
 	/**
@@ -220,7 +246,7 @@ static const StanceBehaviour_AimAnimation = new Global
 
 	UpdateAnim = func (object clonk)
 	{
-		var speed = this["AimSpeed"] ?? 50;
+		var speed = this.AnimAimSpeed ?? 1800;
 		var aim_animation_index = this.AnimAimIndex;
 		if (aim_animation_index == nil)
 		{
