@@ -59,6 +59,7 @@ public func Test()
 	SetOwner(0);
 	MakeCrewMember(0);
 	SetGraphics(nil, Clonk);
+	this->SetAimControlEnabled(true);
 }
 
 

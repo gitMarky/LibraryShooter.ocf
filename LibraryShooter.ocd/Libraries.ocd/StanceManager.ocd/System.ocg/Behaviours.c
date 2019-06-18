@@ -219,6 +219,9 @@ static const StanceBehaviour_AimAnimation = new Global
 	{
 		// Stop the  animation
 		clonk->StopAnimation(clonk->GetRootAnimation(this.AnimSlot));
+		this.AnimAimStatus = nil;
+		// Allow Clonk to turn freely again.
+		clonk->SetTurnForced(-1);
 	},
 
 	PlayAnimLoop = func (object clonk, string name)
@@ -328,6 +331,7 @@ static const StanceBehaviour_AimAnimation = new Global
 		{
 			aim_angle = 900 * clonk->~GetCalcDir();
 		}
+		aim_angle = Normalize(aim_angle, -1800, 10);
 		// Update direction
 		if (aim_angle < 0)
 		{
