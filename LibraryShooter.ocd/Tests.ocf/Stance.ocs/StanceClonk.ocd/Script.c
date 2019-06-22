@@ -59,7 +59,7 @@ public func Test()
 	SetOwner(0);
 	MakeCrewMember(0);
 	SetGraphics(nil, Clonk);
-	this->SetAimControlEnabled(true);
+	SetCursor(GetOwner(), this);
 }
 
 
@@ -68,7 +68,7 @@ public func BowTest()
 	Setup();
 	SetupBowStance();
 	Test();
-	SetCursor(GetOwner(), this);
 	SetStance(POSE_CROUCHING);
 	SetAimPosition(45);
+	this->SetAimControlEnabled(true);
 }

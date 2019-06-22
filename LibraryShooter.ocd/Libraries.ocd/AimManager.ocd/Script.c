@@ -76,6 +76,13 @@ func IsAimControlEnabled()
 	return GetPlayerControlEnabled(GetOwner(), this.AimControl);
 }
 
+func ControlAimAt(int x, int y, object with_item)
+{
+	SetAimAnimationAngle(Angle(0, 0, x, y, 10));
+	return true;
+}
+
+
 /**
 	This function can be called in ObjectControl(),
 	passing all the necessary parameters.
@@ -100,7 +107,7 @@ func HandleAimControl(int player, int ctrl, int x, int y, int strength, bool rep
 
 		var item = this->~GetHandItem(0);
 		if ((item != nil && item->~ControlAimAt(x, y))
-		||  this->~ControlAimAt(x, y))
+		||  this->~ControlAimAt(x, y, item))
 		{
 			return true;
 		}

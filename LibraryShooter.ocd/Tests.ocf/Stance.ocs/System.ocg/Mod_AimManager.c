@@ -30,7 +30,7 @@ func SetAimAnimationAngle(int value)
 	return SetAimPosition(value / 10);
 }
 
-func ControlAimAt(int x, int y)
+func ControlAimAt(int x, int y, object with_item)
 {
 	SetAimAnimationAngle(Angle(0, 0, x, y, 10));
 	return true;
