@@ -80,7 +80,9 @@ public func GetStance(any channel)
 	
 	@par stance Can be a proplist or the stance name.
 	            This stance wil be active.
-	            Must not be {@code nil}.
+	            Must not be {@code nil} if the channel is not given
+	            Can be nil if the channel is given, in order to
+	            remove the stance altogether.
 
 	@par channel The stance channel.
 	
@@ -100,7 +102,10 @@ public func GetStance(any channel)
  */
 public func SetStance(any stance, any channel, bool force)
 {
-	AssertNotNil(stance);
+	if (!channel)
+	{
+		AssertNotNil(stance);
+	}
 	stance = GetStanceDefinition(stance);
 	var current = GetStance(channel);
 	if (current == nil || force || current->HasTransitionTo(stance))
@@ -151,7 +156,7 @@ func GetStanceChannel(any channel)
  */
 func GetStanceDefinition(any stance)
 {
-	if (GetType(stance) == C4V_PropList)
+	if (GetType(stance) == C4V_PropList || stance == nil)
 	{
 		return stance;
 	}
@@ -267,6 +272,15 @@ static const StanceDefinition = new Global
 		{
 			PushBack(this.Behaviours, behaviour);
 		}
+		return this;
+	},
+	
+	/**
+		Clears the behaviours. Use with care!
+	 */
+	ClearBehaviours = func ()
+	{
+		this.Behaviours = [];
 		return this;
 	},
 
