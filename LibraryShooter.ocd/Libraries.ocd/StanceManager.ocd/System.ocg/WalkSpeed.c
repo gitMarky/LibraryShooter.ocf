@@ -6,7 +6,7 @@ static const StanceBehaviour_WalkSpeed = new Global
 	/**
 	 * Constructor function.
 	 */
-	Create = func (int walk_speed, int walk_back)
+	Create = func (int walk_speed, int walk_back, any identifier)
 	{
 		var behaviour = new StanceBehaviour_WalkSpeed { };
 		// Define properties only if they were provided
@@ -18,6 +18,7 @@ static const StanceBehaviour_WalkSpeed = new Global
 		{
 			behaviour.WalkBack = walk_back;
 		}
+		behaviour.Identifier = identifier ?? Clonk;
 		return behaviour;
 	},
 
@@ -28,7 +29,7 @@ static const StanceBehaviour_WalkSpeed = new Global
 
 		if (walk_speed != nil)
 		{
-			clonk->~PushActionSpeed("Walk", walk_speed);
+			clonk->~PushActionSpeed("Walk", walk_speed, this.Identifier);
 		}
 
 		if (walk_back != nil)
@@ -39,7 +40,7 @@ static const StanceBehaviour_WalkSpeed = new Global
 
 	OnStanceReset = func (object clonk, any channel, bool force)
 	{
-		clonk->~PopActionSpeed("Walk");
+		clonk->~PopActionSpeed("Walk", this.Identifier);
 		clonk->~SetBackwardsSpeed(nil);
 	},
 };
